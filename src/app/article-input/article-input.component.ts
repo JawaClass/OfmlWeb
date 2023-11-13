@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 
-
+import { ArticleInputService } from '../article-input.service';
 
 
 @Component({
@@ -19,11 +19,26 @@ import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 })
 export class ArticleInputComponent {
   
+  constructor(private articleInputService: ArticleInputService) {
+
+  }
+
+  DEFAULT_ARTICLES = `S6ALN
+S6AP1000A
+TLATRTL08800B2 
+TLTN16880A
+Q3HO1SE`
+
+
   applyForm = new FormGroup({
-    textarea: new FormControl(''),
+    textarea: new FormControl(this.DEFAULT_ARTICLES),
   });
   
   articlenumbers: string[] = []
+  fetchedArticles: any[] = []
+  hero = {
+    "name": "HansiYeahXD"
+  }
   
   submitApplication() {
 
@@ -40,8 +55,17 @@ export class ArticleInputComponent {
     }
       
    this.articlenumbers = tokens
-   console.log("LOG: ", tokens)
-    
-   }
+
+   /*
+  this.articleInputService.getStream().subscribe(value => {
+    console.log("article-input.component", value)
+  }) 
+*/
+
+  this.articleInputService.postArticlesAndThenListen(this.articlenumbers).subscribe(value => {
+    console.log("article-input.component", value)
+  }) 
+
+  }
    
 }

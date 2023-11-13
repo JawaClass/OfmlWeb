@@ -3,9 +3,40 @@
  
 <form [formGroup]="applyForm" (submit)="submitApplication()">
  
-    <label for="textarea">Artikelnummern</label>
+    <label for="textarea">ArtikelnummernX222X....XXXX.</label>
     <textarea formControlName="textarea" id="textarea" rows="4" cols="50"></textarea>
     
     <button type="submit">Apply now</button>
 </form>
+
+<p>hiii222</p>
+
+<p>
+    I turned the corner
+    @if (hero) {
+      and saw {{ hero.name }}. I waved
+    }
+    and continued on my way.
+  </p>
   
+  @for (article of articlenumbers; track article) {
+    <tr>
+      <td>{{ article }}</td>
+    </tr>
+   } @empty {
+    <p>No results yet!</p>
+   }
+
+   @for (article of fetchedArticles; track article) {
+    <tr>
+      <td>
+        xxxxx22
+        {{ article["article_nr"] }} 
+        {{ article["series"] }}
+        {{ article["manufacturer"] }}
+        {{ article["__sql__program__"] }}
+      </td>
+    </tr>
+   } @empty {
+    <p>No results yet!</p>
+   }
