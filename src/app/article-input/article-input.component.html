@@ -1,0 +1,11 @@
+<p>article-input works!</p>
+
+ 
+<form [formGroup]="applyForm" (submit)="submitApplication()">
+ 
+    <label for="textarea">Artikelnummern</label>
+    <textarea formControlName="textarea" id="textarea" rows="4" cols="50"></textarea>
+    
+    <button type="submit">Apply now</button>
+</form>
+  
