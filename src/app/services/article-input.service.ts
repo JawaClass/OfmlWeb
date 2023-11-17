@@ -3,19 +3,67 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { eventNames } from 'process';
 
+export interface ArticleCompact {
+  article_nr: string
+  series: string
+  sql_db_program: string
+  shorttext: string
+}
+
+export type Item = {
+  article_nr: string;
+  series: string;
+  sql_db_program: string;
+  shorttext: string;
+  prop_class: string;
+};
+
+export type ProgramClassMap = {
+  [propClass: string]: Item[];
+};
+
+export type ProgramMap = {
+  [program: string]: ProgramClassMap;
+};
+
+export type Result = ProgramMap;
+
 @Injectable({
   providedIn: 'root'
 })
 export class ArticleInputService {
 
   constructor(private http: HttpClient) { }
-  //constructor() { }
 
-  baseUrl = "http://192.168.178.191:5000"
+  private baseUrl = "http://localhost:5000"
 
-  getArticleTable(articlenumbers: string[]): Observable<any> {
-    const url = "http://192.168.178.191:5000/ocd/article_data"
-    return this.http.post<any>(url, articlenumbers)
+  private fetchedArticles: Result = {}
+
+  getFetchedArticles() {
+    return this.fetchedArticles
+  }
+  setFetchedArticles(fetchedArticles: Result) {
+    return this.fetchedArticles = fetchedArticles
+  }
+
+  getArticleCompact(articlenumbers: string[]): Observable<Result> { 
+    const url = this.baseUrl + "/ocd/article_compact"
+    return this.http.post<Result>(url, articlenumbers)
+  }
+
+  async getArticleCompact2(articlenumbers: string[]): Promise<ArticleCompact[]> {
+    const api = "/ocd/article_compact"
+    const data = await fetch(this.baseUrl + api, {
+      method: "POST",
+      body: JSON.stringify(articlenumbers)
+    });
+    return (await data.json()) ?? [];
+  }
+
+  getArticleTable(articlenumbers: string[]): Observable<any> { 
+    const url = this.baseUrl + "/ocd/special/article_data"
+    return this.http.post(url, articlenumbers)
+    //return this.http.get(url, {responseType: 'json'}) 
   }
 
   getHelloWorld(): Observable<any> {

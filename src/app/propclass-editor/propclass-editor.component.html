@@ -1,0 +1,11 @@
+<h2>program={{programNameInput}}</h2>
+<h4>propClass={{propClassNameInput}}</h4>
+
+
+@for (propItem of propertyResult; track propItem; let idx = $index) {
+    <h3>{{idx}}.  {{ propItem.property_name }} : {{ propItem.prop_text }} </h3>
+    
+@for (valItem of propItem.values; track valItem; let idx = $index) {
+    <h5>{{idx}}.  {{ valItem.v }} : {{ valItem.text }} ON/OFF </h5>
+}
+}

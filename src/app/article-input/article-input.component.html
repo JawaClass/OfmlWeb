@@ -1,42 +1,72 @@
 <p>article-input works!</p>
 
- 
+<button id="basic" type="button" mat-button>
+  Basic button
+</button>
+
+<button mat-button color="primary">Primary</button>
+
 <form [formGroup]="applyForm" (submit)="submitApplication()">
  
-    <label for="textarea">ArtikelnummernX222X....XXXX.</label>
+    <label for="textarea">Artikelnummern</label>
     <textarea formControlName="textarea" id="textarea" rows="4" cols="50"></textarea>
     
     <button type="submit">Apply now</button>
-</form>
+  </form>
 
-<p>hiii222</p>
 
-<p>
-    I turned the corner
-    @if (hero) {
-      and saw {{ hero.name }}. I waved
-    }
-    and continued on my way.
-  </p>
+  <p>All Program:</p>
   
-  @for (article of articlenumbers; track article) {
-    <tr>
-      <td>{{ article }}</td>
-    </tr>
-   } @empty {
-    <p>No results yet!</p>
-   }
+  @for (program of getIter(); track program; let idx = $index) {
+    {{ program }}
+  }
+  <p>Active Program:</p>
+  @for (program of activePrograms; track program; let idx = $index) {
+    {{ program }}
+  }
 
-   @for (article of fetchedArticles; track article) {
+   @for (program of getIter(); track program; let idx = $index) {
+     <h3>{{idx}}. {{ program }} </h3>
+     
+
+     @for (propClass of getProgramClassMap(program); track propClass; let idx2 = $index) {
+
+      <h4 (click)="navigateToEditPropClass(program, propClass)" >{{ propClass }}</h4>  <!-- this will be for editing the properties  of this propclass -->
+
+      <li *ngFor="let article of fetchedArticles[program][propClass]">
+   
+        <tr>
+          <td>
+            {{ article.sql_db_program | uppercase }}
+            {{ article.series | uppercase }}
+            {{ article.article_nr | uppercase }}
+            {{ article.shorttext }}
+            <a [routerLink]="['/editor', ]">Editiere</a> <!-- this will be for editing the ArtBase Properties -->
+            <button (click)="deleteArticle(article, idx)">X</button>
+            
+          </td>
+        </tr>
+
+      </li>
+      
+
+     }
+   
+    <!--
     <tr>
       <td>
-        xxxxx22
-        {{ article["article_nr"] }} 
-        {{ article["series"] }}
-        {{ article["manufacturer"] }}
-        {{ article["__sql__program__"] }}
+        {{ article.sql_db_program | uppercase }}
+        {{ article.series | uppercase }}
+        {{ article.article_nr | uppercase }}
+        {{ article.shorttext }}
+        <a [routerLink]="['/editor', ]">Editiere</a>
+        <button (click)="deleteArticle(article, idx)">X</button>
+        
       </td>
     </tr>
+  -->
    } @empty {
     <p>No results yet!</p>
    }
+ 
+  
