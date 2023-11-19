@@ -1,35 +1,33 @@
-<p>article-input works!</p>
 
-<button id="basic" type="button" mat-button>
-  Basic button
-</button>
-
-<button mat-button color="primary">Primary</button>
 
 <form [formGroup]="applyForm" (submit)="submitApplication()">
- 
+   
     <label for="textarea">Artikelnummern</label>
     <textarea formControlName="textarea" id="textarea" rows="4" cols="50"></textarea>
     
-    <button type="submit">Apply now</button>
+    <button type="submit" mat-fab>Apply now</button>
   </form>
 
 
   <p>All Program:</p>
   
-  @for (program of getIter(); track program; let idx = $index) {
-    {{ program }}
+  @for (program of tempPrograms; track program; let idx = $index) {
+    <app-toggle-button color="blue" text={{program}}></app-toggle-button>
   }
+
   <p>Active Program:</p>
   @for (program of activePrograms; track program; let idx = $index) {
     {{ program }}
   }
 
    @for (program of getIter(); track program; let idx = $index) {
-     <h3>{{idx}}. {{ program }} </h3>
+     <h2>{{idx}}. {{ program }} </h2>
      
 
      @for (propClass of getProgramClassMap(program); track propClass; let idx2 = $index) {
+
+      <mat-card style="margin-right: 500px;">
+        <mat-card-content>
 
       <h4 (click)="navigateToEditPropClass(program, propClass)" >{{ propClass }}</h4>  <!-- this will be for editing the properties  of this propclass -->
 
@@ -42,14 +40,15 @@
             {{ article.article_nr | uppercase }}
             {{ article.shorttext }}
             <a [routerLink]="['/editor', ]">Editiere</a> <!-- this will be for editing the ArtBase Properties -->
-            <button (click)="deleteArticle(article, idx)">X</button>
-            
+             
           </td>
         </tr>
 
       </li>
       
-
+  </mat-card-content>
+    </mat-card>
+    <mat-divider></mat-divider>
      }
    
     <!--

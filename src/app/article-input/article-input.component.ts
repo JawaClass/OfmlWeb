@@ -2,12 +2,20 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import { ArticleInputService, ArticleCompact, Result } from '../services/article-input.service';
+import { ArticleInputService, Result } from '../services/article-input.service';
 import {RouterModule, Router } from '@angular/router';
 
 import {MatIconModule} from '@angular/material/icon';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatButtonModule} from '@angular/material/button';
+import {MatCheckboxModule} from '@angular/material/checkbox'; 
+import {MatCardModule} from '@angular/material/card'; 
+import {MatChipsModule} from '@angular/material/chips'; 
+import {FormsModule} from '@angular/forms';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
+
+import { ToggleButtonComponent } from './../toggle-button/toggle-button.component'
 
 export type ActiveProgram = {
   program: string,
@@ -21,20 +29,21 @@ export type ActiveProgram = {
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
-    MatButtonModule, MatDividerModule, MatIconModule
+    MatButtonModule, MatDividerModule, MatIconModule, MatCheckboxModule, MatCardModule, MatChipsModule, MatInputModule, FormsModule, MatFormFieldModule, 
+    ToggleButtonComponent,
   ],
   templateUrl: './article-input.component.html',
   styleUrl: './article-input.component.css'
 })
 export class ArticleInputComponent implements OnInit {
-  
+  newProgramName: string = ""
   ngOnInit() {
 
-    console.log("ArticleInputComponent:::ngOnInit", this.articleInputService.getFetchedArticles())
     this.fetchedArticles = this.articleInputService.getFetchedArticles()
 
   }
 
+  tempPrograms = ["talos", "table", "s6", "quick3"]
   constructor(
     private articleInputService: ArticleInputService,
     private router: Router
@@ -141,11 +150,6 @@ export class ArticleInputComponent implements OnInit {
     const keys = Object.keys(this.fetchedArticles[program])
     return keys
   } 
-
-  
-  deleteArticle(article: ArticleCompact, idx: number) {
-    //this.fetchedArticles.splice(idx, 1)
-  }
 
   submitApplication() {
 

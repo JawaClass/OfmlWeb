@@ -1,14 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
-import { eventNames } from 'process';
-
-export interface ArticleCompact {
-  article_nr: string
-  series: string
-  sql_db_program: string
-  shorttext: string
-}
 
 export type Item = {
   article_nr: string;
@@ -35,7 +27,7 @@ export class ArticleInputService {
 
   constructor(private http: HttpClient) { }
 
-  private baseUrl = "http://localhost:5000"
+  private baseUrl = "http://172.22.15.238:5000"
 
   private fetchedArticles: Result = {}
 
@@ -49,15 +41,6 @@ export class ArticleInputService {
   getArticleCompact(articlenumbers: string[]): Observable<Result> { 
     const url = this.baseUrl + "/ocd/article_compact"
     return this.http.post<Result>(url, articlenumbers)
-  }
-
-  async getArticleCompact2(articlenumbers: string[]): Promise<ArticleCompact[]> {
-    const api = "/ocd/article_compact"
-    const data = await fetch(this.baseUrl + api, {
-      method: "POST",
-      body: JSON.stringify(articlenumbers)
-    });
-    return (await data.json()) ?? [];
   }
 
   getArticleTable(articlenumbers: string[]): Observable<any> { 

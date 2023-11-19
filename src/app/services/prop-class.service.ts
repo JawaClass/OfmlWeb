@@ -22,7 +22,7 @@ export type Result = PropertyItem[]
 export class PropClassService {
   constructor(private http: HttpClient) { }
 
-  baseUrl = "http://localhost:5000"
+  baseUrl = "http://172.22.15.238:5000"
 
   getPropsResult(program: string, propClass: string): Observable<Result> {
     const url = this.baseUrl + "/ocd/props_compact/"+program+"/" + propClass
