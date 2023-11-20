@@ -2,45 +2,53 @@
 
 <form [formGroup]="applyForm" (submit)="submitApplication()">
    
-    <label for="textarea">Artikelnummern</label>
-    <textarea formControlName="textarea" id="textarea" rows="4" cols="50"></textarea>
+  <!--
+ <label for="textarea">Artikelnummern</label>
+
+    <textarea  formControlName="textarea" id="textarea" rows="4" cols="50"></textarea>
+
+  --> 
+    <mat-form-field>
+      <mat-label>Artikelnummern</mat-label>
+      <textarea formControlName="textarea" matInput [rows]="5"></textarea>
+    </mat-form-field>
     
-    <button type="submit" mat-fab>Apply now</button>
+    <button type="submit" mat-fab>Go</button>
   </form>
 
-
-  <p>All Program:</p>
-  
-  @for (program of tempPrograms; track program; let idx = $index) {
-    <app-toggle-button color="blue" text={{program}}></app-toggle-button>
+  @if (getIterActivePrograms().length > 0) {
+  <p>Ausgewählte Programme {{getIterActivePrograms().length}}</p>
+  <p>{{getCountActiveArticlesUnique()}} eindeutige ausgewählte Artikel </p>
+  <p>{{getCountActiveArticlesAll()}} ausgewählte Artikel </p>
+}
+  @for (program of getIterAllPrograms(); track program; let idx = $index) {
+    <app-toggle-button (myClick)="this.changeActiveProgram(idx)" [color]="this.activeArray[idx] ? 'blue' : 'red'" text={{program}}></app-toggle-button>
   }
+ 
+  <mat-divider style="margin-top: 20px; margin-bottom: 10px;" ></mat-divider>
 
-  <p>Active Program:</p>
-  @for (program of activePrograms; track program; let idx = $index) {
-    {{ program }}
-  }
+   @for (program of getIterActivePrograms(); track program; let idx = $index) {
 
-   @for (program of getIter(); track program; let idx = $index) {
-     <h2>{{idx}}. {{ program }} </h2>
      
-
+     <h2>{{idx+1}}. {{ program | uppercase }} </h2>
+     
      @for (propClass of getProgramClassMap(program); track propClass; let idx2 = $index) {
 
-      <mat-card style="margin-right: 500px;">
+      <mat-card style="margin-bottom: 50px;">
         <mat-card-content>
 
-      <h4 (click)="navigateToEditPropClass(program, propClass)" >{{ propClass }}</h4>  <!-- this will be for editing the properties  of this propclass -->
+      <h4 class="link"  (click)="navigateToEditPropClass(program, propClass)" >{{ propClass }}</h4>  <!-- this will be for editing the properties  of this propclass -->
 
       <li *ngFor="let article of fetchedArticles[program][propClass]">
    
         <tr>
           <td>
-            {{ article.sql_db_program | uppercase }}
+            <!--{{ article.sql_db_program | uppercase }}-->
             {{ article.series | uppercase }}
             {{ article.article_nr | uppercase }}
             {{ article.shorttext }}
-            <a [routerLink]="['/editor', ]">Editiere</a> <!-- this will be for editing the ArtBase Properties -->
-             
+            <a class="link"  (click)="navigateToEditArtbase(program, article.article_nr, article.prop_class)">zur Artbase</a> <!-- this will be for editing the ArtBase Properties -->
+            
           </td>
         </tr>
 
@@ -48,7 +56,7 @@
       
   </mat-card-content>
     </mat-card>
-    <mat-divider></mat-divider>
+   
      }
    
     <!--
@@ -65,7 +73,6 @@
     </tr>
   -->
    } @empty {
-    <p>No results yet!</p>
+    <p>Kein Auswahl</p>
    }
- 
   

@@ -16,12 +16,8 @@ import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 
 import { ToggleButtonComponent } from './../toggle-button/toggle-button.component'
-
-export type ActiveProgram = {
-  program: string,
-  isActive: boolean,
-}
-
+import {  DEFAULT_ARTICLES } from  './mock-data'
+ 
 @Component({
   selector: 'app-article-input',
   standalone: true,
@@ -36,113 +32,64 @@ export type ActiveProgram = {
   styleUrl: './article-input.component.css'
 })
 export class ArticleInputComponent implements OnInit {
-  newProgramName: string = ""
-  ngOnInit() {
-
-    this.fetchedArticles = this.articleInputService.getFetchedArticles()
-
-  }
-
-  tempPrograms = ["talos", "table", "s6", "quick3"]
+  
+  activeArray: boolean[] = []
+  applyForm = new FormGroup({
+    textarea: new FormControl(DEFAULT_ARTICLES), 
+  });
+  
+  fetchedArticles: Result = {}
+  
   constructor(
     private articleInputService: ArticleInputService,
     private router: Router
     ) {}
 
-  DEFAULT_ARTICLES = `
-  B4TAX248840A
-  B4TNX12880A
-  B4TNX14880A
-  B4TNX16880A
-  B4TNX18880A
-  B4TNX20880A
-  B4TZHZX1
-  B4TZRLX12A
-  B4TZRLX16A
-  B4TZRLX18A
-  BTSR0A
-  BTSTB14880A
-  COCNX08610A
-  COCNX08640A
-  COCNX08810A
-  COCNX08840A
-  COCNX12830A
-  COCNX12840A
-  COCNXSIKI6
-  COCNXSIKI8
-  COCNZTQ
-  COCSX09810A
-  COCSX09840A
-  PNESBFI30W
-  PNEZR03
-  PNEZR04
-  S6AR08400A
-  S6AR10400A
-  S6SADV112140A
-  S6SAV108110A
-  S6SAV108750A
-  S6SAV110110A
-  S6SAV110750A
-  S6SAV112110A
-  S6SAV112750A
-  S6SAV116110A
-  S6SAV116750A
-  S6SLV108750A
-  S6SLV110750A
-  S6SLV116750A
-  S6T1AK610180A
-  S6T1AK612180A
-  S6TA08180A
-  S6TA08210A
-  S6TA10180A
-  S6TA10210A
-  S6TA12180A
-  S6TA12210A
-  S6TR08110A
-  S6TR08140A
-  S6TR08180A
-  S6TR08210A
-  S6TR08750A
-  S6TR10110A
-  S6TR10140A
-  S6TR10180A
-  S6TR10210A
-  S6TR10750A
-  S6TR12110A
-  S6TR12140A
-  S6TR12180A
-  S6TR12210A
-  S6TR12750A
-  S8ASV10408012A
-  S8ASWV10408012A
-  S8ZTQ4224
-  TLTA248840A
-  WPABH
-  WPAPTDB
-  WPAPTN
-  WPBTB
-  WPBTN
-  WPKTS
-  WPTZCPULI
-  WPTZKKMKW
-  WPTZRWBLD
-  WPTZSMPC
-  WPZESD
-  WPZESZ
-  WPZESZMOD  
-`
-
-
-  applyForm = new FormGroup({
-    textarea: new FormControl(this.DEFAULT_ARTICLES),
-  });
+    ngOnInit() {
+      this.fetchedArticles = this.articleInputService.getFetchedArticles()
+      this.activeArray = this.articleInputService.getActiveArray()
+    }
+    getLastPropClassEdit() {
+      return this.articleInputService.getLastPropClassEdit()
+    }
+    
   
-  fetchedArticles: Result = {}
-  activePrograms: ActiveProgram[] = []
-
-  getIter() {
-    const keys = Object.keys(this.fetchedArticles)
+    
+  getIterActivePrograms() {
+    const keys = Object.keys(this.fetchedArticles).filter((value, idx) => this.activeArray[idx]);
     console.log("keys", keys)
+    return keys
+  }
+
+  getCountActiveArticlesAll =() => this.getCountActiveArticles()[0]
+  getCountActiveArticlesUnique =() => this.getCountActiveArticles()[1]
+
+  getCountActiveArticles() {
+    const programs = this.getIterActivePrograms()
+    const seen: Set<string> = new Set();
+    let cntAll = 0
+    let cntUnique = 0
+    programs.forEach(p => {
+      const propClasses = Object.keys(this.fetchedArticles[p])
+      propClasses.forEach(c => {
+        const propClass = this.fetchedArticles[p][c]
+        propClass.forEach(a => 
+          {
+            cntAll += 1
+            const article = a.article_nr
+            if (!seen.has(article))
+              cntUnique += 1
+            seen.add(article)
+          }
+          )
+      })
+    })
+
+    return [cntAll, cntUnique]
+  }
+
+  getIterAllPrograms() {
+    const keys = Object.keys(this.fetchedArticles)
     return keys
   }
 
@@ -170,13 +117,11 @@ export class ArticleInputComponent implements OnInit {
    .getArticleCompact(tokens)
    .subscribe(
     (result: Result) => {
+    this.activeArray = Object.keys(result).map(x => true)
     this.fetchedArticles = result
     this.articleInputService.setFetchedArticles(result)
-    this.activePrograms = this.getIter().map(x => ({
-      program:x,
-      isActive: true
-    }))
-
+    this.articleInputService.setActiveArray(this.activeArray)
+    
     for (const program in result) {
       console.log("program:", program)
       const programClassMap = result[program]
@@ -187,13 +132,28 @@ export class ArticleInputComponent implements OnInit {
   }) 
 
   }
-   
+  
+  changeActiveProgram(idx: number) {
+    this.activeArray[idx] = !this.activeArray[idx]
+    this.articleInputService.setActiveArray(this.activeArray)
+  }
 
   navigateToEditPropClass(program: string, propClass: string) {
+    this.articleInputService.setLastPropClassEdit(program, propClass)
     console.log("navigateToEditPropClass", program, propClass)
     this.router.navigate(['/editor-propclass', { 
       "programNameInput": program,
       "propClassNameInput": propClass
      }]);
   }
+
+  navigateToEditArtbase(program: string, article: string, propClass: string) {
+    this.articleInputService.setLastPropClassEdit(program, article)
+    this.router.navigate(['/editor', { 
+      "programNameInput": program,
+      "articleInput": article,
+      "propClassInput": propClass
+     }]);
+  }
+
 }

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -12,4 +12,12 @@ export class ToggleButtonComponent {
 
   @Input() color!: string
   @Input() text!: string
+  @Output() myClick: EventEmitter<any> = new EventEmitter()
+  toggle() {
+    this.myClick.emit(1)
+    if (this.color == "blue")
+      this.color = "red"
+    else
+      this.color = "blue"
+  }
 }

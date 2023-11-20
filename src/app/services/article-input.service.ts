@@ -30,6 +30,14 @@ export class ArticleInputService {
   private baseUrl = "http://172.22.15.238:5000"
 
   private fetchedArticles: Result = {}
+  private activeArray: boolean[] = []
+  private lastPropClassEdit: [string?, string?] = [undefined, undefined]
+  
+  setLastPropClassEdit(program: string, propClass: string) {
+    this.lastPropClassEdit[0] = program
+    this.lastPropClassEdit[1] = propClass
+  }
+  getLastPropClassEdit = () => this.lastPropClassEdit
 
   getFetchedArticles() {
     return this.fetchedArticles
@@ -38,6 +46,14 @@ export class ArticleInputService {
     return this.fetchedArticles = fetchedArticles
   }
 
+  getActiveArray() {
+    return this.activeArray
+  }
+  
+  setActiveArray(a: boolean[]) {
+    this.activeArray = a
+  }
+  
   getArticleCompact(articlenumbers: string[]): Observable<Result> { 
     const url = this.baseUrl + "/ocd/article_compact"
     return this.http.post<Result>(url, articlenumbers)

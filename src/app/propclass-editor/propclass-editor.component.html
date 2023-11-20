@@ -1,11 +1,55 @@
-<h2>program={{programNameInput}}</h2>
-<h4>propClass={{propClassNameInput}}</h4>
+<h1>Merkmale für Klasse {{propClassNameInput}} von {{programNameInput}}</h1> 
+
+<section>
+    <mat-checkbox disabled checked  >Wert bleibt erhalten</mat-checkbox>
+    <mat-checkbox disabled   >Wert wird entfernt</mat-checkbox>
+</section>
+
+
+<!--
+@for (propItem of propertyResult; track propItem; let idx = $index) {
+    <h3>
+        {{ propItem.property_name }} : {{ propItem.prop_text }} 
+        <mat-checkbox (change)="onChangeAll(propItem, $event)" [(ngModel)]="propItem.active"></mat-checkbox>
+    </h3>
+    
+@for (valItem of propItem.values; track valItem; let idx = $index) {
+    <section>
+        <mat-checkbox [(ngModel)]="valItem.active">{{ valItem.v }} : {{ valItem.text }}</mat-checkbox>
+    </section>
+}
+}
+-->
 
 
 @for (propItem of propertyResult; track propItem; let idx = $index) {
-    <h3>{{idx}}.  {{ propItem.property_name }} : {{ propItem.prop_text }} </h3>
+
+    <mat-expansion-panel style="margin-bottom: 10px;" >
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            
+            <span>
+                {{ propItem.property_name }} : {{ propItem.prop_text }}
+                <mat-checkbox (change)="onChangeAll(propItem, $event)" [(ngModel)]="propItem.active"></mat-checkbox>
+            </span>
+
+          </mat-panel-title>
+          <mat-panel-description>
+            {{  propItem.getActiveValues().length }} / {{ propItem.values.length }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+
     
-@for (valItem of propItem.values; track valItem; let idx = $index) {
-    <h5>{{idx}}.  {{ valItem.v }} : {{ valItem.text }} ON/OFF </h5>
+        @for (valItem of propItem.values; track valItem; let idx = $index) {
+            <section>
+                <mat-checkbox [(ngModel)]="valItem.active">{{ valItem.v }} : {{ valItem.text }}</mat-checkbox>
+            </section>
+        }
+        
+      </mat-expansion-panel>
+
+
+    
 }
-}
+

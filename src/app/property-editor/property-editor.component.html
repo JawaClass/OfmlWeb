@@ -1,1 +1,15 @@
-<p>property-editor works!</p>
+<p>Artbase</p>
+
+   
+@for (prop of nestedValues.keys(); track prop; let idx = $index) {
+    <h3 style="font-weight: bold;"> {{ prop }}</h3>
+
+    @for (row of nestedValues.get(prop); track row; let idx = $index) {
+        <p>{{ row["value_from"] }}</p>
+        {{ isSelected(prop, row["value_from"]) }}
+         
+    }
+     
+} @empty {
+    leere Artbase
+}
