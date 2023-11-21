@@ -23,6 +23,10 @@ export class PropertyItem {
     public getActiveValues() {
       return this.values.filter(a => a.active)
     }
+
+    public getArtbaseValues() {
+      return this.values.filter(a => a.isArtbase)
+    }
   
 }
  

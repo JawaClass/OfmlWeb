@@ -1,0 +1,41 @@
+<h1>Artbase von {{ articleInput  }} aus {{ programNameInput | uppercase }} </h1>
+
+
+@for (propClass of propClass2PropsMap.keys(); track propClass; let idx = $index) {
+<h3> Merkmalsklasse: {{ propClass }}   </h3>
+ 
+
+  @for (propItem of propClass2PropsMap.get(propClass); track propItem; let idx = $index) {
+
+    <mat-expansion-panel [disabled]="!propItem.active" style="margin-bottom: 10px;" >
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            
+            <span>
+                {{ propItem.property_name }} : {{ propItem.prop_text }}
+                <mat-checkbox disabled [(ngModel)]="propItem.active"></mat-checkbox>
+            </span>
+
+          </mat-panel-title>
+          <mat-panel-description>
+            {{  propItem.getArtbaseValues().length }} / {{ propItem.values.length }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+
+    
+        @for (valItem of propItem.values; track valItem; let idx = $index) {
+            <section>
+
+              <mat-checkbox  [(ngModel)]="valItem.isArtbase"> Artbase </mat-checkbox>  
+              <mat-checkbox disabled [(ngModel)]="valItem.active">{{ valItem.v }} : {{ valItem.text }}</mat-checkbox>
+                
+            </section>
+        }
+        
+      </mat-expansion-panel>
+    
+}
+ 
+}
+ 

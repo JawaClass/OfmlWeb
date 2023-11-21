@@ -8,3 +8,7 @@
     cursor: pointer;
     text-decoration: underline;
 }
+
+.input-shorttext {
+  border: none;
+}

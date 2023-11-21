@@ -39,7 +39,7 @@ export class ArticleInputService {
   }
   getLastPropClassEdit = () => this.lastPropClassEdit
 
-  getFetchedArticles() {
+  getFetchedArticles(): Result {
     return this.fetchedArticles
   }
   setFetchedArticles(fetchedArticles: Result) {

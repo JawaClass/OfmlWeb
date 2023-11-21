@@ -20,11 +20,16 @@
   <p>Ausgewählte Programme {{getIterActivePrograms().length}}</p>
   <p>{{getCountActiveArticlesUnique()}} eindeutige ausgewählte Artikel </p>
   <p>{{getCountActiveArticlesAll()}} ausgewählte Artikel </p>
+  <p>
+    <a class="link"  (click)="navigateToEditArtbaseAll()">zur Artbase für Alle!</a> 
+  </p>
 }
   @for (program of getIterAllPrograms(); track program; let idx = $index) {
     <app-toggle-button (myClick)="this.changeActiveProgram(idx)" [color]="this.activeArray[idx] ? 'blue' : 'red'" text={{program}}></app-toggle-button>
   }
  
+  
+    
   <mat-divider style="margin-top: 20px; margin-bottom: 10px;" ></mat-divider>
 
    @for (program of getIterActivePrograms(); track program; let idx = $index) {
@@ -46,7 +51,8 @@
             <!--{{ article.sql_db_program | uppercase }}-->
             {{ article.series | uppercase }}
             {{ article.article_nr | uppercase }}
-            {{ article.shorttext }}
+            <!-- {{ article.shorttext }} -->
+            <input class="input-shorttext" matInput [size]="article.shorttext.length" [(ngModel)]="article.shorttext" />
             <a class="link"  (click)="navigateToEditArtbase(program, article.article_nr, article.prop_class)">zur Artbase</a> <!-- this will be for editing the ArtBase Properties -->
             
           </td>

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { log } from 'node:console';
+import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
@@ -10,10 +11,10 @@ export class PropertyEditorService {
 
   constructor(private http: HttpClient) { }
 
-  getArtbase(program: string, article: string) {
+  getArtbase(program: string, article: string): Observable<any[]> {
     const url = this.baseUrl + "/ocd/table/" + program + "/ocd_artbase/article_nr/" + article
     console.log("getArtbase :: ", url);
-    return this.http.get(url)
+    return this.http.get<any[]>(url)
   }
 
   getPropsResult(program: string, propClass: string){

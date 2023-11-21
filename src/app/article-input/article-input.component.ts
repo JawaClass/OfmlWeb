@@ -58,7 +58,7 @@ export class ArticleInputComponent implements OnInit {
     
   getIterActivePrograms() {
     const keys = Object.keys(this.fetchedArticles).filter((value, idx) => this.activeArray[idx]);
-    console.log("keys", keys)
+    // console.log("keys", keys)
     return keys
   }
 
@@ -124,9 +124,9 @@ export class ArticleInputComponent implements OnInit {
     this.articleInputService.setActiveArray(this.activeArray)
     
     for (const program in result) {
-      console.log("program:", program)
+      // console.log("program:", program)
       const programClassMap = result[program]
-      console.log(programClassMap)
+      // console.log(programClassMap)
     }
 
 
@@ -141,14 +141,11 @@ export class ArticleInputComponent implements OnInit {
 
   navigateToEditPropClass(program: string, propClass: string) {
     this.articleInputService.setLastPropClassEdit(program, propClass)
-    console.log("navigateToEditPropClass", program, propClass)
     this.router.navigate(['/editor-propclass', { 
       "programNameInput": program,
       "propClassNameInput": propClass
      }]);
   }
-
-  
 
   navigateToEditArtbase(program: string, article: string, propClass: string) {
  
@@ -157,6 +154,14 @@ export class ArticleInputComponent implements OnInit {
       "articleInput": article,
       "propClassInput": propClass
      }]);
+  }
+
+  navigateToEditArtbaseAll() {
+    
+    this.router.navigate(['/editor-all', { 
+      "programs": this.getIterActivePrograms()
+     }]);
+
   }
 
 }
