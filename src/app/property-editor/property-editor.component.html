@@ -1,8 +1,42 @@
-<p>Artbase</p>
+<h1>Artbase von {{ articleInput  }} aus {{ programNameInput | uppercase }}</h1>
 
+
+
+@for (propItem of propertyResult; track propItem; let idx = $index) {
+
+    <mat-expansion-panel style="margin-bottom: 10px;" >
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            
+            <span>
+                {{ propItem.property_name }} : {{ propItem.prop_text }}
+                <mat-checkbox disabled [(ngModel)]="propItem.active"></mat-checkbox>
+            </span>
+
+          </mat-panel-title>
+          <mat-panel-description>
+            {{  propItem.getActiveValues().length }} / {{ propItem.values.length }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+
+    
+        @for (valItem of propItem.values; track valItem; let idx = $index) {
+            <section>
+                <mat-checkbox disabled [(ngModel)]="valItem.active">{{ valItem.v }} : {{ valItem.text }}</mat-checkbox>
+                <mat-checkbox  [(ngModel)]="valItem.isArtbase"> Artbase </mat-checkbox>
+            </section>
+        }
+        
+      </mat-expansion-panel>
+    
+}
+
+
+<!--
    
 @for (prop of nestedValues.keys(); track prop; let idx = $index) {
-    <h3 style="font-weight: bold;"> {{ prop }}</h3>
+    <h3 style="font-weight: bold;"> {{ idx }} {{ prop }}</h3>
 
     @for (row of nestedValues.get(prop); track row; let idx = $index) {
         <p>{{ row["value_from"] }}</p>
@@ -11,5 +45,6 @@
     }
      
 } @empty {
-    leere Artbase
+    leere Artbase XXX222
 }
+-->

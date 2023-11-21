@@ -152,5 +152,22 @@ export class ArticleInputService {
     //const url = this.baseUrl + "/stream_test"
     //return this.http.get<any>(url)
     //return this.http.post<any>(url, articlenumbers)
+
+    getPropClassesForArticles(program: string, article: string): string[] {
+      const propClassesProgram: string[] = Object.keys(this.fetchedArticles[program])
+      let propClassesArticle: string[] = []
+      propClassesProgram.forEach(pClass => {
+        const articleItems: Item[] = this.fetchedArticles[program][pClass]
+        articleItems.forEach((articleItem: Item) => {
+  
+          if (articleItem.article_nr === article) {
+            propClassesArticle.push(pClass)
+          }
+  
+        })
+      })
+      return propClassesArticle
+    }
+    
 } 
  

@@ -7,6 +7,7 @@ export interface PropValueItem {
   v: string,
   text: string,
   active: boolean;
+  isArtbase: boolean;
 };
  
 

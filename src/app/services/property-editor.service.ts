@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { log } from 'node:console';
 @Injectable({
   providedIn: 'root'
 })
@@ -11,11 +12,13 @@ export class PropertyEditorService {
 
   getArtbase(program: string, article: string) {
     const url = this.baseUrl + "/ocd/table/" + program + "/ocd_artbase/article_nr/" + article
+    console.log("getArtbase :: ", url);
     return this.http.get(url)
   }
 
   getPropsResult(program: string, propClass: string){
     const url = this.baseUrl + "/ocd/props_compact/"+program+"/" + propClass
+    console.log("getPropsResult :: ", url);
     return this.http.get(url)
   }
 

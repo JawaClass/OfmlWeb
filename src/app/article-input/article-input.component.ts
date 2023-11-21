@@ -2,7 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import { ArticleInputService, Result } from '../services/article-input.service';
+import { ArticleInputService, Result, Item } from '../services/article-input.service';
 import {RouterModule, Router } from '@angular/router';
 
 import {MatIconModule} from '@angular/material/icon';
@@ -17,6 +17,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 
 import { ToggleButtonComponent } from './../toggle-button/toggle-button.component'
 import {  DEFAULT_ARTICLES } from  './mock-data'
+import { log } from 'console';
  
 @Component({
   selector: 'app-article-input',
@@ -147,8 +148,10 @@ export class ArticleInputComponent implements OnInit {
      }]);
   }
 
+  
+
   navigateToEditArtbase(program: string, article: string, propClass: string) {
-    this.articleInputService.setLastPropClassEdit(program, article)
+ 
     this.router.navigate(['/editor', { 
       "programNameInput": program,
       "articleInput": article,
