@@ -1,11 +1,16 @@
-import { Component, Input, OnInit, OnDestroy, ViewChild  } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import {PropClassService,  PropertyItem } from '../services/prop-class.service'
+import { PropClassService } from '../services/prop-class.service'
 import { ToggleButtonComponent } from './../toggle-button/toggle-button.component'
-import {MatCheckboxModule} from '@angular/material/checkbox'; 
-import {FormsModule} from '@angular/forms';
-import {MatExpansionModule, MatAccordion} from '@angular/material/expansion'; 
+import { MatCheckboxModule, MatCheckboxChange } from '@angular/material/checkbox';
+import { FormsModule } from '@angular/forms';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { ArticleInputService } from '../services/article-input.service';
+import { RouterModule, Router } from '@angular/router';
+import { PropertyItem, PropValueItem } from '../models/models';
+import { WaitingCursorComponent } from '../waiting-cursor/waiting-cursor.component'
+
 
 @Component({
   selector: 'app-propclass-editor',
@@ -14,55 +19,49 @@ import {MatExpansionModule, MatAccordion} from '@angular/material/expansion';
     ToggleButtonComponent,
     MatCheckboxModule,
     FormsModule,
-    MatExpansionModule,
+    MatExpansionModule, RouterModule, WaitingCursorComponent
   ],
   templateUrl: './propclass-editor.component.html',
   styleUrl: './propclass-editor.component.css'
 })
-export class PropclassEditorComponent implements OnInit, OnDestroy  {
+export class PropclassEditorComponent implements OnInit {
 
-  @Input() programNameInput!: string
-  @Input() propClassNameInput!: string
- 
+  @Input() program!: string
+  @Input() pClass!: string
 
-propertyResult: PropertyItem[] = []
+  route = inject(ActivatedRoute)
+  service = inject(ArticleInputService)
+  private router = inject(Router)
 
-constructor(private route: ActivatedRoute,
-  private service: PropClassService) {}
+  emptyPlaceholder = ""
+  isLoading = false
 
-  onChangeAll(x: PropertyItem, event: any) {
-  x.values.forEach(x => { x.active = event.checked })
-}
+  async ngOnInit() {
+    if (!this.service.hasProgramData())
+      this.router.navigate(['/'])
 
-ngOnDestroy(): void {
-  this.service.saveChanges(this.programNameInput, this.propClassNameInput, this.propertyResult)
-}
-
-ngOnInit() {
-  this.route.params.subscribe((params) => {
-    this.programNameInput = params['programNameInput']
-    this.propClassNameInput = params['propClassNameInput']
- 
-    this.service.getPropsResult(this.programNameInput, this.propClassNameInput).subscribe((x: PropertyItem[]) => {
-      
-      if (!this.service.hasChanges(this.programNameInput, this.propClassNameInput)) {
-        let temp: PropertyItem[] = []
-        x.forEach( a => {
-          a.active = true
-          a.values.forEach(b => {b.active = true})
-          temp.push(new PropertyItem(a.property_name, a.prop_text, a.values, a.active)) 
-        })
-        this.propertyResult = temp
-      } else {
-        this.propertyResult = x
-      }
-      
-      
-      console.log("SET ---- this.propertyResult = temp");
-      
+    this.route.params.subscribe(async (params) => {
+      this.program = params['program']
+      this.pClass = params['propClass']
+      this.service.programMap.getPropClass(this.program, this.pClass)!!.seen = true
+      this.isLoading = true
+      await this.service.fetchProperties(this.program, this.pClass)
+      this.isLoading = false
+      if (this.getPropItems()?.length == 0)
+        this.emptyPlaceholder = "Leere Klasse"
 
     })
-  });
-}
+
+  }
+
+  getPropItems = () => this.service.programMap.getPropItems(this.program, this.pClass)
+
+  onChangeAll(x: PropertyItem, event: any) {
+    x.values.forEach((x: PropValueItem) => { x.active = event.checked })
+  }
+
+  onMatCheckBoxClick(event: PointerEvent | MouseEvent) {
+    event.stopPropagation()
+  }
 
 }

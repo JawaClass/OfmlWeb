@@ -1,0 +1,41 @@
+.delete {
+    background-color: red;
+    color: white;
+    margin-left: 10px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.program {
+    background-color: blueviolet;
+    color: white;
+    margin-left: 5px;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.header {
+    margin-bottom: 20px;
+}
+
+
+
+.items {
+    width: fit-content;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0 1em;
+}
+
+td {
+    padding: 0 15px;
+}
+
+.centered-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

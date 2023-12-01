@@ -1,0 +1,22 @@
+/* src/styles.css */
+
+/* Import Angular Material Theming */
+@import '../node_modules/@angular/material/prebuilt-themes/purple-green.css';
+
+/* Define your dark theme styles */
+body {
+  background-color: #333;
+  color: #fff;
+}
+
+/* Apply dark theme to specific component(s) */
+.dark-mode-component {
+  background-color: #333;
+  color: #fff;
+}
+
+.primary {
+    background-color: rgb(223, 84, 44) !important;
+    color: whitesmoke !important;
+}
+ 

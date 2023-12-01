@@ -4,11 +4,20 @@
   } 
 
   .link {
+    width: min-content;
     color: red;
     cursor: pointer;
     text-decoration: underline;
 }
 
-.input-shorttext {
+.input-edit {
   border: none;
+  margin-right: 5px;
+}
+
+.header-row {
+  display: flex;
+  align-content: flex-start;
+  justify-content: flex-start;
+  flex-direction: row;
 }

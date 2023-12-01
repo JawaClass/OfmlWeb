@@ -1,5 +1,7 @@
 
  
-<button (click)="toggle()"  [style.background-color]="color">
+<button (click)="toggle()"
+[ngClass]="{'activated': color === 'blue', 'deactivated' : color === 'red' }"
+[style.background-color]="color">
     <span>{{ text }}</span>
 </button> 

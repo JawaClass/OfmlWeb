@@ -1,8 +1,39 @@
-.navbar {
-    width: 100%;
-    background-color: #333;
-    
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+:host {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0; 
+  /*border: solid 3px yellow;  */ /* for debugging purposes */
+}
+ 
+
+.content {
+  padding-top: 2vh;
+  padding-left: 1vw;
+  padding-right: 1vw;
+  padding-bottom: 2vh;
+}
+
+.header-text {
+  cursor: pointer;
+  color: white;
+  transition: opacity 0.25s;
+}
+.header-text:hover {
+  box-shadow: 3px 3px 10px rgb(46, 46, 46);
+}
+
+.back-btn {
+  background-color: transparent;
+  border-color: transparent;
+  color: white;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.back-btn:hover {
+  box-shadow: 3px 3px 10px rgb(46, 46, 46);
+}

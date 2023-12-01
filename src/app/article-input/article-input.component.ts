@@ -1,167 +1,104 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import { ArticleInputService, Result, Item } from '../services/article-input.service';
-import {RouterModule, Router } from '@angular/router';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ArticleInputService } from '../services/article-input.service';
+import { RouterModule, Router } from '@angular/router';
 
-import {MatIconModule} from '@angular/material/icon';
-import {MatDividerModule} from '@angular/material/divider';
-import {MatButtonModule} from '@angular/material/button';
-import {MatCheckboxModule} from '@angular/material/checkbox'; 
-import {MatCardModule} from '@angular/material/card'; 
-import {MatChipsModule} from '@angular/material/chips'; 
-import {FormsModule} from '@angular/forms';
-import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 import { ToggleButtonComponent } from './../toggle-button/toggle-button.component'
-import {  DEFAULT_ARTICLES } from  './mock-data'
-import { log } from 'console';
- 
+import { DEFAULT_ARTICLES } from './mock-data'
+
+import { CreateProgramComponent } from './../create-program/create-program.component'
+import { ArticleItem, ProgramMap } from './../models/models'
+import { Observable, Subject, map } from 'rxjs';
+import { ProgressService } from '../services/progress.service';
+import { WaitingCursorComponent } from '../waiting-cursor/waiting-cursor.component'
+
+
 @Component({
   selector: 'app-article-input',
   standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    CreateProgramComponent,
     RouterModule,
-    MatButtonModule, MatDividerModule, MatIconModule, MatCheckboxModule, MatCardModule, MatChipsModule, MatInputModule, FormsModule, MatFormFieldModule, 
-    ToggleButtonComponent,
+    MatButtonModule, MatDividerModule, MatIconModule, MatCheckboxModule, MatCardModule, MatChipsModule, MatInputModule, FormsModule, MatFormFieldModule,
+    ToggleButtonComponent, WaitingCursorComponent
   ],
   templateUrl: './article-input.component.html',
   styleUrl: './article-input.component.css'
 })
-export class ArticleInputComponent implements OnInit {
+export class ArticleInputComponent {
+  progressService = inject(ProgressService)
+  service = inject(ArticleInputService)
+  router = inject(Router)
+  textAreaArticles: string = DEFAULT_ARTICLES
+  getActivePrograms = () => this.service.programMap.getActivePrograms()
+  getAllPrograms = () => this.service.programMap.getAllPrograms()
+  isProgramActive = (program: string) => this.service.programMap.isActive(program)
+  toggleActive = (program: string) => this.service.programMap.toggleActive(program)
+  getPropClasses = (program: string) => this.service.programMap.getPropClassesFromProgram(program)
+  getArticleItems = (program: string, pClass: string) => this.service.programMap.getArticlesFromPropClass(program, pClass)
+  notUniqueArticles = () => this.service.programMap.notUniqueArticles()
+  removeArticleItem = (artcleItem: ArticleItem) => this.service.programMap.removeArticleItem(artcleItem)
+  isLoading = () => this.progressService.isLoading() 
+  getAllActiveArticleRefs = () => this.service.programMap.getAllActiveArticleRefs()
   
-  activeArray: boolean[] = []
-  applyForm = new FormGroup({
-    textarea: new FormControl(DEFAULT_ARTICLES), 
-  });
-  
-  fetchedArticles: Result = {}
-  
-  constructor(
-    private articleInputService: ArticleInputService,
-    private router: Router
-    ) {}
+  getInputTokens() {
+    const regex: RegExp = /[ ;\r?\n]+/
 
-    ngOnInit() {
-      this.fetchedArticles = this.articleInputService.getFetchedArticles()
-      this.activeArray = this.articleInputService.getActiveArray()
-    }
-    getLastPropClassEdit() {
-      return this.articleInputService.getLastPropClassEdit()
-    }
-    
-  
-    
-  getIterActivePrograms() {
-    const keys = Object.keys(this.fetchedArticles).filter((value, idx) => this.activeArray[idx]);
-    // console.log("keys", keys)
-    return keys
-  }
-
-  getCountActiveArticlesAll =() => this.getCountActiveArticles()[0]
-  getCountActiveArticlesUnique =() => this.getCountActiveArticles()[1]
-
-  getCountActiveArticles() {
-    const programs = this.getIterActivePrograms()
-    const seen: Set<string> = new Set();
-    let cntAll = 0
-    let cntUnique = 0
-    programs.forEach(p => {
-      const propClasses = Object.keys(this.fetchedArticles[p])
-      propClasses.forEach(c => {
-        const propClass = this.fetchedArticles[p][c]
-        propClass.forEach(a => 
-          {
-            cntAll += 1
-            const article = a.article_nr
-            if (!seen.has(article))
-              cntUnique += 1
-            seen.add(article)
-          }
-          )
-      })
-    })
-
-    return [cntAll, cntUnique]
-  }
-
-  getIterAllPrograms() {
-    const keys = Object.keys(this.fetchedArticles)
-    return keys
-  }
-
-  getProgramClassMap(program: string) {
-    const keys = Object.keys(this.fetchedArticles[program])
-    return keys
-  } 
-
-  submitApplication() {
-
-   const regex: RegExp = /[ ;\r?\n]+/
-
-    let tokens = this.applyForm
-    .getRawValue().textarea!!.split(regex)
+    let tokens = this.textAreaArticles.split(regex)
     if (tokens.length > 0) {
-        if (tokens[0] == "")
-          tokens.splice(0, 1)
-        if (tokens.length > 0) {
-          if (tokens[tokens.length - 1] == "")
-            tokens.splice(tokens.length - 1, 1)
-        }
+      if (tokens[0] == "")
+        tokens.splice(0, 1)
+      if (tokens.length > 0) {
+        if (tokens[tokens.length - 1] == "")
+          tokens.splice(tokens.length - 1, 1)
+      }
     }
-      
-   this.articleInputService
-   .getArticleCompact(tokens)
-   .subscribe(
-    (result: Result) => {
-    this.activeArray = Object.keys(result).map(x => true)
-    this.fetchedArticles = result
-    this.articleInputService.setFetchedArticles(result)
-    this.articleInputService.setActiveArray(this.activeArray)
+    return tokens
+  }
+
+  disableSubmitBtn() {
+    return this.getInputTokens().length == 0
+  }
+
+  submitQueryArticles() {
+
+    const tokens = this.getInputTokens()
     
-    for (const program in result) {
-      // console.log("program:", program)
-      const programClassMap = result[program]
-      // console.log(programClassMap)
-    }
-
-
-  }) 
-
-  }
-  
-  changeActiveProgram(idx: number) {
-    this.activeArray[idx] = !this.activeArray[idx]
-    this.articleInputService.setActiveArray(this.activeArray)
+    this.progressService.startLoading()
+    this.service.fetchProgramMap(tokens).subscribe(_ => { this.progressService.stopLoading() })
   }
 
-  navigateToEditPropClass(program: string, propClass: string) {
-    this.articleInputService.setLastPropClassEdit(program, propClass)
-    this.router.navigate(['/editor-propclass', { 
-      "programNameInput": program,
-      "propClassNameInput": propClass
-     }]);
+  navigateToEditArtbase(program: string, articleNr: string, pClass: string) {
+    this.router.navigate(['/editor', {
+      "program": program,
+      "articleNr": articleNr
+    }]);
   }
 
-  navigateToEditArtbase(program: string, article: string, propClass: string) {
- 
-    this.router.navigate(['/editor', { 
-      "programNameInput": program,
-      "articleInput": article,
-      "propClassInput": propClass
-     }]);
+  navigateToEditPropClass(program: string, pClass: string) {
+    this.router.navigate(['/editor-propclass', {
+      "program": program,
+      "propClass": pClass
+    }]);
   }
+
 
   navigateToEditArtbaseAll() {
-    
-    this.router.navigate(['/editor-all', { 
-      "programs": this.getIterActivePrograms()
-     }]);
-
+    this.router.navigate(['/editor-all']);
   }
 
 }

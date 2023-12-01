@@ -1,84 +1,133 @@
+<div class="header-row">
+  <form (submit)="submitQueryArticles()">
 
-
-<form [formGroup]="applyForm" (submit)="submitApplication()">
-   
-  <!--
- <label for="textarea">Artikelnummern</label>
-
-    <textarea  formControlName="textarea" id="textarea" rows="4" cols="50"></textarea>
-
-  --> 
-    <mat-form-field>
+    <mat-form-field style="width: 100%;">
       <mat-label>Artikelnummern</mat-label>
-      <textarea formControlName="textarea" matInput [rows]="5"></textarea>
+      <textarea [(ngModel)]="textAreaArticles"
+      matInput [rows]="5" name="textAreaArticles"
+      oninput="this.value = this.value.toUpperCase()">
+    </textarea>
     </mat-form-field>
-    
-    <button type="submit" mat-fab>Go</button>
+
+    <button type="submit" mat-raised-button [disabled]="disableSubmitBtn()"
+      style="display: inline-block; width: 100%; margin-bottom: 10px;">
+      Starten
+    </button>
+
   </form>
 
-  @if (getIterActivePrograms().length > 0) {
-  <p>Ausgewählte Programme {{getIterActivePrograms().length}}</p>
-  <p>{{getCountActiveArticlesUnique()}} eindeutige ausgewählte Artikel </p>
-  <p>{{getCountActiveArticlesAll()}} ausgewählte Artikel </p>
-  <p>
-    <a class="link"  (click)="navigateToEditArtbaseAll()">zur Artbase für Alle!</a> 
-  </p>
-}
-  @for (program of getIterAllPrograms(); track program; let idx = $index) {
-    <app-toggle-button (myClick)="this.changeActiveProgram(idx)" [color]="this.activeArray[idx] ? 'blue' : 'red'" text={{program}}></app-toggle-button>
+  @if (isLoading()) {
+    <app-waiting-cursor></app-waiting-cursor>
+    }
+
+  <div style="display: inline-block; width: 60%;"></div>
+
+  @if (getActivePrograms().length > 0 && notUniqueArticles().length== 0) {
+  <app-create-program></app-create-program>
   }
- 
-  
-    
-  <mat-divider style="margin-top: 20px; margin-bottom: 10px;" ></mat-divider>
+</div>
 
-   @for (program of getIterActivePrograms(); track program; let idx = $index) {
+@if (getActivePrograms().length > 0) {
+<p><strong>Ausgewählte Programme</strong> {{getActivePrograms().length}}</p>
+<p><strong>Ausgewählte Artikel</strong> {{getAllActiveArticleRefs().length}}</p>
 
-     
-     <h2>{{idx+1}}. {{ program | uppercase }} </h2>
-     
-     @for (propClass of getProgramClassMap(program); track propClass; let idx2 = $index) {
 
-      <mat-card style="margin-bottom: 50px;">
-        <mat-card-content>
+}
 
-      <h4 class="link"  (click)="navigateToEditPropClass(program, propClass)" >{{ propClass }}</h4>  <!-- this will be for editing the properties  of this propclass -->
+@if (getActivePrograms().length > 0 && notUniqueArticles().length== 0) {
+  <p>
+    <a class="link" (click)="navigateToEditArtbaseAll()">
+      zur Artbase für alle
+    </a>
+  </p>  
+}
 
-      <li *ngFor="let article of fetchedArticles[program][propClass]">
-   
-        <tr>
-          <td>
-            <!--{{ article.sql_db_program | uppercase }}-->
-            {{ article.series | uppercase }}
-            {{ article.article_nr | uppercase }}
-            <!-- {{ article.shorttext }} -->
-            <input class="input-shorttext" matInput [size]="article.shorttext.length" [(ngModel)]="article.shorttext" />
-            <a class="link"  (click)="navigateToEditArtbase(program, article.article_nr, article.prop_class)">zur Artbase</a> <!-- this will be for editing the ArtBase Properties -->
-            
-          </td>
-        </tr>
+@for (program of getAllPrograms(); track program; let idx = $index) {
+<app-toggle-button (myClick)="this.toggleActive(program)" [color]="this.isProgramActive(program) ? 'blue' : 'red'"
+  text={{program}}></app-toggle-button>
+}
 
-      </li>
-      
+
+<mat-divider style="margin-top: 20px; margin-bottom: 10px;"></mat-divider>
+
+@if (getActivePrograms().length > 0 && notUniqueArticles().length > 0) {
+
+<p>
+  <strong style="font-size: large;">Stop! {{ notUniqueArticles().length }} Artikel doppeln sich. </strong>
+</p>
+
+@for (articleDuplicate of notUniqueArticles(); track articleDuplicate.articleNr; let idx = $index) {
+
+<div style="margin-right: 15px;">
+  <p>
+    <strong>Duplikate {{ articleDuplicate.articleNr }} {{ articleDuplicate.duplicates.length }} Stk.</strong>
+  </p>
+  @for (duplicate of articleDuplicate.duplicates; track duplicate.articleNr) {
+  <p style="display: flex;   align-items: center;">
+    <strong>{{ duplicate.program }}</strong> - {{ duplicate.articleNr }} - {{ duplicate.shorttext }}
+    <button style="margin-left: 10px; background-color: transparent; border: none; cursor: pointer;">
+      <mat-icon style="align-self: baseline;" (click)="removeArticleItem(duplicate)" fontIcon="delete_outline">
+      </mat-icon>
+    </button>
+  </p>
+  }
+
+</div>
+
+}
+
+} @else {
+
+
+
+@for (program of getActivePrograms(); track program; let idx = $index) {
+
+
+<h2>{{idx+1}}. {{ program | uppercase }} </h2>
+
+@for (pClass of getPropClasses(program); track pClass; let idx2 = $index) {
+
+<mat-card style="margin-bottom: 15px;">
+  <mat-card-content>
+
+    <p>
+      <span class="link" (click)="navigateToEditPropClass(program, pClass.name)">{{ pClass.name }}</span>
+      @if (pClass.seen) {
+      <span style="margin-left: 10px;">x</span>
+      }
+    </p>
+
+    <li *ngFor="let article of pClass.articleItems">
+
+      <tr>
+        <td>
+          {{ article.series | uppercase }}
+
+          <input class="input-edit" matInput [size]="article.articleNrAlias.length"
+            [(ngModel)]="article.articleNrAlias" oninput="this.value = this.value.toUpperCase()"/>
+
+          <input class="input-edit" matInput [size]="article.shorttext.length" [(ngModel)]="article.shorttext" oninput="this.value = this.value.toUpperCase()"/>
+
+          <a class="link" (click)="navigateToEditArtbase(program, article.articleNr, pClass.name)">
+            zur Artbase
+          </a>
+          @if (article.seen) {
+          <span style="margin-left: 10px;">x</span>
+          }
+
+        </td>
+      </tr>
+
+    </li>
+
   </mat-card-content>
-    </mat-card>
-   
-     }
-   
-    <!--
-    <tr>
-      <td>
-        {{ article.sql_db_program | uppercase }}
-        {{ article.series | uppercase }}
-        {{ article.article_nr | uppercase }}
-        {{ article.shorttext }}
-        <a [routerLink]="['/editor', ]">Editiere</a>
-        <button (click)="deleteArticle(article, idx)">X</button>
-        
-      </td>
-    </tr>
-  -->
-   } @empty {
-    <p>Kein Auswahl</p>
-   }
-  
+</mat-card>
+ 
+
+
+}
+
+} @empty {
+<p>Kein Auswahl</p>
+}
+}

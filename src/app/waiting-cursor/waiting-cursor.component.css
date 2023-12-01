@@ -1,0 +1,16 @@
+.container {
+    z-index: 1000;
+    /*left: 50%;
+    top: 50%;
+    position: fixed;
+    transform: translate(-50%, -50%);*/
+    
+  }
+  
+  .spinner {
+    width: 500px; /* Adjust the size as needed */
+    height: 500px; /* Adjust the size as needed */
+    /*border: 10px solid transparent;
+    border-top-color: yellowgreen;*/
+    color: rgb(223, 84, 44) !important;
+  }

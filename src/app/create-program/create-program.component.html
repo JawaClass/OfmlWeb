@@ -1,0 +1,43 @@
+
+<form (submit)="createProgram()" class="primary">
+
+    <mat-form-field style="width: 100%;">
+        <mat-label>Programmname</mat-label>
+        <input matInput [(ngModel)]="newProgramName" name="newProgramName" oninput="this.value = this.value.toLowerCase()" maxlength="20" />
+    </mat-form-field>
+
+    <mat-form-field style="width: 100%;">
+        <mat-label>Programmn ID</mat-label>
+        <input matInput [(ngModel)]="newProgramID" name="newProgramID" oninput="this.value = this.value.toUpperCase()" maxlength="2" />
+    </mat-form-field>
+
+    <button type="submit" [disabled]="!isValidForm()" mat-raised-button color="primary"
+        style="display: inline-block; width: 100%;">
+        Programm erzeugen
+    </button>
+    @if (isProcessing) {
+    <p style="color: white; margin-top: 15px;">
+        <strong>{{ newProgramName }} wird erstellt...</strong>
+    </p>
+    }
+</form>
+
+@if (isProcessing) {
+    <div style="display: flex; justify-content: center;">
+        <app-waiting-cursor></app-waiting-cursor>
+    </div>
+} 
+
+@if (resultExportPath) {
+    <p style="display: flex;   align-items: center; margin-top: 10px;">
+        <strong>Program exportiert nach:</strong>
+        <a [href]="resultExportPath" target="_blank">
+            {{resultExportPath}}
+        </a>
+        <button [cdkCopyToClipboard]="resultExportPath" style="margin-left: 10px; background-color: transparent; border: none; cursor: pointer;">
+            <mat-icon style="align-self: baseline;">
+                content_copy
+            </mat-icon>
+        </button>
+    </p>
+}

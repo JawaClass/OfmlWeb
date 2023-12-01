@@ -1,3 +1,4 @@
+
 button {
     width: 90px; /* Set a minimum width for the button */
     padding: 3px 3px;
@@ -8,10 +9,20 @@ button {
     overflow: hidden;
     display: inline-block;
     white-space: nowrap; /* Prevent text from wrapping */
-    margin-right: 1px;
+    margin-right: 3px;
+    transition: opacity 0.25s;
+    box-shadow: 3px 3px 10px rgb(46, 46, 46);
   }
  
   button:hover {
 
     cursor: pointer;
+}
+
+.activated {
+  opacity: 1;
+}
+
+.deactivated {
+  opacity: 0.5;
 }
