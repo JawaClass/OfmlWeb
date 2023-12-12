@@ -1,0 +1,17 @@
+
+
+<form (ngSubmit)="signup()" #signupForm="ngForm">
+
+    <h2 style="text-align: center;">Es besteht noch kein Konto</h2>
+
+    <mat-form-field style="width: 100%;">
+        <mat-label>Email</mat-label>
+        <input matInput [(ngModel)]="userName" name="userName" maxlength="100" minlength="3" required />
+    </mat-form-field>
+
+    <button type="submit" [disabled]="!signupFormValid()" mat-raised-button color="primary"
+        style="display: inline-block; width: 100%;">
+        Konto erstellen
+    </button>
+
+</form>

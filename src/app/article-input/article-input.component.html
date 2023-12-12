@@ -65,7 +65,7 @@
   @for (duplicate of articleDuplicate.duplicates; track duplicate.articleNr) {
   <p style="display: flex;   align-items: center;">
     <strong>{{ duplicate.program }}</strong> - {{ duplicate.articleNr }} - {{ duplicate.shorttext }}
-    <button style="margin-left: 10px; background-color: transparent; border: none; cursor: pointer;">
+    <button style="margin-left: 10px; background-color: transparent; border: none; cursor: pointer; color: red;">
       <mat-icon style="align-self: baseline;" (click)="removeArticleItem(duplicate)" fontIcon="delete_outline">
       </mat-icon>
     </button>
@@ -102,11 +102,19 @@
       <tr>
         <td>
           {{ article.series | uppercase }}
+          
+            <input  matInput class="input-edit" matInput
+              [size]="article.articleNrAlias.length"
+              [(ngModel)]="article.articleNrAlias"
+              (input)="onInputChangeArticle(article)"
+              oninput="this.value = this.value.toUpperCase()"/>
+                    
 
-          <input class="input-edit" matInput [size]="article.articleNrAlias.length"
-            [(ngModel)]="article.articleNrAlias" oninput="this.value = this.value.toUpperCase()"/>
-
-          <input class="input-edit" matInput [size]="article.shorttext.length" [(ngModel)]="article.shorttext" oninput="this.value = this.value.toUpperCase()"/>
+          <input matInput class="input-edit" matInput
+                [size]="article.shorttext.length"
+                [(ngModel)]="article.shorttext"
+                (input)="onInputChangeArticle(article)"
+                oninput="this.value = this.value.toUpperCase()"/>
 
           <a class="link" (click)="navigateToEditArtbase(program, article.articleNr, pClass.name)">
             zur Artbase

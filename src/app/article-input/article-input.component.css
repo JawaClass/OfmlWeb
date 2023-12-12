@@ -13,6 +13,8 @@
 .input-edit {
   border: none;
   margin-right: 5px;
+  background-color: #424242;
+  color: white;
 }
 
 .header-row {

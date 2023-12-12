@@ -22,6 +22,13 @@ export class ArticleInputService extends BaseService {
       }))
   }
 
+  async fetchMiscData(): Promise<any> {
+    const url = this.baseUrl + "/misc/all"
+    const response = await fetch(url)
+    const misc: string = await response.json()
+    return misc
+  }
+
   async fetchAndSetArtbase(articleItem: ArticleItem): Promise<void> {
     if (articleItem.artbaseFetched)
       return
@@ -41,7 +48,6 @@ export class ArticleInputService extends BaseService {
     const props: PropertyItem[][] = await Promise.all(articleItem.pClasses.map(pClass => {
       const storedPropertyItems = this.programMap.getPropItems(articleItem.program, pClass)
       return Boolean(storedPropertyItems) ? storedPropertyItems!! : this.fetchProperties(articleItem.program, pClass)
-
     }))
     return props
   }
@@ -62,11 +68,16 @@ export class ArticleInputService extends BaseService {
 
     const response = await fetch(url)
     const items = await response.json()
-    const propItems = items.map((item: any) =>
-      new PropertyItem(item["property_name"],
+    const propItems = items.map((item: any) => 
+    
+      new PropertyItem(
+        item["property_name"],
         item["prop_text"],
         item["values"].map((valItem: any) => new PropValueItem(valItem["v"], valItem["text"], true, false)),
-        true)
+        true,
+        item["prop_class"],
+        item["program"]
+        )
     )
 
     this.programMap.setPropItems(program, pClass, propItems)

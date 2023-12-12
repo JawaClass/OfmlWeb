@@ -1,14 +1,12 @@
 import { Component, Inject, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ArtbaseEditorService } from '../services/artbase-editor.service';
-import { PropClassService } from '../services/prop-class.service';
 import { inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { MatExpansionModule, MatAccordion } from '@angular/material/expansion';
 import { ArticleInputService } from '../services/article-input.service';
-import { log } from 'node:console';
+import { SaveChangesService } from '../services/save-changes.service';
 import { ArtbaseItem, ArticleItem, PropertyItem } from '../models/models';
 import { RouterModule, Router } from '@angular/router';
 import { WaitingCursorComponent } from './../waiting-cursor/waiting-cursor.component'
@@ -30,6 +28,9 @@ import { WaitingCursorComponent } from './../waiting-cursor/waiting-cursor.compo
 export class ArtbaseEditorComponent implements OnInit, OnDestroy {
 
   private service = inject(ArticleInputService)
+  private saveChangesService = inject(SaveChangesService)
+  
+
   private route = inject(ActivatedRoute)
   private router = inject(Router)
 
@@ -65,6 +66,8 @@ export class ArtbaseEditorComponent implements OnInit, OnDestroy {
       })
     })
     this.articleItem.artbaseItems = newArtbase
+    // persist updated articleItem in backend
+    this.saveChangesService.saveArticleItem(this.articleItem)
   }
 
   ngOnDestroy(): void {

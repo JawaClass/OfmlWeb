@@ -1,0 +1,49 @@
+<div class="container">
+
+    @if (selectedProgram.length) {
+        <h2>
+            Übersicht von {{ selectedProgram }}
+        </h2>
+        
+        <mat-divider></mat-divider>
+        
+        <mat-accordion class="example-headers-align" multi> 
+                
+            @for (p of filteredResult; track p.pClass.name; let idx = $index) {
+                <h3>
+                    <strong>
+                        {{ p.pClass.name }}
+                    </strong>
+                </h3>
+            
+                @for (propItem of p.propItems; track propItem) {
+                    
+        
+                    <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        {{ propItem.property }} : {{ propItem.propertyText }}
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    
+                    @for (pValue of propItem.values; track pValue) {
+                        <p>
+                            -  {{ pValue.value }} : {{ pValue.text }}
+                        </p>
+                    }
+              
+                  </mat-expansion-panel>
+        
+                }
+        
+        
+            }
+        </mat-accordion>
+    } @else {
+        <h3>
+            Programm auswählen für Übersicht   
+        </h3>
+    }
+    
+    
+</div>

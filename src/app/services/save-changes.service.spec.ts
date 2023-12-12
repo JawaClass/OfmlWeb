@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ArtbaseEditorService } from './artbase-editor.service';
+import { SaveChangesService } from './save-changes.service';
 
-describe('ArtbaseEditorService', () => {
-  let service: ArtbaseEditorService;
+describe('SaveChangesService', () => {
+  let service: SaveChangesService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(ArtbaseEditorService);
+    service = TestBed.inject(SaveChangesService);
   });
 
   it('should be created', () => {

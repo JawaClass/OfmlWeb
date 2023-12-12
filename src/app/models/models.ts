@@ -6,6 +6,14 @@ export class PropValueItem {
         public active: boolean,
         public isArtbase: boolean,
     ) { }
+    static fromJSON(json: any) {
+        return new PropValueItem(
+            json["value"],
+            json["text"],
+            json["active"],
+            json["isArtbase"],
+        )
+    }
 };
 
 
@@ -16,7 +24,20 @@ export class PropertyItem {
         public propertyText: string,
         public values: PropValueItem[],
         public active: boolean,
+        public pClass: string,
+        public program: string,
     ) { }
+    
+    static fromJSON(json: any) {
+        return new PropertyItem(
+            json["property"],
+            json["propertyText"],
+            json["values"].map((item: any) => PropValueItem.fromJSON(item)),
+            json["active"],
+            json["pClass"],
+            json["program"],
+        )
+    }
 
     public setAllActive(value: boolean = true) {
         this.active = value
@@ -41,6 +62,10 @@ export class PropertyItem {
         return `PropertyItem (${this.property}, ${this.active})`;
     }
 
+    jsonify() {
+        return JSON.stringify(this)
+    }
+
 }
 
 export class ArtbaseItem {
@@ -50,6 +75,14 @@ export class ArtbaseItem {
         public property: string,
         public value: string,
     ) { }
+    static fromJSON(json: any) {
+        return new ArtbaseItem(
+            json["articleNr"],
+            json["pClass"],
+            json["property"],
+            json["value"],
+        )
+    }
 }
 
 
@@ -65,7 +98,22 @@ export class ArticleItem {
         public articleNrAlias: string = articleNr,
         public seen: boolean = false
     ) { }
-
+    static fromJSON(json: any) {
+        return new ArticleItem(
+            json["articleNr"],
+            json["series"],
+            json["program"],
+            json["shorttext"],
+            json["pClasses"],
+            json["artbaseItems"].map((item: any) => ArtbaseItem.fromJSON(item)),
+            json["artbaseFetched"],
+            json["articleNrAlias"],
+            json["seen"]
+        )
+    }
+    jsonify() {
+        return JSON.stringify(this)
+    }
 }
 
 export class PropertyClass {
@@ -110,6 +158,86 @@ export class ProgramMap extends Map<ProgramString, Map<PropertyClassString, Prop
 
     private _articleItems: Map<ProgramString, Map<ArticleString, ArticleItem>>
     private _propertyItems: PropertyMap
+
+    updateWithItems(articleItems: ArticleItem[], propertyItems: PropertyItem[]) {
+        this.clear()
+        this._propertyItems.clear()
+        this._articleItems.clear()
+        this._isActive.clear()
+        articleItems.forEach(item => {
+
+            // program map 
+            if (!this.get(item.program)) this.set(item.program, new Map())
+            item.pClasses.forEach(pClass => {
+                if (!this.get(item.program)!!.get(pClass)) this.get(item.program)!!.set(pClass,
+                    new PropertyClass(pClass, [], false, false))
+            })
+            
+            item.pClasses.forEach(pClass => {
+                this.get(item.program)!!.get(pClass)?.articleItems.push(item)
+            })
+
+            // _articleItems
+            if (!this._articleItems.get(item.program)) this._articleItems.set(item.program, new Map())
+            this._articleItems.get(item.program)!!.set(item.articleNr, item)
+            
+            // _isActive
+            this._isActive.add(item.program)
+            
+            // _propertyItems
+            if (!this._propertyItems.get(item.program))
+                this._propertyItems.set(item.program, new Map())
+
+        })
+
+        propertyItems.forEach(item => {
+            if (!this._propertyItems.get(item.program)) this._propertyItems.set(item.program, new Map())
+            if (!this._propertyItems.get(item.program)!!.get(item.pClass)) this._propertyItems.get(item.program)!!.set(item.pClass, [])
+            this._propertyItems.get(item.program)!!.get(item.pClass)!!.push(item)
+
+            this.get(item.program)!!.get(item.pClass)!!.seen = true
+            this.get(item.program)!!.get(item.pClass)!!.edited = true
+             
+        })
+
+    }
+
+    constructor(input: any | null = null) {
+        super()
+
+        this._isActive = new Set()
+        this._articleItems = new Map()
+        this._propertyItems = new PropertyMap()
+
+        if (input !== null)
+            Object.keys(input!!).forEach((program: ProgramString) => {
+                this.set(program, new Map<PropertyClassString, PropertyClass>)
+                this._isActive.add(program)
+
+                this._articleItems.set(program, new Map())
+                this._propertyItems.set(program, new Map())
+
+                Object.keys(input[program]).forEach((pClass: PropertyClassString) => {
+                    this.get(program)!!.set(pClass, new PropertyClass(pClass, []))
+                    
+                    Array.from(input[program][pClass]).forEach((articleJson: any) => {
+                        const articleNr = articleJson["article_nr"]
+                        let articleItemRef = this.getArticleRef(program, articleNr)
+                        const hasRef = Boolean(articleItemRef)
+                        if (!hasRef) {
+                            this._articleItems.get(program)?.set(
+                                articleNr,
+                                new ArticleItem(articleNr, articleJson["series"], program, articleJson["shorttext"])
+                            )
+                            articleItemRef = this.getArticleRef(program, articleNr)
+                        }
+
+                        articleItemRef?.pClasses.push(pClass)
+                        this.get(program)!!.get(pClass)?.articleItems.push(articleItemRef!!)
+                    })
+                })
+            })
+    }
 
     jsonify(): Object {
         let json = Object(this.getAllActiveArticleRefs())
@@ -181,43 +309,6 @@ export class ProgramMap extends Map<ProgramString, Map<PropertyClassString, Prop
 
     getAllActiveArticleRefs(): ArticleItem[] {
         return this.getActivePrograms().flatMap((program: string) => Array.from(this._articleItems.get(program)!!.values()))
-    }
-
-    constructor(input: any | null = null) {
-        super()
-
-        this._isActive = new Set()
-        this._articleItems = new Map()
-        this._propertyItems = new PropertyMap()
-
-        if (input !== null)
-            Object.keys(input!!).forEach((program: ProgramString) => {
-                this.set(program, new Map<PropertyClassString, PropertyClass>)
-                this._isActive.add(program)
-
-                this._articleItems.set(program, new Map())
-                this._propertyItems.set(program, new Map())
-
-                Object.keys(input[program]).forEach((pClass: PropertyClassString) => {
-                    this.get(program)!!.set(pClass, new PropertyClass(pClass, []))
-                    
-                    Array.from(input[program][pClass]).forEach((articleJson: any) => {
-                        const articleNr = articleJson["article_nr"]
-                        let articleItemRef = this.getArticleRef(program, articleNr)
-                        const hasRef = Boolean(articleItemRef)
-                        if (!hasRef) {
-                            this._articleItems.get(program)?.set(
-                                articleNr,
-                                new ArticleItem(articleNr, articleJson["series"], program, articleJson["shorttext"])
-                            )
-                            articleItemRef = this.getArticleRef(program, articleNr)
-                        }
-
-                        articleItemRef?.pClasses.push(pClass)
-                        this.get(program)!!.get(pClass)?.articleItems.push(articleItemRef!!)
-                    })
-                })
-            })
     }
 
     isActive(program: ProgramString) {

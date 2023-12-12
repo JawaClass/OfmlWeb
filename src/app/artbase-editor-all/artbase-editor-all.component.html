@@ -1,70 +1,79 @@
-<div class="header">
-    <h2> Artbase für <strong>alle</strong> Artikel aus folgenden Programmen einmalig setzen </h2>
-    @for(program of activePrograms(); track program) {
-    <span class="program">{{program}}</span>
-    }
-</div>
-
-@if (isFetchingData) {
-    <p><strong>Einen Moment bitte (initial werden Daten geladen) ...</strong></p>
-    <app-waiting-cursor></app-waiting-cursor>
-} @else {
-
-<div class="items">
-    <table>
-        <tr>
-            <th><mat-label>Merkmal</mat-label></th>
-            <th><mat-label>Wert</mat-label></th>
-        </tr>
-        @for(item of artbaseItems; track item; let idx = $index) {
-
-        <tr>
-
-            <td><input matInput [(ngModel)]="item.property" placeholder="z.B. F1" oninput="this.value = this.value.toUpperCase()"/></td>
-            <td><input matInput [(ngModel)]="item.value" placeholder="z.B. WI" oninput="this.value = this.value.toUpperCase()"/></td>
-            
-            @if(idx > 0) {
-                <span (click)="deleteItem(idx)" class="delete">x</span>
+<div class="container">
+    <div class="artbase-div">
+        <div class="header">
+            <h2> Artbase für <strong>alle</strong> Artikel aus folgenden Programmen einmalig setzen </h2>
+            @for(program of activePrograms(); track program) {
+            <span class="program primary" (click)="selectedProgram = program" >{{program}}</span>
+            }
+        </div>
+        
+        @if (isFetchingData) {
+            <p><strong>Einen Moment bitte (initial werden Daten geladen) ...</strong></p>
+            <app-waiting-cursor></app-waiting-cursor>
+        } @else {
+        
+        <div class="items">
+            <table>
+                <tr>
+                    <th><mat-label>Merkmal</mat-label></th>
+                    <th><mat-label>Wert</mat-label></th>
+                </tr>
+                @for(item of artbaseItems; track item; let idx = $index) {
+        
+                <tr>
+        
+                    <td><input matInput (ngModelChange)="onPropertyInput($event)" [(ngModel)]="item.property" placeholder="z.B. F1" 
+                        /></td>
+                    <td><input matInput [(ngModel)]="item.value" placeholder="z.B. WI" oninput="this.value = this.value.toUpperCase()"/></td>
+                    
+                    @if(idx > 0) {
+                        <span (click)="deleteItem(idx)" class="delete">x</span>
+                    }
+                    
+                </tr>
+        
+                }
+            </table>
+            <div class="centered-div">
+                <button class="add-button" mat-mini-fab (click)="addEmptyItem()"
+                    [disabled]="btnAddDisabled()"> 
+                    <mat-icon>plus_one</mat-icon>
+                </button>
+            </div>
+        
+            @if (this.validArtbaseItems().length > 0) {
+                <button type="submit" mat-raised-button class="" [disabled]="btnDisabled()" (click)="updateAll()">
+                    Alle aktualisieren
+                  </button>
             }
             
-        </tr>
-
+          
+            
+        @if (showArtbaseChangesResult) {
+            <div style="margin-top: 20px;">
+                <p>
+                    <strong>Artbase Einträge neu hinzugefügt:</strong> {{artbaseChanges.length}}
+                </p>
+                @for(item of artbaseItemsResultCopy; track item; let idx = $index) {
+                    <p>
+                        <strong>{{ item.property }} {{ item.value }} : </strong> {{ item.changeCounter }} x
+                    </p>
+                }
+                @for(item of artbaseChanges; track item; let idx = $index) {
+                    <p>
+                        {{ item.articleNr }} - {{ item.pClass }} - {{ item.property }} - {{ item.value }}  
+                    </p>
+                }
+            </div>
         }
-    </table>
-    <div class="centered-div">
-        <button class="add-button" mat-mini-fab color="primary" (click)="addEmptyItem()"
-            [disabled]="btnAddDisabled()"> 
-            <mat-icon>plus_one</mat-icon>
-        </button>
-    </div>
-
-    @if (this.validArtbaseItems().length > 0) {
-        <button type="submit" mat-raised-button color="primary" [disabled]="btnDisabled()" (click)="updateAll()">
-            Alle aktualisieren
-          </button>
-    }
-    
-  
-    
-@if (showArtbaseChangesResult) {
-    <div style="margin-top: 20px;">
-        <p>
-            <strong>Artbase Einträge neu hinzugefügt:</strong> {{artbaseChanges.length}}
-        </p>
-        @for(item of artbaseItemsResultCopy; track item; let idx = $index) {
-            <p>
-                <strong>{{ item.property }} {{ item.value }} : </strong> {{ item.changeCounter }} x
-            </p>
-        }
-        @for(item of artbaseChanges; track item; let idx = $index) {
-            <p>
-                {{ item.articleNr }} - {{ item.pClass }} - {{ item.property }} - {{ item.value }}  
-            </p>
+        
+        
+        </div>
         }
     </div>
-}
-
-
+    
+    <div style="min-width: 30%;">
+        <app-prop-summary [selectedProgram]="selectedProgram" [currentPropertyInput]="currentUserInput.property">
+        </app-prop-summary>
+    </div>
 </div>
-}
-

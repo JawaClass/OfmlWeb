@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({
   providedIn: 'any' //'root'
 })
-export class BaseService implements OnInit {
+export abstract class BaseService implements OnInit {
   
   ngOnInit(): void {
     console.log("BaseService INIT........");

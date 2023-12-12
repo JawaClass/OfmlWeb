@@ -19,10 +19,10 @@ import { ToggleButtonComponent } from './../toggle-button/toggle-button.componen
 import { DEFAULT_ARTICLES } from './mock-data'
 
 import { CreateProgramComponent } from './../create-program/create-program.component'
-import { ArticleItem, ProgramMap } from './../models/models'
-import { Observable, Subject, map } from 'rxjs';
+import { ArticleItem } from './../models/models'
 import { ProgressService } from '../services/progress.service';
 import { WaitingCursorComponent } from '../waiting-cursor/waiting-cursor.component'
+import { SaveChangesService } from '../services/save-changes.service'; 
 
 
 @Component({
@@ -42,6 +42,7 @@ import { WaitingCursorComponent } from '../waiting-cursor/waiting-cursor.compone
 export class ArticleInputComponent {
   progressService = inject(ProgressService)
   service = inject(ArticleInputService)
+  saveChangesService = inject(SaveChangesService)
   router = inject(Router)
   textAreaArticles: string = DEFAULT_ARTICLES
   getActivePrograms = () => this.service.programMap.getActivePrograms()
@@ -55,6 +56,31 @@ export class ArticleInputComponent {
   isLoading = () => this.progressService.isLoading() 
   getAllActiveArticleRefs = () => this.service.programMap.getAllActiveArticleRefs()
   
+
+  private persistArticleItemPromises = new Map<string, any[]>()
+  
+  onInputChangeArticle(articleItem: ArticleItem) {
+
+    const delayPersist = 5000
+
+    this.persistArticleItemPromises.get(articleItem.articleNr)
+    ?.forEach(timeoutId => clearTimeout(timeoutId))
+
+    const timeoutId = setTimeout(async (item: ArticleItem) => {
+
+      console.log("write articleItem to Database!", item)
+      // TODO: is not awaited
+      await this.saveChangesService.saveArticleItem(item)
+      
+    }, delayPersist, articleItem)
+
+    if (!this.persistArticleItemPromises.get(articleItem.articleNr))
+      this.persistArticleItemPromises.set(articleItem.articleNr, [])
+    
+    this.persistArticleItemPromises.get(articleItem.articleNr)!!.push(timeoutId)
+
+  }
+
   getInputTokens() {
     const regex: RegExp = /[ ;\r?\n]+/
 
@@ -74,12 +100,20 @@ export class ArticleInputComponent {
     return this.getInputTokens().length == 0
   }
 
-  submitQueryArticles() {
+  async submitQueryArticles() {
 
     const tokens = this.getInputTokens()
     
     this.progressService.startLoading()
-    this.service.fetchProgramMap(tokens).subscribe(_ => { this.progressService.stopLoading() })
+    this.service.fetchProgramMap(tokens).subscribe(async _ => { 
+      this.progressService.stopLoading()
+      const items = this.service.programMap.getAllActiveArticleRefs()
+      console.log("fetched Articles:::", items)
+      await Promise.all(items.map(item => this.saveChangesService.saveArticleItem(item)))
+      
+      
+     })
+    
   }
 
   navigateToEditArtbase(program: string, articleNr: string, pClass: string) {

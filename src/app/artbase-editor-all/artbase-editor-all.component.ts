@@ -1,25 +1,19 @@
 import { Component, Input, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ArtbaseEditorService } from '../services/artbase-editor.service';
-import { PropClassService } from '../services/prop-class.service';
 import { ArticleInputService } from '../services/article-input.service';
-import { Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { log } from 'console';
-import assert from 'assert';
 import { MatExpansionModule, MatAccordion } from '@angular/material/expansion';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ArticleItem, ArtbaseItem, PropertyItem, PropValueItem } from '../models/models';
 import { WaitingCursorComponent } from './../waiting-cursor/waiting-cursor.component'
+import { SaveChangesService } from '../services/save-changes.service';
+import { PropSummaryComponent } from '../prop-summary/prop-summary.component'
 
 interface SimpleArtbase {
   property: string,
@@ -32,7 +26,7 @@ interface SimpleArtbase {
   standalone: true,
   imports: [CommonModule, MatCheckboxModule, FormsModule, MatExpansionModule,
     MatButtonModule, MatDividerModule, MatIconModule, MatCheckboxModule, MatInputModule, FormsModule, MatFormFieldModule,
-    WaitingCursorComponent
+    WaitingCursorComponent, PropSummaryComponent
   ],
   templateUrl: './artbase-editor-all.component.html',
   styleUrl: './artbase-editor-all.component.css'
@@ -40,8 +34,10 @@ interface SimpleArtbase {
 export class ArtbaseEditorAllComponent implements OnInit, OnDestroy {
 
   private service = inject(ArticleInputService)
-  private route = inject(ActivatedRoute)
+  private saveChangesService = inject(SaveChangesService)
   private router = inject(Router)
+
+  selectedProgram = ""
 
   private MOCK = [
     { property: "", value: "", changeCounter: 0 }
@@ -55,10 +51,28 @@ export class ArtbaseEditorAllComponent implements OnInit, OnDestroy {
   artbaseItemsResultCopy: SimpleArtbase[] = [] 
 
   validArtbaseItems = () => this.artbaseItems.filter((_: SimpleArtbase, idx: number) => this.isArtbaseItemValid(idx))
-  isArtbaseItemValid = (idx: number) => this.artbaseItems[idx].property.trim().length > 0 && this.artbaseItems[idx].value.trim().length > 0
+  isArtbaseItemValid(idx: number): boolean {
+    const prop = this.artbaseItems[idx].property
+    const value = this.artbaseItems[idx].value
+    return prop.trim().length > 0 && value.trim().length > 0 && prop === prop.toUpperCase() && value === value.toUpperCase()
+  }
 
   isFetchingData = false
   showArtbaseChangesResult = false
+
+  currentUserInput: SimpleArtbase = {
+    property: "",
+    value: "",
+    changeCounter: -1, // nod needed
+  }
+
+  onPropertyInput(value: string) {
+    console.log("onPropertyInput.......", value, value.length);
+    if (value.trim().length) 
+      this.currentUserInput.property = value
+    else 
+      this.currentUserInput.property = ""
+  }
 
   resetChanges() {
     //this.isFetchingData = false
@@ -70,6 +84,9 @@ export class ArtbaseEditorAllComponent implements OnInit, OnDestroy {
   async addArtbaseItemsToAllArticles(enteredArtbaseItems: SimpleArtbase[]) {
     console.log("addArtbaseItemsToAllArticles:: enteredArtbaseItems =", enteredArtbaseItems);
     
+    // collected articleItems that get updated
+    let affectedArticleItems = new Map()
+     
     this.service.programMap.getAllActiveArticleRefs().forEach((articleItem: ArticleItem) => {
       articleItem.pClasses.forEach((pClass: string) => {
         this.service.programMap.getPropItems(articleItem.program, pClass)?.forEach((propItem: PropertyItem) => {
@@ -84,6 +101,11 @@ export class ArtbaseEditorAllComponent implements OnInit, OnDestroy {
             ) {
               const newEntry = new ArtbaseItem(articleItem.articleNr, pClass, artbaseItem.property, artbaseItem.value)
               articleItem.artbaseItems.push(newEntry)
+              
+              if (!affectedArticleItems.has(articleItem.articleNr)) {
+                affectedArticleItems.set(articleItem.articleNr, articleItem)
+              }
+              
               console.log("add ArtbaseItem", newEntry);
               this.artbaseChanges.push(newEntry)
               // window.alert("add ArtbaseItem: " + newEntry)
@@ -93,7 +115,9 @@ export class ArtbaseEditorAllComponent implements OnInit, OnDestroy {
         })
       })
     })
-    //window.alert("Artbase changes: " + artbaseChanges)
+    
+    await Promise.all(Array.from([...affectedArticleItems.values()]).map(item => this.saveChangesService.saveArticleItem(item)))
+
   }
 
   btnDisabled() {
@@ -151,6 +175,7 @@ export class ArtbaseEditorAllComponent implements OnInit, OnDestroy {
       value: "",
       changeCounter: 0
     })
+    this.currentUserInput.property = ""
   }
 
   deleteItem(idx: number) {
@@ -158,4 +183,5 @@ export class ArtbaseEditorAllComponent implements OnInit, OnDestroy {
   }
 
   activePrograms = () => this.service.programMap.getActivePrograms()
+
 } 

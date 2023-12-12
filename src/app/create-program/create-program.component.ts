@@ -2,9 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ArticleInputService } from '../services/article-input.service';
-import { PropClassService } from '../services/prop-class.service';
 import { CreateProgramService } from '../services/create-program.service';
-import { ArtbaseEditorService } from '../services/artbase-editor.service';
 import { RouterModule, Router } from '@angular/router';
 
 import { MatIconModule } from '@angular/material/icon';

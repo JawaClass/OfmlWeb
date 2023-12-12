@@ -1,5 +1,5 @@
 <mat-toolbar class="primary">
-  <mat-toolbar-row>
+  <mat-toolbar-row class="row">
 
     @if (showBtnGoPack()) {
       <button class="back-btn" (click)="goBackPage()">
@@ -9,6 +9,44 @@
     
     <span class="header-text" routerLink="" routerLinkActive="active">Der OFML Datenmacher</span>
 
+    @if (ownerText) {
+      
+    <span style="font-size:small;"> {{ ownerText }}</span>
+
+    <span style="font-size:small;"> Session: {{ sessionName }}</span>
+
+    @if (sessionNames.length > 0) {
+       
+        <mat-form-field style="margin: 0; padding: 0; align-self: baseline; min-width: 350px;">
+          <mat-label>Meine Sessions</mat-label>
+          <mat-select [(value)]="sessionName">
+          
+            @for (name of sessionNames; track name) {
+              <mat-option (click)="selectSession(name)" [value]="name">
+                <div style="flex-grow: 10;  background-color: transparent; display: flex; justify-content: space-between;">
+
+                  <span style="display: flex; align-items: center;">{{ name }}</span>
+
+                    <button style="margin-left: 30px;  cursor: pointer; color: red; display: flex;
+                    justify-content: center;
+                    align-items: center;" (click)="deleteSession($event, name)">
+                      <mat-icon style="margin-right: 0px;" fontIcon="delete_outline">
+                      </mat-icon>
+                    </button>
+
+                </div>
+              </mat-option>
+            } 
+        </mat-select>
+        </mat-form-field>
+   
+    }
+    
+    }
+
+    <span style="font-size:small;"> {{ path }} | {{ timestamp }}</span>
+
+
   </mat-toolbar-row>
 
 </mat-toolbar>
@@ -16,3 +54,4 @@
 <div class="content">
   <router-outlet></router-outlet>
 </div>
+
