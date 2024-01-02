@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject, map } from 'rxjs';
+import { Observable, Subject, map, of, BehaviorSubject } from 'rxjs';
 import { BaseService } from './base.service'
 import { ProgramMap, ArtbaseItem, ArticleItem, PropertyItem, PropValueItem } from './../models/models'
 
@@ -8,16 +8,25 @@ import { ProgramMap, ArtbaseItem, ArticleItem, PropertyItem, PropValueItem } fro
 })
 export class ArticleInputService extends BaseService {
 
+  scrollY = 0
+
   programMap: ProgramMap = new ProgramMap()
+  behaviorSubjectProgramMap = new BehaviorSubject<ProgramMap>(this.programMap)
+
+  clearMap() {
+    this.programMap = new ProgramMap()
+    this.behaviorSubjectProgramMap.next(this.programMap)
+  }
 
   hasProgramData = () => this.programMap.size > 0
 
   fetchProgramMap(articlenumbers: string[]): Observable<ProgramMap> {
 
     const url = this.baseUrl + "/ocd/article_compact"
-    return this.http.post<ProgramMap>(url, articlenumbers)
+    return this.httpClient.post<ProgramMap>(url, articlenumbers)
       .pipe(map((result: Object) => {
         this.programMap = new ProgramMap(result)
+        this.behaviorSubjectProgramMap.next(this.programMap)
         return this.programMap
       }))
   }

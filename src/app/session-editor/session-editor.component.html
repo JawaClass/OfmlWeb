@@ -1,0 +1,28 @@
+<form (submit)="saveSession()" class="primary">
+    <h2 color="primary" style="text-align: center; color: whitesmoke">
+        {{ textResource.header }} 
+    </h2>   
+    <section style="color: whitesmoke; margin: 16px;">
+        <strong>Sitzungseigentümer: {{ geUser() }} </strong>
+    </section>
+    <mat-form-field style="width: 100%;">
+        <mat-label>Sitzungsname</mat-label>
+        <input matInput [(ngModel)]="sessionAndOwner.session.name" name="sessionName" maxlength="20" />
+    </mat-form-field>
+    <section>
+        <mat-checkbox name="isPublic" id="isPublic" [(ngModel)]="sessionAndOwner.session.isPublic"> {{ textResource.checkbox }} </mat-checkbox>
+    </section>
+    <mat-form-field style="width: 100%;">
+        <mat-label>Artikelnummern</mat-label>
+        <textarea  style="width: 100%;" [(ngModel)]="sessionAndOwner.session.articleInput"
+        matInput [rows]="5" name="textAreaArticles"
+        oninput="this.value = this.value.toUpperCase()">
+      </textarea>
+      </mat-form-field>
+    <button type="submit" mat-raised-button color="primary"
+        style="display: inline-block; width: 100%;"
+        [disabled]="!signupFormValid()">
+        {{ textResource.button }} 
+    </button>
+    
+</form>

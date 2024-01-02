@@ -1,16 +1,17 @@
-import { Component, Inject, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Inject, Input, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCheckboxModule, MatCheckboxChange} from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
-import { MatExpansionModule, MatAccordion } from '@angular/material/expansion';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { ArticleInputService } from '../services/article-input.service';
-import { SaveChangesService } from '../services/save-changes.service';
-import { ArtbaseItem, ArticleItem, PropertyItem } from '../models/models';
+import { ArticleitemService } from '../services/articleitem.service';
+import { ArtbaseItem, ArticleItem, PropertyItem, PropValueItem } from '../models/models';
 import { RouterModule, Router } from '@angular/router';
 import { WaitingCursorComponent } from './../waiting-cursor/waiting-cursor.component'
-//type PropClass2PropsMap = Map<string, PropertyItem[]>
+import { MatTooltipModule } from '@angular/material/tooltip';
+
 
 @Component({
   selector: 'app-artbase-editor',
@@ -21,14 +22,15 @@ import { WaitingCursorComponent } from './../waiting-cursor/waiting-cursor.compo
     MatExpansionModule,
     RouterModule,
     WaitingCursorComponent,
+    MatTooltipModule
   ],
   templateUrl: './artbase-editor.component.html',
   styleUrl: './artbase-editor.component.css'
 })
-export class ArtbaseEditorComponent implements OnInit, OnDestroy {
+export class ArtbaseEditorComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private service = inject(ArticleInputService)
-  private saveChangesService = inject(SaveChangesService)
+  private articleitemService = inject(ArticleitemService)
   
 
   private route = inject(ActivatedRoute)
@@ -36,6 +38,26 @@ export class ArtbaseEditorComponent implements OnInit, OnDestroy {
 
   articleItem!: ArticleItem
   isFetchingData = false
+
+  ngAfterViewInit() {
+    const elem = document.querySelector('.mat-sidenav-content')
+    elem!!.scroll(
+      {
+        left: 0,
+        top: 0,
+        behavior: 'instant',
+      }
+    )
+  }
+
+  onToggleAll(propItem: PropertyItem, e: MatCheckboxChange) {
+    propItem.setAllArtbase(e.checked)
+    this.articleItem.edited = true
+  }
+
+  onToggle(valItem: PropValueItem, e: MatCheckboxChange) {
+    this.articleItem.edited = true
+  }
 
   setArtbaseOnStart() {
     this.articleItem.artbaseItems.forEach(item => {
@@ -45,7 +67,7 @@ export class ArtbaseEditorComponent implements OnInit, OnDestroy {
             if (valueItem.value === item.value) {
               valueItem.isArtbase = true
             }
-          });
+          })
         }
       })
     })
@@ -59,15 +81,18 @@ export class ArtbaseEditorComponent implements OnInit, OnDestroy {
         propItem.values.forEach(valueItem => {
           if (valueItem.isArtbase) {
             newArtbase.push(new ArtbaseItem(this.articleItem.articleNr, pClass, propItem.property, valueItem.value))
+            // ----- this.articleItem.edited = true
           }
         });
         // reset property Artbase
         propItem.setAllArtbase(false)
       })
     })
+    
     this.articleItem.artbaseItems = newArtbase
-    // persist updated articleItem in backend
-    this.saveChangesService.saveArticleItem(this.articleItem)
+    
+    this.articleitemService.saveArticleItem(this.articleItem)
+    
   }
 
   ngOnDestroy(): void {
@@ -102,102 +127,4 @@ export class ArtbaseEditorComponent implements OnInit, OnDestroy {
     return this.service.programMap.getPropItems(this.articleItem.program, pClass)!!
   }
 }
-
-/*
-
-
-  propClass2PropsMap: PropClass2PropsMap = new Map()
-  // propClass -> Prop -> Values
-  artbase: Map<string, Map<string, any[]>> = new Map()
-
-  ngOnDestroy(): void {
-
-    //console.log("Artbase :: ngOnDestroy");
-    let tempChanges: ArtbaseItem[] = []
-    Array.from(this.propClass2PropsMap.keys()).forEach((pClass: string) => {
-      //console.log("k", pClass)
-      const changes: PropertyItem[] = Array.from(this.propClass2PropsMap.get(pClass)!!)
-      console.log("changes", changes);
-      changes.forEach(pItem => {
-        pItem.values.forEach(value => {
-          if (value.isArtbase) {
-
-            const artbaseItem: ArtbaseItem = {
-              article_nr: this.article,
-              prop_class: pClass,
-              prop_value: value.v,
-              property: pItem.property_name
-            }
-            tempChanges.push(artbaseItem)
-
-          }
-        })
-      })
-
-    });
-
-    this.service.saveChanges(this.program, this.article, tempChanges)
-  }
-
-
-  getPropsResult(pClass: string) {
-
-    this.propClassService
-      .getPropsResult(this.program, pClass)
-      .subscribe((xOrig: PropertyItem[]) => {
-        let x = xOrig//structuredClone(xOrig)
-
-        let temp: PropertyItem[] = []
-        x.forEach(a => {
-          temp.push(new PropertyItem(a.property_name, a.prop_text, a.values, a.active))
-          a.values.forEach(v => {
-
-            const isArtbase = Boolean(
-              this.artbase.
-                get(pClass)?.get(a.property_name)?.find(x => x.prop_value == v.v)
-            )
-
-            v.isArtbase = isArtbase
-          })
-
-        })
-        this.propClass2PropsMap.set(pClass, temp)
-
-      })
-
-  }
-
-  ngOnInit() {
-    this.route.params.subscribe((params) => {
-      this.program = params['program']
-      this.article = params['article']
-
-      this.service.getArtbase(this.program, this.article).subscribe((artbase: ArtbaseItem[]) => {
-
-        console.log("artbase entries....", artbase.length);
-
-        artbase.forEach((row: ArtbaseItem) => {
-
-          if (!this.artbase.has(row.prop_class))
-            this.artbase.set(row.prop_class, new Map())
-
-          if (!this.artbase.get(row.prop_class)!!.has(row.property))
-            this.artbase.get(row.prop_class)!!.set(row.property, [])
-
-          this.artbase.get(row.prop_class)!!.get(row.property)!!.push(row)
-          console.log("PUSH artbase::", row.prop_class, row.property, row);
-
-        })
-
-        //console.log("propClass2Prop2Values ::: ", this.propClass2Prop2Values)
-
-        // get all the propClasses from the data we already have fetched for this article and this program
-        const pClasses = this.articleInputService.
-          getPropClassesForArticles(this.program, this.article)
-        // console.log("propClassesArticle", pClasses);
-        pClasses.forEach(x => { this.getPropsResult(x) })
-
-      })
-    });
-  }*/
-//}
+ 

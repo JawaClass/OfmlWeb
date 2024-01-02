@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ArticleInputComponent } from './article-input.component';
+import { SessionEditorComponent } from './session-editor.component';
 
-describe('ArticleInputComponent', () => {
-  let component: ArticleInputComponent;
-  let fixture: ComponentFixture<ArticleInputComponent>;
+describe('SessionEditorComponent', () => {
+  let component: SessionEditorComponent;
+  let fixture: ComponentFixture<SessionEditorComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ArticleInputComponent]
+      imports: [SessionEditorComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(ArticleInputComponent);
+    fixture = TestBed.createComponent(SessionEditorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

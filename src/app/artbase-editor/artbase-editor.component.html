@@ -1,12 +1,13 @@
-
-
-<h1>Artbase von <strong>{{ this.articleItem?.articleNr }}</strong> aus <strong>{{ this.articleItem?.program | uppercase
-    }}</strong> </h1>
+<h1>Artbase von
+  <strong>
+    {{ this.articleItem?.articleNr }}</strong> aus <strong>{{ this.articleItem?.program | uppercase}}
+  </strong>
+</h1>
 
 @if (isFetchingData) {
-  <app-waiting-cursor></app-waiting-cursor>
+<app-waiting-cursor></app-waiting-cursor>
 } @else {
-  
+
 
 @for (pClass of articleItem?.pClasses; track pClass; let idx = $index) {
 
@@ -19,6 +20,7 @@
 
       <span>
         {{ propItem.property }} : {{ propItem.propertyText }}
+        <mat-checkbox (change)="onToggleAll(propItem, $event)"></mat-checkbox>
         <mat-checkbox disabled [(ngModel)]="propItem.active"></mat-checkbox>
       </span>
 
@@ -30,10 +32,11 @@
 
 
 
+  <span>Artbase</span>
   @for (valItem of propItem.values; track valItem.value; let idx = $index) {
   <section>
 
-    <mat-checkbox [(ngModel)]="valItem.isArtbase"> Artbase </mat-checkbox>
+    <mat-checkbox (change)="onToggle(valItem, $event)" [(ngModel)]="valItem.isArtbase"></mat-checkbox>
     <mat-checkbox disabled [(ngModel)]="valItem.active">{{ valItem.value }} : {{ valItem.text }}</mat-checkbox>
 
   </section>
@@ -42,11 +45,10 @@
 </mat-expansion-panel>
 
 } @empty {
-  <p><strong>Leer</strong></p>
-  }
+<p><strong>Leer</strong></p>
+}
 
 }
 
 
 }
- 

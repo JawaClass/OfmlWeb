@@ -1,0 +1,68 @@
+<mat-chip-listbox multiple>
+
+  @for (program of getAllPrograms(); track program; let idx = $index) {
+
+  <mat-chip-option [selected]="isProgramActive(program)" (click)="toggleActive(program)">
+    {{ program }}
+  </mat-chip-option>
+
+  }
+
+</mat-chip-listbox>
+
+
+
+@if (notUniqueArticles().length) {
+
+<h2>
+  <strong style="font-size: large;">{{ notUniqueArticles().length }} Artikel doppeln sich. Entferne zuerst die
+    Duplikate.</strong>
+</h2>
+
+<table>
+
+  @for (articleDuplicate of notUniqueArticles(); track articleDuplicate.articleNr; let idx = $index) {
+
+
+  <tr>
+    <strong>{{ articleDuplicate.articleNr }} {{ articleDuplicate.duplicates.length }} Stk.</strong>
+  </tr>
+
+
+
+  @for (duplicate of articleDuplicate.duplicates; track duplicate.articleNr) {
+  <tr>
+
+    <td><strong>{{ duplicate.program }}</strong></td>
+    <td>{{ duplicate.articleNr }}</td>
+    <td>{{ duplicate.shorttext }}</td>
+    <td>
+      <button style="margin-left: 10px; background-color: transparent; border: none; cursor: pointer; color: red;">
+        <mat-icon style="align-self: baseline;" (click)="removeArticleItem(duplicate)" fontIcon="delete_outline">
+        </mat-icon>
+      </button>
+    </td>
+  </tr>
+  }
+
+  }
+</table>
+} @else {
+
+<table>
+  @for (article of getAllActiveArticleRefs(); track article.articleNr; let idx = $index) {
+  <tr>
+    <td>{{ idx }}.</td>
+    <td>{{ article.articleNr }}</td>
+    <td>{{ article.program }}</td>
+  </tr>
+  }
+
+</table>
+
+}
+
+<button type="submit" [disabled]="!selectionIsValid()" mat-raised-button color="primary"
+  matTooltip="Ohne Duplikate fortfahren" style="display: inline-block; width: 20%;" (click)="confirmSelection()">
+  Auswahl bestätigen
+</button>

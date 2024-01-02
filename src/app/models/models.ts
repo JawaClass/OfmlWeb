@@ -1,4 +1,138 @@
 
+export interface ErrorMessage {
+    error: string,
+    message: string
+}
+
+export interface IDate {
+    year: number,
+    month: number,
+    day: number,
+    hour: number,
+    minute: number,
+    second: number
+}
+
+export class Date implements IDate {
+    constructor(
+       public year: number,
+       public month: number,
+       public day: number,
+       public hour: number,
+       public minute: number,
+       public second: number,
+    ) {}
+    
+    getYearMonthDay() {
+        const day = this.day > 9 ?  `${this.day}`: `0${this.day}`
+        const month = this.month > 9 ?  `${this.month}`: `0${this.month}`  
+        return `${day}.${month}.${this.year}`
+    }
+
+    getHourMinSec() {
+        const hour = this.hour > 9 ?  `${this.hour}`: `0${this.hour}`
+        const minute = this.minute > 9 ?  `${this.minute}`: `0${this.minute}` 
+        const second = this.second > 9 ?  `${this.second}`: `0${this.second}`  
+        return `${hour}:${minute}:${second}`
+    }
+
+    static fromJSON(json: any) {
+        console.log("Date :: fromJSON");
+        
+        return new Date(
+            json["year"],
+            json["month"],
+            json["day"],
+            json["hour"],
+            json["minute"],
+            json["second"],
+        )
+    }
+}
+
+export interface ISession {
+    id?: number,
+    name: string,
+    creationDate?: Date,
+    editDate?: Date,
+    isPublic: boolean,
+    ownerId: number,
+    articleInput: string
+}
+
+export interface SessionAndOwner {
+    session: Session,
+    owner: User
+}
+
+export class Session implements ISession {
+    constructor(
+        public id: number | undefined,
+        public name: string,
+        public creationDate: Date | undefined,
+        public editDate: Date | undefined,
+        public isPublic: boolean,
+        public ownerId: number,
+        public articleInput: string,
+    ) {}
+    
+    static emptyOne(userId: number) {
+        return new Session(
+            undefined,
+            "",
+            undefined,
+            undefined,
+            true,
+            userId,
+            ""
+        )
+    }
+
+    static fromJSON(json: any) {   
+        return new Session(
+            json["id"],
+            json["name"],
+            Date.fromJSON(json["creationDate"]),
+            Date.fromJSON(json["editDate"]),
+            json["isPublic"],
+            json["ownerId"],
+            json["articleInput"],
+        )
+    }
+
+    public getInputTokens() {
+        const regex: RegExp = /[ ;\r?\n]+/
+    
+        let tokens = this.articleInput.split(regex)
+        if (tokens.length > 0) {
+          if (tokens[0] == "")
+            tokens.splice(0, 1)
+          if (tokens.length > 0) {
+            if (tokens[tokens.length - 1] == "")
+              tokens.splice(tokens.length - 1, 1)
+          }
+        }
+        return tokens
+      }
+}
+
+
+export interface User {
+    id?: number,
+    email: string,
+    name: string,
+    creationDate?: Date,
+    editDate?: Date
+}
+
+class Utils {
+   static stringSorter(a: string, b: string) {
+        if(a < b) { return -1; }
+        if(a > b) { return 1; }
+        return 0;
+    }
+}
+
 export class PropValueItem {
     constructor(
         public value: string,
@@ -16,6 +150,10 @@ export class PropValueItem {
     }
 };
 
+export interface PropertyAndValueItem {
+    propertyItem: PropertyItem,
+    propValueItem: PropValueItem
+}
 
 export class PropertyItem {
 
@@ -96,9 +234,17 @@ export class ArticleItem {
         public artbaseItems: ArtbaseItem[] = [],
         public artbaseFetched: boolean = false,
         public articleNrAlias: string = articleNr,
-        public seen: boolean = false
+        public seen: boolean = false,
+        public edited: boolean = false,
+        public shorttextEdited = true,
+        public articleNrEdited = false,
     ) { }
     static fromJSON(json: any) {
+        console.log("Article Item :: fromJSON", json)
+         
+        console.log("artbaseItems ::", json["artbaseItems"], json["articleNr"], json["program"]);
+        
+        
         return new ArticleItem(
             json["articleNr"],
             json["series"],
@@ -108,7 +254,8 @@ export class ArticleItem {
             json["artbaseItems"].map((item: any) => ArtbaseItem.fromJSON(item)),
             json["artbaseFetched"],
             json["articleNrAlias"],
-            json["seen"]
+            json["seen"],
+            json["edited"]
         )
     }
     jsonify() {
@@ -154,10 +301,29 @@ class PropertyMap extends Map<ProgramString, Map<PropertyClassString, PropertyIt
 
 export class ProgramMap extends Map<ProgramString, Map<PropertyClassString, PropertyClass>> {
 
+    clearEmptyPrograms() {
+        const articlePrograms = new Set(this.getAllArticleRefs().map(item => item.program))
+        this.getAllPrograms().forEach(p => {
+          if (!articlePrograms.has(p)) this.delete(p)
+        })
+    }
+
+    clearInActivePrograms() {
+        this.getAllPrograms().forEach(program => {
+            if (!this._isActive.has(program)) {
+                this.delete(program)
+                this._articleItems.delete(program)
+                this._propertyItems.delete(program)
+            }            
+        })
+    }
+
     private _isActive: Set<ProgramString>
 
     private _articleItems: Map<ProgramString, Map<ArticleString, ArticleItem>>
     private _propertyItems: PropertyMap
+
+    getArticleItemsMap = () => this._articleItems
 
     updateWithItems(articleItems: ArticleItem[], propertyItems: PropertyItem[]) {
         this.clear()
@@ -311,6 +477,15 @@ export class ProgramMap extends Map<ProgramString, Map<PropertyClassString, Prop
         return this.getActivePrograms().flatMap((program: string) => Array.from(this._articleItems.get(program)!!.values()))
     }
 
+    getAllArticleRefs(): ArticleItem[] {
+        let refs: ArticleItem[] = []
+        
+        Array.from(this._articleItems.keys()).forEach(program => {
+            refs = [...refs, ...this._articleItems.get(program)!!.values()]
+        })
+        return refs
+    }
+
     isActive(program: ProgramString) {
         return this._isActive.has(program)
     }
@@ -343,12 +518,13 @@ export class ProgramMap extends Map<ProgramString, Map<PropertyClassString, Prop
 
 
     getActivePrograms(): ProgramString[] {
-        return Array.from(this.keys()).filter((program: ProgramString) => this.isActive(program))
+        return Array.from(this.keys()).filter((program: ProgramString) => this.isActive(program)).sort(Utils.stringSorter)
     }
 
     getAllPrograms() {
         return Array.from(this.keys())
     }
 
+    
 
 }

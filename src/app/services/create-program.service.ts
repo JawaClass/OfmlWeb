@@ -1,26 +1,24 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
 import { BaseService } from './base.service';
 import { ProgramMap } from './../models/models'
+import { ArticleInputService } from './article-input.service'
 
 @Injectable({
   providedIn: 'root'
 })
 export class CreateProgramService extends BaseService {
 
-  postCreate(programName: string, programID: string, programMap: ProgramMap): Observable<any> {
+  private service = inject(ArticleInputService)
 
-    console.log("CreateProgramService::postCreate");
-    
+  postCreate(programName: string, programID: string): Observable<any> {
     const url = this.baseUrl + "/ocd/create"
-
-    return this.http.post(url, {
+    const programMap: ProgramMap = this.service.programMap
+    return this.httpClient.post(url, {
       "programName": programName,
       "programID": programID,
       "articleItems": programMap.jsonify(),
       "propertyItems": programMap.jsonifyProperties()
     })
   }
-
 }

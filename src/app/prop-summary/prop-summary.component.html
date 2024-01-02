@@ -1,49 +1,55 @@
 <div class="container">
-
     @if (selectedProgram.length) {
-        <h2>
-            Übersicht von {{ selectedProgram }}
-        </h2>
-        
-        <mat-divider></mat-divider>
-        
-        <mat-accordion class="example-headers-align" multi> 
-                
-            @for (p of filteredResult; track p.pClass.name; let idx = $index) {
-                <h3>
-                    <strong>
-                        {{ p.pClass.name }}
-                    </strong>
-                </h3>
-            
-                @for (propItem of p.propItems; track propItem) {
-                    
-        
-                    <mat-expansion-panel>
-                    <mat-expansion-panel-header>
-                      <mat-panel-title>
-                        {{ propItem.property }} : {{ propItem.propertyText }}
-                      </mat-panel-title>
-                    </mat-expansion-panel-header>
-                    
-                    @for (pValue of propItem.values; track pValue) {
-                        <p>
-                            -  {{ pValue.value }} : {{ pValue.text }}
-                        </p>
-                    }
-              
-                  </mat-expansion-panel>
-        
-                }
-        
-        
+    <div style="display: flex;">
+        <h2 style="flex: 2">Übersicht von <strong>{{ selectedProgram }}</strong></h2>
+        <mat-form-field style="flex: 1">
+            <mat-label>Merkmalsfilter</mat-label>
+            @if (currentPropertyInput.length) {
+            <mat-icon style="cursor: pointer" matSuffix
+                (click)="currentPropertyInput = ''; filterResult(); ">clear</mat-icon>
             }
-        </mat-accordion>
-    } @else {
+            <mat-icon matSuffix>filter_list</mat-icon>
+            <input matInput [(ngModel)]="currentPropertyInput" (input)="filterResult()"
+                placeholder="z.B. F1 oder Farbe" />
+        </mat-form-field>
+    </div>
+    <mat-divider></mat-divider>
+    @if (!isLoading) {
+    <mat-accordion class="example-headers-align" multi>
+        @for (p of filteredResult; track p.pClass.name; let idx = $index) {
         <h3>
-            Programm auswählen für Übersicht   
+            <strong>
+                {{ p.pClass.name }}
+            </strong>
         </h3>
+        @for (propItem of p.propItems; track propItem) {
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    {{ propItem.property }} : {{ propItem.propertyText }}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-selection-list>
+                @for (pValue of propItem.values; track pValue.value) {
+                <mat-list-item style="height: 28px; line-height: 28px;">
+                    <section (click)="selectPropertyValue($event, propItem, pValue)" style="display: flex;">
+                        <span style="flex: 1;">{{ pValue.value }}</span>
+                        <span style="flex: 0.5;">:</span>
+                        <span style="flex: 3;">{{ pValue.text }}</span>
+                    </section>
+                </mat-list-item>
+                }
+            </mat-selection-list>
+        </mat-expansion-panel>
+        }
+        }
+    </mat-accordion>
+    } @else {
+    <mat-spinner></mat-spinner>
     }
-    
-    
+    } @else {
+    <h3>
+        Programm auswählen für Übersicht
+    </h3>
+    }
 </div>

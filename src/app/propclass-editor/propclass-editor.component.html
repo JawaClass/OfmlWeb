@@ -1,34 +1,23 @@
 
 <h1>Merkmale für Klasse <strong>{{pClass}}</strong> von <strong>{{program}}</strong></h1>
 
-<section style="font-size: large; margin-left: 10px;">
-    <span>
-        Werte:
-        <mat-checkbox disabled checked>Wert bleibt erhalten</mat-checkbox>
-        <mat-checkbox disabled>Wert wird entfernt</mat-checkbox>
-    </span>
-</section>
-<section style="font-size: large; margin-left: 10px;">
-    <span>
-        Merkmale:
-        <mat-checkbox disabled checked>Merkmal ist sichtbar (Scope C)</mat-checkbox>
-        <mat-checkbox disabled>Merkmal ist unsichtbar (Scope G)</mat-checkbox>
-    </span>
-</section>
-
 @if (isLoading) {
     <app-waiting-cursor></app-waiting-cursor>
     }
 
-@for (propItem of getPropItems(); track propItem.property; let idx = $index) {
+@for (propItem of propItems; track propItem.property; let idx = $index) {
 
 <mat-expansion-panel style="margin-bottom: 10px;">
     <mat-expansion-panel-header>
         <mat-panel-title>
-
+            
             <span>
                 {{ propItem.property }} : {{ propItem.propertyText }}
-                <mat-checkbox (click)="onMatCheckBoxClick($event)" (change)="onChangeAll(propItem, $event)" [(ngModel)]="propItem.active"></mat-checkbox>
+                <mat-checkbox
+                (click)="$event.stopPropagation()"
+                (change)="onChangeAll(propItem, $event)"
+                [(ngModel)]="propItem.active">
+                </mat-checkbox>
             </span>
 
         </mat-panel-title>
@@ -41,15 +30,20 @@
 
     @for (valItem of propItem.values; track valItem; let idx = $index) {
     <section>
-        <mat-checkbox [(ngModel)]="valItem.active">{{ valItem.value }} : {{ valItem.text }}</mat-checkbox>
+        <mat-checkbox (change)="propClass.edited = true"
+            [(ngModel)]="valItem.active">
+            {{ valItem.value }} : {{ valItem.text }}
+        </mat-checkbox>
     </section>
     }
 
 </mat-expansion-panel>
 
 } @empty {
-    <p>
-        <strong>{{ emptyPlaceholder }}</strong>
-    </p>
+    @if (!isLoading) {
+        <p>
+            <strong> Leere Klasse </strong>
+        </p>
+    }
 }
  

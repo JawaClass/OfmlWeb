@@ -16,35 +16,11 @@
   padding-right: 1vw;
   padding-bottom: 2vh;
 }
-
-.header-text {
-  cursor: pointer;
-  color: white;
-  transition: opacity 0.25s;
-  margin-right: 10px;
-}
-.header-text:hover {
-  box-shadow: 3px 3px 10px rgb(46, 46, 46);
-}
-
-.back-btn {
-  background-color: transparent;
-  border-color: transparent;
-  color: white;
-  cursor: pointer;
-  margin-right: 10px;
-}
-
-.back-btn:hover {
-  box-shadow: 3px 3px 10px rgb(46, 46, 46);
-}
-
-.row {
-  justify-content: space-between;
-}
-
-.select {
-  color: whitesmoke;
-  background-color: #333;
-  border-color:  #333;
+ 
+mat-sidenav-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }

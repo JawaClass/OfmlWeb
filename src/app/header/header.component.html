@@ -1,0 +1,44 @@
+<div name="navigation" style="vertical-align: middle;">
+    @if (router.url !== "/") {
+    <button mat-button (click)="location.back()">
+        <mat-icon>arrow_back</mat-icon>
+    </button>
+    }
+    <button mat-button routerLink="" routerLinkActive="active">Der OFML Datenmacher</button>
+</div>
+<section name="userSection" style="
+width: 100%;
+vertical-align: middle;
+font-size: var(--mdc-typography-button-font-size, 14px);
+display: flex; justify-content: space-evenly;">
+    @if (currentUser) {
+    <section>
+        <a>
+            <mat-icon style="vertical-align: middle;">person_outline</mat-icon>
+        </a>
+        <span style="vertical-align: middle; font-size:  var(--mdc-typography-button-font-size, 14px);">
+            [{{ currentUser?.id }}] {{ currentUser?.email }}
+        </span>
+        <button (click)="logout()" mat-stroked-button>
+            Abmelden
+        </button>
+    </section>
+    <section>
+        <button (click)="openSessionList()" mat-stroked-button>
+            @if (currentSession) {
+            <span style="vertical-align: middle"> [{{ currentSession.id }}] {{ currentSession.name }}</span>
+            } @else {
+            Sitzungen
+            }
+            <mat-icon>menu</mat-icon>
+        </button>
+    </section>
+    } @else {
+    <button (click)="openLoginDialog()" mat-stroked-button>
+        Anmelden
+    </button>
+    }
+</section>
+<section style="vertical-align: middle">
+    <mat-icon style="vertical-align: middle" [matTooltip]="'Pfad: ' + path + ', Datum: ' + timestamp">info</mat-icon>
+</section>

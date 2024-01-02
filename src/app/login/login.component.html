@@ -1,17 +1,22 @@
 
 
-<form (ngSubmit)="signup()" #signupForm="ngForm">
+<form [formGroup]="loginForm" >
 
-    <h2 style="text-align: center;">Es besteht noch kein Konto</h2>
+    <h2 color="primary" style="text-align: center; color: whitesmoke">Es besteht noch kein Konto</h2>
 
     <mat-form-field style="width: 100%;">
         <mat-label>Email</mat-label>
-        <input matInput [(ngModel)]="userName" name="userName" maxlength="100" minlength="3" required />
+        <input matInput 
+            [formControl]="loginForm.controls.email"
+            placeholder="yourEmail@koenig-neurath.de"/>
+        <mat-error>Keine valide König+Neurath Email</mat-error>
     </mat-form-field>
 
-    <button type="submit" [disabled]="!signupFormValid()" mat-raised-button color="primary"
+    <button type="submit" [disabled]="!loginForm.valid" mat-raised-button color="primary"
+        (click)="signup()"
         style="display: inline-block; width: 100%;">
         Konto erstellen
     </button>
+
 
 </form>

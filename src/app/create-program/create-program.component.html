@@ -1,43 +1,67 @@
-
-<form (submit)="createProgram()" class="primary">
+<form [formGroup]="createProgramForm">
 
     <mat-form-field style="width: 100%;">
         <mat-label>Programmname</mat-label>
-        <input matInput [(ngModel)]="newProgramName" name="newProgramName" oninput="this.value = this.value.toLowerCase()" maxlength="20" />
+        <input matInput [formControl]="createProgramForm.controls.programName"
+            oninput="this.value = this.value.toLowerCase()" maxlength="25" />
+        @if (createProgramForm.controls.programName.invalid) { <mat-error>Kein valider Name für ein Programm</mat-error>
+        }
     </mat-form-field>
 
     <mat-form-field style="width: 100%;">
         <mat-label>Programmn ID</mat-label>
-        <input matInput [(ngModel)]="newProgramID" name="newProgramID" oninput="this.value = this.value.toUpperCase()" maxlength="2" />
+        <input #input matInput [formControl]="createProgramForm.controls.programId"
+            oninput="this.value = this.value.toUpperCase()" maxlength="2" />
+        @if (createProgramForm.controls.programId.invalid) { <mat-error>Eine Programm ID besteht aus zwei
+            Ziffern</mat-error> }
     </mat-form-field>
 
-    <button type="submit" [disabled]="!isValidForm()" mat-raised-button color="primary"
-        style="display: inline-block; width: 100%;">
+    <button type="submit" [disabled]="!createProgramForm.valid" (click)="createProgram()" mat-raised-button
+        color="accent" style="display: inline-block; width: 100%;">
         Programm erzeugen
     </button>
-    @if (isProcessing) {
-    <p style="color: white; margin-top: 15px;">
-        <strong>{{ newProgramName }} wird erstellt...</strong>
-    </p>
-    }
 </form>
 
 @if (isProcessing) {
-    <div style="display: flex; justify-content: center;">
-        <app-waiting-cursor></app-waiting-cursor>
-    </div>
-} 
+<section style="color: white; margin-top: 15px; padding: 0 0 30px 30px; display: flex; justify-content: space-evenly;">
+    <strong>Programm "{{ createProgramForm.get('programName')!!.value!! }}" wird erstellt...</strong>
+    <strong>{{ secondsPassed }}s</strong>
+</section>
+<div style="display: flex; justify-content: center; margin-bottom: 15px;">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+}
 
 @if (resultExportPath) {
-    <p style="display: flex;   align-items: center; margin-top: 10px;">
+<div style="margin-top: 5px; color: whitesmoke; padding: 0 0 30px 30px;">
+    <p>
         <strong>Program exportiert nach:</strong>
-        <a [href]="resultExportPath" target="_blank">
-            {{resultExportPath}}
-        </a>
-        <button [cdkCopyToClipboard]="resultExportPath" style="margin-left: 10px; background-color: transparent; border: none; cursor: pointer;">
-            <mat-icon style="align-self: baseline;">
+    </p>
+
+    <section style="display: flex; justify-content: space-evenly;">
+        <p>
+            <a [href]="resultExportPath" target="_blank">
+                <strong>{{resultExportPath}}</strong>
+            </a>
+        </p>
+        <button mat-button [cdkCopyToClipboard]="resultExportPath" style="background-color: transparent; border: none;">
+            <mat-icon style="color: whitesmoke">
                 content_copy
             </mat-icon>
         </button>
+    </section>
+</div>
+} @else if(errorMessage) {
+<div style="margin-top: 5px; padding: 0 0 30px 30px; background-color: yellow; color: red;">
+    <p>
+        <strong style="font-weight: 900; font-size: larger;">Es ist ein Fehler aufgetreten</strong>
     </p>
+    <p>
+        Fehler: {{ errorMessage.error }}
+    </p>
+
+    <p>
+        Detail: {{ errorMessage.message }}
+    </p>
+</div>
 }
