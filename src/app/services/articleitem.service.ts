@@ -12,6 +12,7 @@ export class ArticleitemService extends BaseService {
 
   async fetchArticleItems(): Promise<ArticleItem[]> {
     const session = this.sessionService.currentSession$.value!!
+    console.log("fetchArticleItems :::", session.id, session.name);
     const url = this.baseUrl + "/web_ofml/article_item/by_session_id/" + session.id
     const response = await fetch(url)
     const article_items: any[] = await response.json()

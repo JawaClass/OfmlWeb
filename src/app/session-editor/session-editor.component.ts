@@ -1,4 +1,4 @@
-import { Component, inject, Inject } from '@angular/core';
+import { Component, inject, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -7,12 +7,21 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { TextFieldModule } from '@angular/cdk/text-field';
-import { SessionAndOwner } from '../models/models'
+import { ArticleItem, SessionAndOwner, Session, User } from '../models/models'
 import { MatDialogRef } from '@angular/material/dialog';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SessionService } from '../services/session.service'
+import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
 
-export enum EditorMode {
+
+interface AlteredArticleItem {
+  articleItem: ArticleItem;
+  deleted: boolean;
+  added: boolean
+}
+
+enum EditorMode {
   Create = 'CREATE',
   Edit = 'EDIT',
 }
@@ -29,12 +38,14 @@ export enum EditorMode {
     MatButtonModule,
     ReactiveFormsModule,
     MatCheckboxModule,
-    TextFieldModule
+    TextFieldModule,
+    MatIconModule,
+    MatDividerModule
   ],
   templateUrl: './session-editor.component.html',
   styleUrl: './session-editor.component.css'
 })
-export class SessionEditorComponent {
+export class SessionEditorComponent implements OnInit {
 
   sessionAndOwner!: SessionAndOwner
   editorMode: EditorMode
@@ -43,13 +54,38 @@ export class SessionEditorComponent {
   service = inject(SessionService)
   dialogRef = inject(MatDialogRef<SessionEditorComponent>)
 
-  constructor(@Inject(MAT_DIALOG_DATA) session: SessionAndOwner) {
-    this.sessionAndOwner = session
-    this.editorMode = this.sessionAndOwner.session.id ? EditorMode.Edit : EditorMode.Create
+  articleItems: AlteredArticleItem[] = []
+  addArticleFailed = false
+
+  constructor(@Inject(MAT_DIALOG_DATA) sessionAndOwner: SessionAndOwner) {
+    this.editorMode = sessionAndOwner.session.id ? EditorMode.Edit : EditorMode.Create
+    if (this.editorMode === EditorMode.Edit) {
+      const sessionCopy = Session.fromJSON(JSON.parse(JSON.stringify(sessionAndOwner.session)))
+      this.sessionAndOwner = {session: sessionCopy, owner: sessionAndOwner.owner}
+    } else {
+      this.sessionAndOwner = sessionAndOwner
+    }
     this.textResource = {
-      "header": this.isEditMode() ? "Sitzung editieren" : "Sitzung anlegen",
+      "header": this.isEditMode() ? `Sitzung editieren [${sessionAndOwner.session.id}]` : "Sitzung anlegen",
       "button": this.isEditMode() ? "Änderungen bestätigten" : "Sitzung erstellen",
       "checkbox": this.sessionAndOwner.session.isPublic ? "öffentliches Projekt" : "privates Projekt"
+    }
+  }
+
+  async ngOnInit() {
+    this.dialogRef.disableClose = true
+    if (this.isEditMode()) {
+      await this.service.setCurrentSession(this.sessionAndOwner.session)
+      this.articleItems = (await this.service.fetchArticleItems()).map((item: ArticleItem) => ({articleItem: item, deleted: false, added: false}))
+    }
+  }
+
+  async addArticle(articleNr: string, program: string) { 
+    const maybeArticleItem = await this.service.fetchProgramMapOnly(articleNr, program)
+    const canAdd = maybeArticleItem !== undefined && this.articleItems.find(item => item.articleItem.articleNr === maybeArticleItem.articleNr) === undefined
+    this.addArticleFailed = !canAdd
+    if (canAdd) {
+      this.articleItems.push(({articleItem: maybeArticleItem, deleted: false, added: true}))
     }
   }
 
@@ -65,7 +101,14 @@ export class SessionEditorComponent {
   }
 
   private async editSession() {
-
+    const addedItems = this.articleItems.filter(item => item.added)
+    const deletedItems = this.articleItems.filter(item => item.deleted)
+    await addedItems.map(item => this.service.saveArticleItem(item.articleItem))
+    await deletedItems.map(item => this.service.removeArticleItem(item.articleItem))
+    const session = await this.service.editSession(this.sessionAndOwner.session)
+    this.dialogRef.close({
+      session: session
+    })
   }
 
   async saveSession() {

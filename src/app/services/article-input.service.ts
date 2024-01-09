@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject, map, of, BehaviorSubject } from 'rxjs';
+import { Observable, Subject, map, of, BehaviorSubject, firstValueFrom } from 'rxjs';
 import { BaseService } from './base.service'
 import { ProgramMap, ArtbaseItem, ArticleItem, PropertyItem, PropValueItem } from './../models/models'
 
@@ -9,6 +9,12 @@ import { ProgramMap, ArtbaseItem, ArticleItem, PropertyItem, PropValueItem } fro
 export class ArticleInputService extends BaseService {
 
   scrollY = 0
+
+  filter = {
+    "program": "",
+    "pClass": "",
+    "article": "",
+  }
 
   programMap: ProgramMap = new ProgramMap()
   behaviorSubjectProgramMap = new BehaviorSubject<ProgramMap>(this.programMap)
@@ -29,6 +35,12 @@ export class ArticleInputService extends BaseService {
         this.behaviorSubjectProgramMap.next(this.programMap)
         return this.programMap
       }))
+  }
+
+  async fetchProgramMapOnly(articlenumbers: string[]): Promise<ProgramMap> {
+    const url = this.baseUrl + "/ocd/article_compact"
+    const json = await firstValueFrom(this.httpClient.post<ProgramMap>(url, articlenumbers))
+    return new ProgramMap(json)
   }
 
   async fetchMiscData(): Promise<any> {

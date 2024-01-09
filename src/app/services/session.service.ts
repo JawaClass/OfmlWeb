@@ -1,7 +1,7 @@
 import { Injectable, inject, Injector } from '@angular/core';
 import { BaseService } from './base.service'
-import { Session, SessionAndOwner, ArticleItem } from '../models/models'
-import { BehaviorSubject } from 'rxjs';
+import { Session, SessionAndOwner, ArticleItem, ProgramMap } from '../models/models'
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { ArticleInputService } from './article-input.service';
 import { ArticleitemService } from './articleitem.service';
 import { PropertyitemService } from './propertyitem.service';
@@ -40,9 +40,11 @@ export class SessionService extends BaseService {
     const url = this.baseUrl + "/web_ofml/session/update"
     const requestOptions = this.buildPutRequestOptions(JSON.stringify(session))
     const response = await fetch(url, requestOptions)
-    const editedSession: Session = await response.json()
-    this.currentSession$.next(editedSession)
-    return editedSession
+    await response.json()
+    this.currentSession$.next(session)
+    await this.fetchAndSetSessionData()
+    this.snackBar.open("Ihre Sitzung wurde geändert", "Ok", { duration: 2000 })
+    return session
   }
 
   async deleteSession(session: Session): Promise<void> {
@@ -53,6 +55,7 @@ export class SessionService extends BaseService {
       this.articleService.clearMap()
       localStorage.removeItem("sessionId")
       this.currentSession$.next(null)
+      this.snackBar.open("Ihre Sitzung wurde gelöscht", "Ok", { duration: 2000 })
     }
   }
 
@@ -117,6 +120,24 @@ export class SessionService extends BaseService {
 
     this.articleService.programMap.updateWithItems(articleItems, propertyItems)
     this.articleService.behaviorSubjectProgramMap.next(this.articleService.programMap)
+  }
+
+  async fetchArticleItems(): Promise<ArticleItem[]>  {
+    return this.articleItemService().fetchArticleItems()
+  }
+
+  async fetchProgramMapOnly(articleNr: string, program: string): Promise<ArticleItem | undefined> {
+    const value: ProgramMap = await this.articleService.fetchProgramMapOnly([articleNr])
+    const maybeArticleItem = value.getArticleItemsMap().get(program.toLowerCase())?.get(articleNr)
+    return maybeArticleItem
+  }
+
+  async saveArticleItem(articleItem: ArticleItem) { 
+    return this.articleItemService().saveArticleItem(articleItem)
+  }
+
+  async removeArticleItem(articleItem: ArticleItem) { 
+    return this.articleItemService().removeArticleItem(articleItem)
   }
 
 }

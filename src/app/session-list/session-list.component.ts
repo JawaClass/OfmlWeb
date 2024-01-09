@@ -44,14 +44,12 @@ export class SessionListComponent implements OnInit {
     this.currentUser = this.userService.currentUser$.value!!
   }
 
-  openCreateSessionDialog = () => this.openEditSessionDialog(
-    { session: Session.emptyOne(this.currentUser.id!!), owner: this.currentUser } as SessionAndOwner
-  )
+  openCreateSessionDialog = () => this.openEditSessionDialog({session: Session.emptyOne(this.currentUser.id!!), owner: this.currentUser})
 
-  openEditSessionDialog(session: SessionAndOwner) {
+  openEditSessionDialog(sessionAndOwner: SessionAndOwner) {
     this.dialogOpener.open(SessionEditorComponent,
       {
-        data: session
+        data: sessionAndOwner
       }).afterClosed()
       .subscribe((result: any) => {
         this.dialogRef.close({

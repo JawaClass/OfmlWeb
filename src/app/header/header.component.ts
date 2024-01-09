@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnChanges, OnInit, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, RouterModule, Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -50,6 +50,10 @@ export class HeaderComponent {
   router = inject(Router)
   dialogOpener = inject(MatDialog)
 
+  getSessionText() {
+    return this.currentSession ? `[${this.currentSession.id}] ${this.currentSession.name}` : "Sitzungen"
+  } 
+
   logout = () => this.userService.logout()
 
   openLoginDialog() {
@@ -73,8 +77,16 @@ export class HeaderComponent {
 
   async ngOnInit() {
 
-    this.userService.currentUser$.subscribe( user => this.currentUser = user )
-    this.sessionService.currentSession$.subscribe( session => this.currentSession = session)
+    this.userService.currentUser$.subscribe( user => {
+      setTimeout(() => {
+        this.currentUser = user
+      })
+    } )
+    this.sessionService.currentSession$.subscribe( session => {
+      setTimeout(() => {
+        this.currentSession = session
+      })
+    })
 
     await this.fetchAndSetMiscData()
 

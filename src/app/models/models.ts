@@ -37,8 +37,6 @@ export class Date implements IDate {
     }
 
     static fromJSON(json: any) {
-        console.log("Date :: fromJSON");
-        
         return new Date(
             json["year"],
             json["month"],
@@ -188,6 +186,14 @@ export class PropertyItem {
         return this
     }
 
+    isAllActive() {
+        return (this.getActiveValues().length === this.values.length)
+    }
+
+    isAllArtbase() {
+        return (this.getArtbaseValues().length === this.values.length)
+    }
+
     public getActiveValues() {
         return this.values.filter(a => a.active)
     }
@@ -240,11 +246,6 @@ export class ArticleItem {
         public articleNrEdited = false,
     ) { }
     static fromJSON(json: any) {
-        console.log("Article Item :: fromJSON", json)
-         
-        console.log("artbaseItems ::", json["artbaseItems"], json["articleNr"], json["program"]);
-        
-        
         return new ArticleItem(
             json["articleNr"],
             json["series"],
@@ -360,9 +361,12 @@ export class ProgramMap extends Map<ProgramString, Map<PropertyClassString, Prop
             if (!this._propertyItems.get(item.program)) this._propertyItems.set(item.program, new Map())
             if (!this._propertyItems.get(item.program)!!.get(item.pClass)) this._propertyItems.get(item.program)!!.set(item.pClass, [])
             this._propertyItems.get(item.program)!!.get(item.pClass)!!.push(item)
-
-            this.get(item.program)!!.get(item.pClass)!!.seen = true
-            this.get(item.program)!!.get(item.pClass)!!.edited = true
+            
+            if (this.get(item.program)?.get(item.pClass) !== undefined) {
+                this.get(item.program)!!.get(item.pClass)!!.seen = true
+                this.get(item.program)!!.get(item.pClass)!!.edited = true
+            }
+            
              
         })
 

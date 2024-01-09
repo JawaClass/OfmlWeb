@@ -15,17 +15,24 @@
 @for (propItem of getPropItems(pClass); track propItem.property; let idx2 = $index) {
 
 <mat-expansion-panel [disabled]="!propItem.active" style="margin-bottom: 10px;">
-  <mat-expansion-panel-header>
-    <mat-panel-title>
+  <mat-expansion-panel-header style="display: flex;">
+    <mat-panel-title style="flex: 5; display: flex;">
 
-      <span>
-        {{ propItem.property }} : {{ propItem.propertyText }}
-        <mat-checkbox (change)="onToggleAll(propItem, $event)"></mat-checkbox>
-        <mat-checkbox disabled [(ngModel)]="propItem.active"></mat-checkbox>
-      </span>
+      <section style="display: flex; background-color: transparent; flex: 4;">
+        <section style="flex: 3; display: flex; gap: 10px; align-items: center;">
+          <span>{{ propItem.property }}</span>
+          <span>:</span>
+          <span>{{ propItem.propertyText }}</span>
+        </section>
+        
+        <section style="flex:1; display: flex; gap: 5px;">
+          <mat-checkbox (click)="$event.stopPropagation()" [checked]="propItem.isAllArtbase()" (change)="onToggleAll(propItem, $event)"></mat-checkbox>
+          <mat-checkbox  disabled [(ngModel)]="propItem.active"></mat-checkbox>
+        </section>
+      </section> 
 
     </mat-panel-title>
-    <mat-panel-description>
+    <mat-panel-description style="flex: 1;">
       {{ propItem.getArtbaseValues().length }} / {{ propItem.values.length }}
     </mat-panel-description>
   </mat-expansion-panel-header>

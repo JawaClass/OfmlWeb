@@ -1,4 +1,4 @@
-import { AfterViewChecked, AfterViewInit, Component, OnInit, inject } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ArticleItem, PropertyClass } from './../models/models'
 import { RouterModule, Router } from '@angular/router';
@@ -45,12 +45,9 @@ export class ArticleListComponent implements OnInit, AfterViewInit {
   persistArticleItemPromises = new Map<string, any[]>()
   dialogOpener = inject(MatDialog)
 
-  filter = {
-    "program": "",
-    "pClass": "",
-    "article": "",
-  }
+  filter = this.service.filter
 
+   
   storeScrollPos() {
     const elem = document.querySelector('.mat-sidenav-content')
     this.service.scrollY = elem!!.scrollTop
@@ -68,7 +65,7 @@ export class ArticleListComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.restoreScrollPos()
+    this.restoreScrollPos() 
   }
 
   async ngOnInit() {

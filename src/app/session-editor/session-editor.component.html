@@ -1,4 +1,4 @@
-<form (submit)="saveSession()" class="primary">
+<form class="primary">
     <h2 color="primary" style="text-align: center; color: whitesmoke">
         {{ textResource.header }} 
     </h2>   
@@ -10,19 +10,92 @@
         <input matInput [(ngModel)]="sessionAndOwner.session.name" name="sessionName" maxlength="20" />
     </mat-form-field>
     <section>
-        <mat-checkbox name="isPublic" id="isPublic" [(ngModel)]="sessionAndOwner.session.isPublic"> {{ textResource.checkbox }} </mat-checkbox>
+        <mat-checkbox disabled name="isPublic" id="isPublic" [(ngModel)]="sessionAndOwner.session.isPublic"> {{ textResource.checkbox }} </mat-checkbox>
     </section>
-    <mat-form-field style="width: 100%;">
-        <mat-label>Artikelnummern</mat-label>
-        <textarea  style="width: 100%;" [(ngModel)]="sessionAndOwner.session.articleInput"
-        matInput [rows]="5" name="textAreaArticles"
-        oninput="this.value = this.value.toUpperCase()">
-      </textarea>
-      </mat-form-field>
+
+    @if (isCreateMode()) {
+        <mat-form-field style="width: 100%;">
+            <mat-label>Artikelnummern</mat-label>
+            <textarea  style="width: 100%;" [(ngModel)]="sessionAndOwner.session.articleInput"
+            matInput [rows]="5" name="textAreaArticles"
+            oninput="this.value = this.value.toUpperCase()">
+          </textarea>
+          </mat-form-field>
+    } @else {
+        
+        <mat-divider style="margin-top: 10px; margin-bottom: 10px;"></mat-divider>
+
+        <div style="max-height: 40vh; overflow-y: auto; overflow-x: hidden; color: whitesmoke">
+            
+            <section style="display: flex; justify-content: space-between; font-size: 20px;
+            font-weight: bold; margin-bottom:15px;">
+                <span style="flex: 1;">Artikel</span>
+                <span style="flex: 1;">Program</span>
+                <span style="flex: 0.5;">Löschen</span>
+            </section>
+            
+            @for (item of articleItems; track item.articleItem.articleNr; let idx = $index) {
+                <section style="display: flex; justify-content: space-between; align-items: center;" 
+                [ngStyle]="{'background-color': item.added ? 'green' : 'transparent' }">
+                    <span style="flex: 1; overflow: hidden;">{{ item.articleItem.articleNr }}</span>
+                    <span style="flex: 1; overflow: hidden;">{{ item.articleItem.program }}</span>
+                    <mat-checkbox name="deleted" [(ngModel)]="item.deleted" style="flex: 0.5;"></mat-checkbox>
+                </section>
+            }
+            
+        </div>
+        
+        <mat-divider style="margin-top: 10px; margin-bottom: 10px;"></mat-divider>
+
+        <div>
+            
+            <fieldset style="display: flex; justify-content: space-around; color: whitesmoke;">
+                
+                <legend>Artikel hinzufügen</legend>
+
+                <mat-form-field>
+                    <mat-label>Artikelnummer</mat-label>
+                    <input matInput name="addArticle"
+                    #newArticleNr
+                    oninput="this.value = this.value.toUpperCase()">
+                </mat-form-field>
+    
+                <mat-form-field style="flex: 1;">
+                    <mat-label>Programname</mat-label>
+                    <input matInput name="addArticleProgram"
+                    #newArticleProgram
+                    oninput="this.value = this.value.toUpperCase()">
+                </mat-form-field>
+                
+                
+                <button mat-stroked-button color="accent" (click)="addArticle(newArticleNr.value, newArticleProgram.value)"
+                style="height: 52px; padding: 0; display: flex; align-content: center;">
+                     <mat-icon style="font-size: 50px; height: 52px; width: 100%; padding: 0; margin: 0;">add</mat-icon>  
+                </button>
+
+            </fieldset>
+            @if (addArticleFailed) {
+                <mat-error>Artikel konnte nicht hinzugefügt werden</mat-error>
+            }
+            
+        </div>
+
+    }
+    
+    <mat-divider style="margin-top: 10px; margin-bottom: 10px;"></mat-divider>
+
     <button type="submit" mat-raised-button color="primary"
-        style="display: inline-block; width: 100%;"
+        (click)="saveSession()"
+        style="display: inline-block; width: 100%; height: 50px;"
         [disabled]="!signupFormValid()">
         {{ textResource.button }} 
+    </button>
+
+    <button mat-stroked-button color="accent"
+        (click)="dialogRef.close()"
+        style="display: inline-block; width: 100%; height: 35px; margin-top: 10px;"
+        >
+        Abbrechen
     </button>
     
 </form>

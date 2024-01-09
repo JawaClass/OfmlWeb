@@ -8,20 +8,25 @@
 @for (propItem of propItems; track propItem.property; let idx = $index) {
 
 <mat-expansion-panel style="margin-bottom: 10px;">
-    <mat-expansion-panel-header>
-        <mat-panel-title>
+    <mat-expansion-panel-header style="display: flex;">
+        <mat-panel-title style="flex: 4;">
             
-            <span>
-                {{ propItem.property }} : {{ propItem.propertyText }}
-                <mat-checkbox
-                (click)="$event.stopPropagation()"
-                (change)="onChangeAll(propItem, $event)"
-                [(ngModel)]="propItem.active">
-                </mat-checkbox>
-            </span>
+            <section style="display: flex; flex: 3; gap: 10px;">
+                <span>{{ propItem.property }}</span>
+                <span>:</span>
+                <span>{{ propItem.propertyText }}</span>
+            </section>
+
+            <mat-checkbox
+            style="flex: 1;"
+            (click)="$event.stopPropagation()"
+            (change)="onChangeAll(propItem, $event)"
+            [(ngModel)]="propItem.active">
+            </mat-checkbox>
+            
 
         </mat-panel-title>
-        <mat-panel-description>
+        <mat-panel-description style="flex: 1;">
             {{ propItem.getActiveValues().length }} / {{ propItem.values.length }}
         </mat-panel-description>
     </mat-expansion-panel-header>

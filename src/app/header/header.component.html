@@ -25,11 +25,7 @@ display: flex; justify-content: space-evenly;">
     </section>
     <section>
         <button (click)="openSessionList()" mat-stroked-button>
-            @if (currentSession) {
-            <span style="vertical-align: middle"> [{{ currentSession.id }}] {{ currentSession.name }}</span>
-            } @else {
-            Sitzungen
-            }
+            <span style="vertical-align: middle">{{ getSessionText() }}</span>
             <mat-icon>menu</mat-icon>
         </button>
     </section>
