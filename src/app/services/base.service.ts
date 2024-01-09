@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
 })
 export abstract class BaseService {
 
-  protected baseUrl = environment.backendBaseUrl // "http://172.22.15.238:5000"
+  /* protected */ baseUrl = environment.backendBaseUrl // "http://172.22.15.238:5000"
 
   protected httpClient: HttpClient = inject(HttpClient)
   protected snackBar = inject(MatSnackBar)
