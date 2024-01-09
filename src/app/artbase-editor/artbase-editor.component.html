@@ -1,6 +1,6 @@
 <h1>Artbase von
   <strong>
-    {{ this.articleItem?.articleNr }}</strong> aus <strong>{{ this.articleItem?.program | uppercase}}
+    {{ this.articleItem.articleNr }}</strong> aus <strong>{{ this.articleItem.program | uppercase}}
   </strong>
 </h1>
 
@@ -9,7 +9,7 @@
 } @else {
 
 
-@for (pClass of articleItem?.pClasses; track pClass; let idx = $index) {
+@for (pClass of articleItem.pClasses; track pClass; let idx = $index) {
 
 <h2> Merkmalsklasse: <strong>{{ pClass }}</strong> </h2>
 @for (propItem of getPropItems(pClass); track propItem.property; let idx2 = $index) {

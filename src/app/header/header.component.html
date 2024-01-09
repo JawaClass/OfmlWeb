@@ -17,7 +17,7 @@ display: flex; justify-content: space-evenly;">
             <mat-icon style="vertical-align: middle;">person_outline</mat-icon>
         </a>
         <span style="vertical-align: middle; font-size:  var(--mdc-typography-button-font-size, 14px);">
-            [{{ currentUser?.id }}] {{ currentUser?.email }}
+            [{{ currentUser.id }}] {{ currentUser.email }}
         </span>
         <button (click)="logout()" mat-stroked-button>
             Abmelden

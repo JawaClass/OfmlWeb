@@ -1,7 +1,6 @@
-# Use an official Node runtime as a parent image
-FROM node:18
 
-# Set the working directory in the container
+FROM node:21
+
 WORKDIR /app
 
 # Install the Angular CLI globally
@@ -23,4 +22,4 @@ RUN npm run
 EXPOSE 4200
 
 # Define the command to run your app using ng serve
-CMD ["npm", "start"]
+CMD ng serve --host 0.0.0.0 --disable-host-check --configuration=production
