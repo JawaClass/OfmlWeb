@@ -244,6 +244,8 @@ export class ArticleItem {
         public edited: boolean = false,
         public shorttextEdited = true,
         public articleNrEdited = false,
+        public longText: string[] | null = null,
+        public price: number | null = null,
     ) { }
     static fromJSON(json: any) {
         return new ArticleItem(
@@ -256,7 +258,11 @@ export class ArticleItem {
             json["artbaseFetched"],
             json["articleNrAlias"],
             json["seen"],
-            json["edited"]
+            json["edited"],
+            json["shorttextEdited"],
+            json["articleNrEdited"],
+            json["longText"],
+            json["price"]
         )
     }
     jsonify() {

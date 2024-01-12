@@ -10,6 +10,14 @@ export class ArticleitemService extends BaseService {
 
   sessionService = inject(SessionService)
 
+  async fetchArticlePriceAndLongtext(articleItem: ArticleItem) {
+    const url = this.baseUrl + "/ocd/longtext_and_price/" + articleItem.articleNr + "/" + articleItem.program
+    const response = await fetch(url)
+    const json: any = await response.json()
+    console.log("fetchArticlePriceAndLongtext RESULT :::", json, json["price"], json["longtext"]);
+    return json
+  }
+
   async fetchArticleItems(): Promise<ArticleItem[]> {
     const session = this.sessionService.currentSession$.value!!
     console.log("fetchArticleItems :::", session.id, session.name);

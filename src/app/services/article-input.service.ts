@@ -54,7 +54,8 @@ export class ArticleInputService extends BaseService {
     if (articleItem.artbaseFetched)
       return
 
-    const url = this.baseUrl + "/ocd/table/" + articleItem.program + "/ocd_artbase/article_nr/" + articleItem.articleNr
+    // const url = this.baseUrl + "/ocd/table/" + articleItem.program + "/ocd_artbase/article_nr/" + articleItem.articleNr
+    const url = this.baseUrl + `/ocd/table/${articleItem.program}/ocd_artbase?where=article_nr = "${articleItem.articleNr}"` //?select=" + articleItem.articleNr
     console.log("getArtbase :: ", url);
     const response = await fetch(url)
     console.log("response", response);

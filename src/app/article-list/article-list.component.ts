@@ -15,7 +15,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog'; 
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CreateProgramComponent } from '../create-program/create-program.component';
-import {MatExpansionModule} from '@angular/material/expansion';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { ArticleComponent } from '../article/article.component';
 
 @Component({
   selector: 'app-article-list',
@@ -144,12 +145,17 @@ export class ArticleListComponent implements OnInit, AfterViewInit {
   }
 
   openCreateProgramDialog() {
-
     this.dialogOpener.open(CreateProgramComponent)
         .afterClosed()
         .subscribe((result: any) => {
-          
         })
+  }
 
+  openEditArticle(articleItem: ArticleItem) {
+    this.dialogOpener.open(ArticleComponent, {
+      data: articleItem,
+      height: '70vh',
+      width: '35vw',
+    })
   }
 }

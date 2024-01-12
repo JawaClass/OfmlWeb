@@ -72,6 +72,11 @@ export class HeaderComponent {
   async fetchAndSetMiscData() {
     const misc = await this.service.fetchMiscData()
     this.timestamp = misc["init_tables"]
+    const oldTimestamp = localStorage.getItem("timestamp_db")
+    if (oldTimestamp !== this.timestamp) {
+      this.service.snackBar.open("Neuer OFML Datenstand aktiv vom " + this.timestamp, "Ok", {duration: 10000})
+    }
+    localStorage.setItem("timestamp_db", this.timestamp)
     this.path = misc["path"]
   }
 

@@ -16,6 +16,10 @@
             Ziffern</mat-error> }
     </mat-form-field>
 
+    <p style="color: whitesmoke;">
+        Daten stehen nach Programmerzeugung unter <br> B:\ofml_development\Tools\ofml_datenmacher <br>bereit.
+    </p>
+
     <button type="submit" [disabled]="!createProgramForm.valid" (click)="createProgram()" mat-raised-button
         color="accent" style="display: inline-block; width: 100%;">
         Programm erzeugen
@@ -34,6 +38,9 @@
 
 @if (resultExportPath) {
 <div style="margin-top: 5px; color: whitesmoke; padding: 0 0 30px 30px;">
+    <p>
+        <strong>Dauer: {{ secondsPassed }}s</strong>
+    </p>
     <p>
         <strong>Program exportiert nach:</strong>
     </p>

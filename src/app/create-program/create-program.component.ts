@@ -52,7 +52,7 @@ export class CreateProgramComponent {
     programId: new FormControl("", [
       Validators.required,
       Validators.pattern(/^[A-Z][A-Z0-9]{1}$/)]),
-  });
+  })
 
   dialogRef = inject(MatDialogRef<CreateProgramComponent>)
   createService = inject(CreateProgramService)
@@ -62,6 +62,7 @@ export class CreateProgramComponent {
   secondsPassed: number = 0
 
   createProgram() {
+    this.errorMessage = null
     this.dialogRef.disableClose = true
     this.isProcessing = true
     this.resultExportPath = ""

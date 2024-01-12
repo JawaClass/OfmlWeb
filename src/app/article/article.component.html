@@ -1,0 +1,46 @@
+<form [formGroup]="articleForm" style="display: flex; flex-direction: column;">
+
+    <h3 style="color: whitesmoke;">
+        Artikeldetails ändern
+    </h3>
+
+    <h2  style="display: flex; justify-content: left; gap: 10px; color: whitesmoke;">
+        <span matTooltip="Artikelnummer (Original)">{{ articleItem.articleNr }}</span>
+        <span matTooltip="Programm">{{ articleItem.program }}</span>
+        @if (articleItem.articleNrAlias !== articleItem.articleNr) {
+            <span matTooltip="Artikelnummer (Geändert)">({{ articleItem.articleNrAlias }})</span>
+        }
+    </h2>
+
+    <mat-form-field>
+        <mat-label>Artikelnummer</mat-label>
+        <input matInput [formControl]="articleForm.controls.articleNr"
+            oninput="this.value = this.value.toUpperCase()" />
+        @if (articleForm.controls.articleNr.invalid) { <mat-error>Keine valide Artikelnummer</mat-error>
+        }
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>Artikelpreis</mat-label>
+        <input #input matInput [formControl]="articleForm.controls.articlePrice" /> <!--  [value]="articleForm.get('articlePrice')!!.value | currency:'EUR':'symbol':'1.2-10'"  -->
+        @if (articleForm.controls.articlePrice) { <mat-error>Kein valider Preis. Zahl mit oder ohne Dezimalpunkt erwartet.</mat-error> } 
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>Artikelkurztext</mat-label>
+        <input #input matInput [formControl]="articleForm.controls.shortText"
+            oninput="this.value = this.value.toUpperCase()"/>
+        @if (articleForm.controls.shortText) { <mat-error>Kein valider Kurztext</mat-error> }
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>Artikellangtext</mat-label>
+        <textarea #input matInput [formControl]="articleForm.controls.longText" [rows]="5" ></textarea>
+        @if (articleForm.controls.longText) { <mat-error>Kein valider Langtext</mat-error> }
+    </mat-form-field>
+
+    <button type="submit" [disabled]="!articleForm.valid" (click)="submitArticleChanges()" mat-raised-button
+        color="accent" style="height: 3rem;">
+        Änderungen bestätigen
+    </button>
+</form>
