@@ -23,3 +23,5 @@ EXPOSE 4200
 
 # Define the command to run your app using ng serve
 CMD ng serve --host 0.0.0.0 --disable-host-check --configuration=production
+
+# docker run -p 4200:4200 -d --network=ofml_net --name frontend ofml_web
