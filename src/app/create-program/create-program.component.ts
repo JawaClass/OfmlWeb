@@ -16,9 +16,10 @@ import { WaitingCursorComponent } from '../waiting-cursor/waiting-cursor.compone
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialogRef } from '@angular/material/dialog';
-import { ErrorMessage } from '../models/models'
 import { HttpErrorResponse } from '@angular/common/http';
 import { interval } from 'rxjs';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
 
 @Component({
   selector: 'app-create-program',
@@ -38,7 +39,8 @@ import { interval } from 'rxjs';
     MatFormFieldModule,
     WaitingCursorComponent,
     ClipboardModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatTooltipModule
   ],
   templateUrl: './create-program.component.html',
   styleUrl: './create-program.component.css'
@@ -52,24 +54,39 @@ export class CreateProgramComponent {
     programId: new FormControl("", [
       Validators.required,
       Validators.pattern(/^[A-Z][A-Z0-9]{1}$/)]),
+    exportOcd: new FormControl(true),
+    exportOdb: new FormControl(true),
+    exportOas: new FormControl(true),
+    exportOam: new FormControl(true),
+    exportOfml: new FormControl(true),
+    exportGo: new FormControl(true),
   })
 
   dialogRef = inject(MatDialogRef<CreateProgramComponent>)
   createService = inject(CreateProgramService)
-  errorMessage: ErrorMessage | null = null
+  httpErrorResponse: HttpErrorResponse | null = null
   isProcessing = false
   resultExportPath = ""
   secondsPassed: number = 0
 
   createProgram() {
-    this.errorMessage = null
+    this.secondsPassed = 0
+    this.httpErrorResponse = null
     this.dialogRef.disableClose = true
     this.isProcessing = true
     this.resultExportPath = ""
     const subscription = interval(1000).subscribe(x => this.secondsPassed = x)
     this.createService.postCreate(
       this.createProgramForm.get("programName")!!.value!!,
-      this.createProgramForm.get("programId")!!.value!
+      this.createProgramForm.get("programId")!!.value!,
+      {
+        "ocd": this.createProgramForm.get("exportOcd")!!.value!,
+        "oam": this.createProgramForm.get("exportOam")!!.value!,
+        "oas": this.createProgramForm.get("exportOas")!!.value!,
+        "ofml": this.createProgramForm.get("exportOfml")!!.value!,
+        "go": this.createProgramForm.get("exportGo")!!.value!,
+        "odb": this.createProgramForm.get("exportOdb")!!.value!,
+      }
     )
       .subscribe({
         next: (result) => {
@@ -78,8 +95,12 @@ export class CreateProgramComponent {
           this.dialogRef.disableClose = false
           subscription.unsubscribe()
         },
-        error: (err: HttpErrorResponse) => {
-          this.errorMessage = err.error
+        error: (httpErrorResponse: HttpErrorResponse) => {
+          //console.log("createProgram HttpErrorResponse::", err.error);
+          //console.error('Error:', err.error); // The error details provided by the server
+          //console.error('Status:', err.status); // The HTTP status code
+          //console.error('Status Text:', err.statusText); // The status text
+          this.httpErrorResponse = httpErrorResponse
           this.isProcessing = false
           this.dialogRef.disableClose = false
           subscription.unsubscribe()

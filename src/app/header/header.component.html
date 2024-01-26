@@ -16,7 +16,8 @@ display: flex; justify-content: space-evenly;">
         <a>
             <mat-icon style="vertical-align: middle;">person_outline</mat-icon>
         </a>
-        <span style="vertical-align: middle; font-size:  var(--mdc-typography-button-font-size, 14px);">
+        <span style="vertical-align: middle; font-size:  var(--mdc-typography-button-font-size, 14px);"
+        matTooltip="Deine UserID">
             [{{ currentUser.id }}] {{ currentUser.email }}
         </span>
         <button (click)="logout()" mat-stroked-button>

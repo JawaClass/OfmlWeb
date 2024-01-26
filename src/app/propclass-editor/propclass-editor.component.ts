@@ -9,6 +9,7 @@ import { PropertyitemService } from '../services/propertyitem.service';
 import { RouterModule, Router } from '@angular/router';
 import { PropertyClass, PropertyItem, PropValueItem } from '../models/models';
 import { WaitingCursorComponent } from '../waiting-cursor/waiting-cursor.component'
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 @Component({
@@ -20,7 +21,8 @@ import { WaitingCursorComponent } from '../waiting-cursor/waiting-cursor.compone
     FormsModule,
     MatExpansionModule,
     RouterModule,
-    WaitingCursorComponent
+    WaitingCursorComponent,
+    MatTooltipModule
   ],
   templateUrl: './propclass-editor.component.html',
   styleUrl: './propclass-editor.component.css'
@@ -59,17 +61,18 @@ export class PropclassEditorComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   async ngOnInit() {
+    this.isLoading = true
     if (!this.service.hasProgramData())
       this.router.navigate(['/'])
 
     this.route.params.subscribe(async (params) => {
       this.program = params['program']
       this.pClass = params['propClass']
+      
       await this.service.fetchProperties(this.program, this.pClass)
       this.propClass = this.service.programMap.getPropClass(this.program, this.pClass)!!
       this.propItems = this.service.programMap.getPropItems(this.program, this.pClass)!!
       this.propClass.seen = true
-      this.isLoading = true
       this.isLoading = false
     })
 

@@ -21,12 +21,13 @@
             style="flex: 1;"
             (click)="$event.stopPropagation()"
             (change)="onChangeAll(propItem, $event)"
-            [(ngModel)]="propItem.active">
+            [(ngModel)]="propItem.active"
+            [matTooltip]="propItem.active ? 'Merkmal unsichtbar schalten' : 'Merkmal sichtbar schalten'">
             </mat-checkbox>
             
 
         </mat-panel-title>
-        <mat-panel-description style="flex: 1;">
+        <mat-panel-description style="flex: 1;" matTooltip="aktive Merkmalswerte">
             {{ propItem.getActiveValues().length }} / {{ propItem.values.length }}
         </mat-panel-description>
     </mat-expansion-panel-header>
@@ -35,7 +36,7 @@
 
     @for (valItem of propItem.values; track valItem; let idx = $index) {
     <section>
-        <mat-checkbox (change)="propClass.edited = true"
+        <mat-checkbox (change)="propClass.edited = true; propItem.active= true;"
             [(ngModel)]="valItem.active">
             {{ valItem.value }} : {{ valItem.text }}
         </mat-checkbox>

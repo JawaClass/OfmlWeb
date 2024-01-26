@@ -26,8 +26,18 @@
         </section>
         
         <section style="flex:1; display: flex; gap: 5px;">
-          <mat-checkbox (click)="$event.stopPropagation()" [checked]="propItem.isAllArtbase()" (change)="onToggleAll(propItem, $event)"></mat-checkbox>
-          <mat-checkbox  disabled [(ngModel)]="propItem.active"></mat-checkbox>
+          <mat-checkbox (click)="$event.stopPropagation()"
+          [checked]="propItem.isAnyArtbase()"
+          (change)="onToggleAll(propItem, $event)"
+          matTooltip="Alle Artbase Einträge umschalten">
+        </mat-checkbox>
+          <mat-checkbox 
+          disabled [(ngModel)]="propItem.active"
+          [matTooltip]="propItem.active ? 'Merkmal ist sichtbar' : 'Merkmal ist unsichtbar'">
+          @if (!propItem.active) {
+            Merkmal ist unsichtbar
+          }
+        </mat-checkbox>
         </section>
       </section> 
 
@@ -38,16 +48,23 @@
   </mat-expansion-panel-header>
 
 
-
-  <span>Artbase</span>
-  @for (valItem of propItem.values; track valItem.value; let idx = $index) {
-  <section>
-
-    <mat-checkbox (change)="onToggle(valItem, $event)" [(ngModel)]="valItem.isArtbase"></mat-checkbox>
-    <mat-checkbox disabled [(ngModel)]="valItem.active">{{ valItem.value }} : {{ valItem.text }}</mat-checkbox>
-
-  </section>
-  }
+  <div>
+    <section style="display: flex; align-items: flex-start;">
+      <span style="flex-basis: 5rem;">Artbase</span>
+      <span style="flex-basis: 5rem;">Sichtbarkeit</span>
+    </section>
+    <div style="display: flex; flex-direction: column;">
+      @for (valItem of propItem.values; track valItem.value; let idx = $index) {
+        <section style="display: flex; align-items: flex-start;">
+    
+          <mat-checkbox style="flex-basis: 5rem;" (change)="onToggle(valItem, $event)" [(ngModel)]="valItem.isArtbase"></mat-checkbox>
+          <mat-checkbox style="flex-basis: 5rem;" disabled [(ngModel)]="valItem.active"></mat-checkbox>
+          <span>{{ valItem.value }} : {{ valItem.text }}</span>
+        </section>
+        }
+    </div>
+  </div>
+  
 
 </mat-expansion-panel>
 

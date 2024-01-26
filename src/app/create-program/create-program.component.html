@@ -1,74 +1,133 @@
-<form [formGroup]="createProgramForm">
+<div style="padding: 30px; border-radius: 5px;">
+    <form [formGroup]="createProgramForm">
 
-    <mat-form-field style="width: 100%;">
-        <mat-label>Programmname</mat-label>
-        <input matInput [formControl]="createProgramForm.controls.programName"
-            oninput="this.value = this.value.toLowerCase()" maxlength="25" />
-        @if (createProgramForm.controls.programName.invalid) { <mat-error>Kein valider Name für ein Programm</mat-error>
-        }
-    </mat-form-field>
+        <mat-form-field style="width: 100%;">
+            <mat-label>Programmname</mat-label>
+            <input matInput [formControl]="createProgramForm.controls.programName"
+                oninput="this.value = this.value.toLowerCase()" maxlength="25" />
+            @if (createProgramForm.controls.programName.invalid) { <mat-error>Kein valider Name für ein Programm</mat-error>
+            }
+        </mat-form-field>
+    
+        <mat-form-field style="width: 100%;">
+            <mat-label>Programmn ID</mat-label>
+            <input #input matInput [formControl]="createProgramForm.controls.programId"
+                oninput="this.value = this.value.toUpperCase()" maxlength="2" />
+            @if (createProgramForm.controls.programId.invalid) { <mat-error>Eine Programm ID besteht aus zwei
+                Ziffern</mat-error> }
+        </mat-form-field>
+            
+        <section style="display: flex; flex-direction: column;">
+            
+            <p style="color: whitesmoke;">
+                Welche Daten sollen erstellt und exportiert werden?
+            </p>
 
-    <mat-form-field style="width: 100%;">
-        <mat-label>Programmn ID</mat-label>
-        <input #input matInput [formControl]="createProgramForm.controls.programId"
-            oninput="this.value = this.value.toUpperCase()" maxlength="2" />
-        @if (createProgramForm.controls.programId.invalid) { <mat-error>Eine Programm ID besteht aus zwei
-            Ziffern</mat-error> }
-    </mat-form-field>
+            <mat-checkbox
+            [formControl]="createProgramForm.controls.exportOdb"
+            matTooltip="Grafische Daten und Grafiken im 2er Ordner">
+            ODB
+            </mat-checkbox>
 
-    <p style="color: whitesmoke;">
-        Daten stehen nach Programmerzeugung unter <br> B:\ofml_development\Tools\ofml_datenmacher <br>bereit.
-    </p>
+            <mat-checkbox
+            [formControl]="createProgramForm.controls.exportOcd"
+            matTooltip="Kaufmännische Daten im DE 2er Ordner">
+            OCD
+            </mat-checkbox>
+            
+            <mat-checkbox
+            [formControl]="createProgramForm.controls.exportOam"
+            matTooltip="OAM Mapping Daten im DE 2er Ordner">
+            OAM
+            </mat-checkbox>
+            
+            <mat-checkbox
+            [formControl]="createProgramForm.controls.exportOfml"
+            matTooltip="OFML Daten im 2er Ordner">
+            OFML
+            </mat-checkbox>
 
-    <button type="submit" [disabled]="!createProgramForm.valid" (click)="createProgram()" mat-raised-button
-        color="accent" style="display: inline-block; width: 100%;">
-        Programm erzeugen
-    </button>
-</form>
+            <mat-checkbox
+            [formControl]="createProgramForm.controls.exportOas"
+            matTooltip="Katalogdaten im DE 2er Ordner">
+            OAS
+            </mat-checkbox>
+            
+            <mat-checkbox
+            [formControl]="createProgramForm.controls.exportGo"
+            matTooltip="Metatypen im 2er Ordner">
+            GO
+            </mat-checkbox>
+        </section>
 
-@if (isProcessing) {
-<section style="color: white; margin-top: 15px; padding: 0 0 30px 30px; display: flex; justify-content: space-evenly;">
-    <strong>Programm "{{ createProgramForm.get('programName')!!.value!! }}" wird erstellt...</strong>
-    <strong>{{ secondsPassed }}s</strong>
-</section>
-<div style="display: flex; justify-content: center; margin-bottom: 15px;">
-    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-</div>
-}
-
-@if (resultExportPath) {
-<div style="margin-top: 5px; color: whitesmoke; padding: 0 0 30px 30px;">
-    <p>
-        <strong>Dauer: {{ secondsPassed }}s</strong>
-    </p>
-    <p>
-        <strong>Program exportiert nach:</strong>
-    </p>
-
-    <section style="display: flex; justify-content: space-evenly;">
-        <p>
-            <a [href]="resultExportPath" target="_blank">
-                <strong>{{resultExportPath}}</strong>
-            </a>
+        <p style="color: whitesmoke;">
+            Daten stehen nach Programmerzeugung unter <br> B:\ofml_development\Tools\ofml_datenmacher <br>bereit.
         </p>
-        <button mat-button [cdkCopyToClipboard]="resultExportPath" style="background-color: transparent; border: none;">
-            <mat-icon style="color: whitesmoke">
-                content_copy
-            </mat-icon>
+    
+        <button type="submit" [disabled]="!createProgramForm.valid" (click)="createProgram()" mat-raised-button
+            color="accent" style="display: inline-block; width: 100%;">
+            Programm erzeugen
         </button>
+    </form>
+    
+    @if (isProcessing) {
+    <section style="color: white; margin-top: 15px; padding: 0 0 30px 30px; display: flex; justify-content: space-evenly;">
+        <strong>Programm "{{ createProgramForm.get('programName')!!.value!! }}" wird erstellt...</strong>
+        <strong>{{ secondsPassed }}s</strong>
     </section>
+    <div style="display: flex; justify-content: center; margin-bottom: 15px;">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+    }
+    
+    @if (resultExportPath) {
+    <div style="margin-top: 5px; color: whitesmoke; padding: 0 0 30px 30px;">
+        <p>
+            <strong>Dauer: {{ secondsPassed }}s</strong>
+        </p>
+        <p>
+            <strong>Program exportiert nach:</strong>
+        </p>
+    
+        <section style="display: flex; justify-content: space-evenly;">
+            <p>
+                <a [href]="resultExportPath" target="_blank">
+                    <strong>{{resultExportPath}}</strong>
+                </a>
+            </p>
+            <button mat-button [cdkCopyToClipboard]="resultExportPath" style="background-color: transparent; border: none;">
+                <mat-icon style="color: whitesmoke">
+                    content_copy
+                </mat-icon>
+            </button>
+        </section>
+    </div>
+    } @else if(httpErrorResponse) {
+    <div style="margin-top: 5px; padding: 5px 30px 5px 30px; background-color: yellow; color: red; max-width: 50vw;">
+        <p>
+            <strong style="font-weight: 900; font-size: larger;">Es ist ein Fehler aufgetreten</strong>
+        </p>
+        
+        @if (httpErrorResponse.error.error) {
+            <p>
+                Fehler: {{ httpErrorResponse.error.error }}
+            </p>
+        }
+        
+        @if (httpErrorResponse.error.message) {
+            <p>
+                Detail: {{ httpErrorResponse.error.message }}
+            </p>
+        }
+        
+        <p>
+            {{ httpErrorResponse.statusText }}
+        </p>
+    
+        <p>
+            {{ httpErrorResponse.message }}
+        </p>
+        
+    </div>
+    }
 </div>
-} @else if(errorMessage) {
-<div style="margin-top: 5px; padding: 0 0 30px 30px; background-color: yellow; color: red;">
-    <p>
-        <strong style="font-weight: 900; font-size: larger;">Es ist ein Fehler aufgetreten</strong>
-    </p>
-    <p>
-        Fehler: {{ errorMessage.error }}
-    </p>
-
-    <p>
-        Detail: {{ errorMessage.message }}
-    </p>
-</div>
-}

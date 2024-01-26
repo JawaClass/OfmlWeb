@@ -72,6 +72,7 @@ export class Session implements ISession {
         public isPublic: boolean,
         public ownerId: number,
         public articleInput: string,
+        public editUserId: number,
     ) {}
     
     static emptyOne(userId: number) {
@@ -82,7 +83,8 @@ export class Session implements ISession {
             undefined,
             true,
             userId,
-            ""
+            "",
+            userId
         )
     }
 
@@ -95,6 +97,7 @@ export class Session implements ISession {
             json["isPublic"],
             json["ownerId"],
             json["articleInput"],
+            json["editUserId"],
         )
     }
 
@@ -192,6 +195,10 @@ export class PropertyItem {
 
     isAllArtbase() {
         return (this.getArtbaseValues().length === this.values.length)
+    }
+
+    isAnyArtbase() {
+        return (this.getArtbaseValues().length > 0)
     }
 
     public getActiveValues() {

@@ -8,12 +8,17 @@
     <section style="display: flex; justify-content: left; gap: 1px;">
         <button mat-stroked-button color="accent" (click)="filter.program =''; filter.pClass=''; filter.article='';">
             <mat-icon color="accent">filter_list</mat-icon>
+            <span>{{ allFilteredArticles().length }}</span>
         </button>
 
         <input [(ngModel)]="filter.program" matInput placeholder="Program"
-            oninput="this.value = this.value.toUpperCase()">
+            oninput="this.value = this.value.toUpperCase()"
+            matTooltip="$ am Ende hilft evtl.">
         <input [(ngModel)]="filter.article" matInput placeholder="Artikel"
-            oninput="this.value = this.value.toUpperCase()">
+            oninput="this.value = this.value.toUpperCase()"
+            matTooltip="$ am Ende hilft evtl.">
+
+          
     </section>
 
 </div>
@@ -27,7 +32,7 @@
 
 <h2>{{idx+1}}. {{ program | uppercase }} </h2>
 
-@for (pClass of getPropClasses(program); track pClass; let idx2 = $index) {
+@for (pClass of getFilteredPropClasses(program); track pClass; let idx2 = $index) {
 
 <mat-card style="margin-bottom: 15px;">
     <mat-card-content>

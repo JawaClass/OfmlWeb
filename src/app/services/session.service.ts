@@ -5,6 +5,7 @@ import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { ArticleInputService } from './article-input.service';
 import { ArticleitemService } from './articleitem.service';
 import { PropertyitemService } from './propertyitem.service';
+import { UserService } from './user.service';
 
 
 @Injectable({
@@ -15,6 +16,7 @@ export class SessionService extends BaseService {
   private injector = inject(Injector)
   private articleItemService = () => this.injector.get(ArticleitemService)
   private propertyItemService = () => this.injector.get(PropertyitemService)
+  private userService = () => this.injector.get(UserService)
   private articleService = inject(ArticleInputService)
   currentSession$ = new BehaviorSubject<Session | null>(null)
 
@@ -38,6 +40,9 @@ export class SessionService extends BaseService {
 
   async editSession(session: Session): Promise<Session> {
     const url = this.baseUrl + "/web_ofml/session/update"
+    const currentUser = this.userService().currentUser$.value!!
+    const currentUserId = currentUser.id!!
+    session.editUserId = currentUserId
     const requestOptions = this.buildPutRequestOptions(JSON.stringify(session))
     const response = await fetch(url, requestOptions)
     await response.json()

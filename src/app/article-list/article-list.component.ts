@@ -78,16 +78,26 @@ export class ArticleListComponent implements OnInit, AfterViewInit {
     })
   }
 
+  allFilteredArticles() {
+    const a = this.getActivePrograms().map(program => this.getFilteredPropClasses(program).map(pClass => this.getFilteredArticleItems(pClass))).flat(3)
+    console.log("allFilteredArticles", a.length, a);
+    return a
+  }
+
   getActivePrograms()  {
     const programFilter = this.filter.program.toUpperCase()
     const regexPattern = new RegExp(`^${programFilter}`)
-    return this.service.programMap.getActivePrograms().filter(p => regexPattern.test(p.toUpperCase()))
+    return this.service.programMap.getActivePrograms().filter(p => regexPattern.test(p.toUpperCase()) && this.getFilteredPropClasses(p).length)
   }
 
   getPropClasses(program: string)  {
     return this.service.programMap.getPropClassesFromProgram(program)
   }
 
+  getFilteredPropClasses(program: string) {
+    const pClasses: PropertyClass[] = this.service.programMap.getPropClassesFromProgram(program)
+    return pClasses.filter(pClass => this.getFilteredArticleItems(pClass).length)
+  }
   getFilteredArticleItems(pClass: PropertyClass) {
     const articleFilter = this.filter.article.toUpperCase()
     const regexPattern = new RegExp(`^${articleFilter}`)
@@ -154,7 +164,6 @@ export class ArticleListComponent implements OnInit, AfterViewInit {
   openEditArticle(articleItem: ArticleItem) {
     this.dialogOpener.open(ArticleComponent, {
       data: articleItem,
-      height: '70vh',
       width: '35vw',
     })
   }
