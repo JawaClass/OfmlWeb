@@ -7,11 +7,13 @@ import { FormsModule } from '@angular/forms';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { ArticleInputService } from '../services/article-input.service';
 import { ArticleitemService } from '../services/articleitem.service';
+import { ArtbaseService } from '../services/artbase.service';
 import { ArtbaseItem, ArticleItem, PropertyItem, PropValueItem } from '../models/models';
 import { RouterModule, Router } from '@angular/router';
 import { WaitingCursorComponent } from './../waiting-cursor/waiting-cursor.component'
 import { MatTooltipModule } from '@angular/material/tooltip';
-
+import { PropclassEditorComponent } from './../propclass-editor/propclass-editor.component'
+import { Artbase4proplassComponent } from './artbase4proplass/artbase4proplass.component'
 
 @Component({
   selector: 'app-artbase-editor',
@@ -22,7 +24,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatExpansionModule,
     RouterModule,
     WaitingCursorComponent,
-    MatTooltipModule
+    MatTooltipModule,
+    PropclassEditorComponent,
+    Artbase4proplassComponent
   ],
   templateUrl: './artbase-editor.component.html',
   styleUrl: './artbase-editor.component.css'
@@ -31,12 +35,11 @@ export class ArtbaseEditorComponent implements OnInit, OnDestroy, AfterViewInit 
 
   private service = inject(ArticleInputService)
   private articleitemService = inject(ArticleitemService)
-  
-
+  private artbaseService = inject(ArtbaseService)
   private route = inject(ActivatedRoute)
   private router = inject(Router)
 
-  articleItem!: ArticleItem
+  articleItem!: any
   isFetchingData = false
 
   ngAfterViewInit() {
@@ -59,6 +62,7 @@ export class ArtbaseEditorComponent implements OnInit, OnDestroy, AfterViewInit 
     this.articleItem.edited = true
   }
 
+  /*
   setArtbaseOnStart() {
     this.articleItem.artbaseItems.forEach(item => {
       this.getPropItems(item.pClass).forEach(propItem => {
@@ -72,7 +76,9 @@ export class ArtbaseEditorComponent implements OnInit, OnDestroy, AfterViewInit 
       })
     })
   }
+   */
 
+ /*
   setArtbaseOnLeave() {
     let newArtbase: ArtbaseItem[] = []
     // create new artbase items according to user selection
@@ -92,23 +98,45 @@ export class ArtbaseEditorComponent implements OnInit, OnDestroy, AfterViewInit 
     this.articleItem.artbaseItems = newArtbase
     
     this.articleitemService.saveArticleItem(this.articleItem)
-    
+  }
+ */
+
+*ngOnDestroy() {
+   // if (Boolean(this.articleItem))
+    //  this.setArtbaseOnLeave()
   }
 
-  ngOnDestroy(): void {
-    if (Boolean(this.articleItem))
-      this.setArtbaseOnLeave()
+  getPropClasses() {
+    if (!this.articleItem) return []
+    else return this.articleItem.klassen
   }
+
 
   ngOnInit() {
+    this.artbaseService.currentArticleItem$.subscribe(item => {
+      if (!item) {
+        this.router.navigate(['/'])
+      }
+      console.log("ArtbaseEditor INIT ::", item)
+      console.log(item.klassen)
+      this.articleItem = item
+    })
+    /**
     this.route.params.subscribe(async (params) => {
       const articleNr = params['articleNr']
       const program = params['program']
+
+      if (!articleNr || !program)
+        this.router.navigate(['/'])
+      
+        console.log("fetch Artbase", articleNr, program);
+        
+       
+         * 
       const articleItem = this.service.programMap.getArticleRef(program, articleNr)
       console.log("ArtbaseEditorComponent articleItem", articleItem);
 
-      if (!Boolean(articleItem))
-        this.router.navigate(['/'])
+      
       else {
         this.articleItem = articleItem!!
         this.articleItem.seen = true
@@ -120,7 +148,8 @@ export class ArtbaseEditorComponent implements OnInit, OnDestroy, AfterViewInit 
         console.log("fetch end");
         this.setArtbaseOnStart()
       }
-    })
+        
+    }) */
   }
 
   getPropItems(pClass: string): PropertyItem[] {

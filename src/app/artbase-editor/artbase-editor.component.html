@@ -1,4 +1,29 @@
-<h1>Artbase von
+<h1> Artbase für...</h1>
+@if(articleItem) {
+
+  <h1> {{ articleItem.article_nr }}</h1>
+
+  @for (pClass of getPropClasses(); track pClass; let idx = $index) {
+    
+    
+    <!--
+      <app-propclass-editor
+      [program]="pClass.sql_db_program"
+      [pClass]="pClass.prop_class"
+      ></app-propclass-editor> 
+    -->
+    
+    <app-artbase4proplass
+    [program]="pClass.sql_db_program"
+    [pClass]="pClass.prop_class"
+    [articleItem]="articleItem"
+    ></app-artbase4proplass> 
+  }
+
+}
+
+<!--
+  <h1>Artbase von
   <strong>
     {{ this.articleItem.articleNr }}</strong> aus <strong>{{ this.articleItem.program | uppercase}}
   </strong>
@@ -76,3 +101,4 @@
 
 
 }
+-->
