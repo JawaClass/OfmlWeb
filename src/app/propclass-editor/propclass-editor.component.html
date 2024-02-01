@@ -3,53 +3,56 @@
 
 @if (isLoading) {
     <app-waiting-cursor></app-waiting-cursor>
-    }
+} @else {
 
-@for (propItem of propItems; track propItem.property; let idx = $index) {
-
-<mat-expansion-panel style="margin-bottom: 10px;">
-    <mat-expansion-panel-header style="display: flex;">
-        <mat-panel-title style="flex: 4;">
-            
-            <section style="display: flex; flex: 3; gap: 10px;">
-                <span>{{ propItem.property }}</span>
-                <span>:</span>
-                <span>{{ propItem.propertyText }}</span>
-            </section>
-
-            <mat-checkbox
-            style="flex: 1;"
-            (click)="$event.stopPropagation()"
-            (change)="onChangeAll(propItem, $event)"
-            [(ngModel)]="propItem.active"
-            [matTooltip]="propItem.active ? 'Merkmal unsichtbar schalten' : 'Merkmal sichtbar schalten'">
+    
+@for (propItem of getProperties(); track propItem.property; let idx = $index) {
+   
+        <mat-expansion-panel style="margin-bottom: 10px;">
+        <mat-expansion-panel-header style="display: flex;">
+            <mat-panel-title style="flex: 4;">
+                
+                <section style="display: flex; flex: 3; gap: 10px;">
+                    <span>{{ getPropertyHeaderText(propItem) }}</span>
+                </section>
+    
+                <!--
+                <mat-checkbox
+                style="flex: 1;"
+                (click)="$event.stopPropagation()"
+                (change)="onChangeAll(propItem, $event)"
+                [(ngModel)]="propItem.active" 
+                [matTooltip]="propItem.active ? 'Merkmal unsichtbar schalten' : 'Merkmal sichtbar schalten'">
+                </mat-checkbox>
+                -->
+                
+    
+            </mat-panel-title>
+            <mat-panel-description style="flex: 1;" matTooltip="aktive Merkmalswerte">
+                <!-- {{ propItem.getActiveValues().length }} / {{ propItem.values.length }} -->
+                TODO...
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+    
+        @for (valItem of propItem.values; track valItem; let idx = $index) {
+        <section>
+            <mat-checkbox (change)="propClass.edited = true; propItem.active= true;"
+                [(ngModel)]="valItem.active">
+                <span>{{ getPropertyValueText(valItem) }}</span>
             </mat-checkbox>
-            
-
-        </mat-panel-title>
-        <mat-panel-description style="flex: 1;" matTooltip="aktive Merkmalswerte">
-            {{ propItem.getActiveValues().length }} / {{ propItem.values.length }}
-        </mat-panel-description>
-    </mat-expansion-panel-header>
-
-
-
-    @for (valItem of propItem.values; track valItem; let idx = $index) {
-    <section>
-        <mat-checkbox (change)="propClass.edited = true; propItem.active= true;"
-            [(ngModel)]="valItem.active">
-            {{ valItem.value }} : {{ valItem.text }}
-        </mat-checkbox>
-    </section>
+        </section>
+        }
+    
+    </mat-expansion-panel>
+    
+    
+    } @empty {
+        @if (!isLoading) {
+            <p>
+                <strong> Leere Klasse </strong>
+            </p>
+        }
     }
-
-</mat-expansion-panel>
-
-} @empty {
-    @if (!isLoading) {
-        <p>
-            <strong> Leere Klasse </strong>
-        </p>
-    }
-}
  
+    
+}

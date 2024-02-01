@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector, inject } from '@angular/core';
 import { Observable, Subject, map, of, BehaviorSubject, firstValueFrom } from 'rxjs';
 import { BaseService } from './base.service'
 import { ProgramMap, ArtbaseItem, ArticleItem, PropertyItem, PropValueItem } from './../models/models'
+import { SessionService } from './session.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,25 @@ export class ArticleInputService extends BaseService {
     "program": "",
     "pClass": "",
     "article": "",
+  }
+
+  private injector = inject(Injector)
+  sessionService = () => this.injector.get(SessionService)
+
+  async fetchPropClassWithDetails(program: string, pClass: string) {
+    const programWeb: string = this.sessionService().currentSession$.value!.name
+    const url = this.baseUrl +  "/web_ofml/ocd/web_ocd_propertyclass/details?where=web_program_name=%22" + programWeb + "%22 AND sql_db_program=%22" + program + "%22 AND  prop_class=%22" + pClass + "%22&limit=1"
+    console.log("url", url);
+    
+    return await this.fetchAndParseFromUrl(url)
+  }
+
+  async fetchWebOcdArticleWithDetails(): Promise<any[]> {
+    const program: string = this.sessionService().currentSession$.value!.name
+    const url = this.baseUrl +  "/web_ofml/ocd/web_ocd_article/details?where=web_program_name=%22" + program + "%22"
+    const response = await fetch(url)
+    const json: any = await response.json()
+    return json
   }
 
   programMap: ProgramMap = new ProgramMap()

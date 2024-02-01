@@ -3,12 +3,18 @@ import { HttpClient } from '@angular/common/http';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import { environment } from '../../environments/environment';
 
+
 @Injectable({
   providedIn: 'any' //'root'
 })
 export abstract class BaseService {
 
   /*protected*/  baseUrl = environment.backendBaseUrl // "http://172.22.15.238:5000"
+
+  protected async fetchAndParseFromUrl<T>(url: string): Promise<T> {
+      const response = await fetch(url)
+      return await response.json()
+  }
 
   protected httpClient: HttpClient = inject(HttpClient)
   snackBar = inject(MatSnackBar)
@@ -33,7 +39,7 @@ export abstract class BaseService {
     }
   }
 
-  protected buildDeleteRequestOptions(body: string) {
+  protected buildDeleteRequestOptions(body: string = "") {
     return {
       method: 'DELETE',
       headers: {

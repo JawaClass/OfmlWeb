@@ -1,7 +1,20 @@
 
+
 export interface ErrorMessage {
     error: string,
     message: string
+}
+
+export interface IArticleProgramTuple {
+    article: string,
+    program: string
+  }
+
+export interface IArticleDuplicate {
+    article_nr: string,
+    series: string,
+    sql_db_program: string,
+    ocd_artshorttext: string
 }
 
 export interface IDate {
@@ -72,7 +85,7 @@ export class Session implements ISession {
         public isPublic: boolean,
         public ownerId: number,
         public articleInput: string,
-        public editUserId: number,
+        //public editUserId: number,
     ) {}
     
     static emptyOne(userId: number) {
@@ -84,7 +97,7 @@ export class Session implements ISession {
             true,
             userId,
             "",
-            userId
+            //userId
         )
     }
 
@@ -92,16 +105,16 @@ export class Session implements ISession {
         return new Session(
             json["id"],
             json["name"],
-            Date.fromJSON(json["creationDate"]),
-            Date.fromJSON(json["editDate"]),
-            json["isPublic"],
-            json["ownerId"],
-            json["articleInput"],
-            json["editUserId"],
+            Date.fromJSON(json["creation_date"]),
+            Date.fromJSON(json["edit_date"]),
+            json["is_public"],
+            json["owner_id"],
+            json["article_input"],
+            //json["editUserId"],
         )
     }
 
-    public getInputTokens() {
+    public getInputTokens(): string[] {
         const regex: RegExp = /[ ;\r?\n]+/
     
         let tokens = this.articleInput.split(regex)

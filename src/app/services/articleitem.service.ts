@@ -10,6 +10,13 @@ export class ArticleitemService extends BaseService {
 
   sessionService = inject(SessionService)
 
+  async fetchArticlePrice(article: any) {
+    const web_program_name = article["web_program_name"]
+    const article_nr = article["article_nr"]
+    const url = this.baseUrl +  "/web_ofml/ocd/web_ocd_price?where=web_program_name=%22" + web_program_name +"%22%20AND%20article_nr=%22"+article_nr+"%22%20AND%20price_type=%22S%22%20AND%20price_level=%22B%22&limit=1"
+    return await this.fetchAndParseFromUrl<any>(url)
+  }
+ 
   async fetchArticlePriceAndLongtext(articleItem: ArticleItem) {
     const url = this.baseUrl + "/ocd/longtext_and_price/" + articleItem.articleNr + "/" + articleItem.program
     const response = await fetch(url)

@@ -10,7 +10,7 @@ export const routes: Routes = [
     // TODO: set names for each page etc., see https://angular.dev/guide/routing/common-router-tasks
     { path: '', component: ArticleListComponent },
     { path: 'duplicates', component: ArticleDuplicateEditorComponent },
-    { path: 'editor', component: ArtbaseEditorComponent },
+    { path: 'editor-artbase', component: ArtbaseEditorComponent },
     { path: 'editor-all', component: ArtbaseEditorAllComponent },
     { path: 'editor-propclass', component: PropclassEditorComponent },
     //  { path: '**', component: PageNotFoundComponent },

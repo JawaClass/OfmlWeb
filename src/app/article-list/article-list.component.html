@@ -1,4 +1,55 @@
-<div style="display: flex; justify-content: left; gap: 10px;">
+article-lit component...
+
+
+@for (program of getGroupKeys(program2pClass2ArticlesMap); track program; let idx = $index) {
+    <section>
+        <h2>{{idx+1}}. {{ program | uppercase }} </h2>
+    </section>
+
+    @for (pClass of getGroupKeys(program2pClass2ArticlesMap[program]); track pClass; let idx = $index) {
+
+            
+    <mat-card style="margin-bottom: 15px;">
+        <button mat-stroked-button color="accent" style="user-select: text;  width: max-content"
+            (click)="navigateToEditPropClass(program, pClass)">
+            {{ pClass }}
+        </button>
+        <mat-card-content>
+            
+        <table>
+            
+        @for (article of program2pClass2ArticlesMap[program][pClass]; track article; let idx = $index) {
+            <tr>
+                <td style="padding-right: 10px;">{{ article.article_nr }}</td>
+                <td style="padding-right: 10px;">{{ article.series }}</td>
+                <td style="padding-right: 10px;">{{ getShortText(article) }}</td>
+                <td>
+                    <button mat-button matTooltip="Artikel öffnen" (click)="openEditArticle(article)">
+                        <mat-icon color="accent" style="vertical-align: middle;">
+                        edit
+                    </mat-icon>
+                    </button>
+                    <button mat-button matTooltip="Artbase öffnen" (click)="navigateToEditArtbase(article)">
+                        <mat-icon color="accent" style="vertical-align: middle;">
+                            label_important
+                    </mat-icon>
+                    </button>
+                </td>
+            </tr>
+        }
+        </table>
+
+
+    </mat-card-content>
+    </mat-card> 
+            
+    }
+}
+
+
+
+<!--
+    <div style="display: flex; justify-content: left; gap: 10px;">
 
     <button mat-stroked-button color="accent" (click)="navigateToEditArtbaseAll()">
         globale Artbase
@@ -125,3 +176,4 @@
 } @empty {
 <p>Kein Auswahl</p>
 }
+-->

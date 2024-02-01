@@ -13,6 +13,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SessionService } from '../services/session.service'
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
+import { Router } from '@angular/router';
 
 
 interface AlteredArticleItem {
@@ -57,6 +58,8 @@ export class SessionEditorComponent implements OnInit {
   articleItems: AlteredArticleItem[] = []
   addArticleFailed = false
 
+  router = inject(Router)
+
   constructor(@Inject(MAT_DIALOG_DATA) sessionAndOwner: SessionAndOwner) {
     this.editorMode = sessionAndOwner.session.id ? EditorMode.Edit : EditorMode.Create
     if (this.editorMode === EditorMode.Edit) {
@@ -65,9 +68,11 @@ export class SessionEditorComponent implements OnInit {
     } else {
       this.sessionAndOwner = sessionAndOwner
     }
+    this.sessionAndOwner.session.articleInput = "TLTN16880A TLTN20880A WPBTN WPBTT Q3HO1WE Q3HO2WE"
+    this.sessionAndOwner.session.name = "test_dasdkflk"
     this.textResource = {
       "header": this.isEditMode() ? `Sitzung editieren [${sessionAndOwner.session.id}]` : "Sitzung anlegen",
-      "button": this.isEditMode() ? "Änderungen bestätigten" : "Sitzung erstellen",
+      "button": this.isEditMode() ? "Änderungen bestätigten" : "Mit Sitzung erstellen fortfahren",
       "checkbox": this.sessionAndOwner.session.isPublic ? "öffentliches Projekt" : "privates Projekt"
     }
   }
@@ -94,10 +99,18 @@ export class SessionEditorComponent implements OnInit {
   geUser = () => this.sessionAndOwner.owner.email
 
   private async createNewSession() {
-    const session = await this.service.createSession(this.sessionAndOwner.session)
+    //const session = await this.service.createSession(this.sessionAndOwner.session)
     this.dialogRef.close({
-      session: session
+      session: undefined
     })
+    const articleTokens = this.sessionAndOwner.session.getInputTokens()
+
+    console.log("createNewSession::articleTokens... articleTokens")
+    console.log(articleTokens)
+    this.service.currentSession$.next(this.sessionAndOwner.session)
+    await this.service.fetchArticleDuplicates(articleTokens)
+    
+    this.router.navigate(['/duplicates', { }])
   }
 
   private async editSession() {

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ArticleInputService } from '../services/article-input.service';
@@ -13,11 +13,20 @@ import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CreateProgramComponent } from '../create-program/create-program.component'
-import { ArticleItem } from '../models/models'
+import { ArticleItem, IArticleDuplicate, Session, IArticleProgramTuple } from '../models/models'
 import { WaitingCursorComponent } from '../waiting-cursor/waiting-cursor.component'
 import { ArticleitemService } from '../services/articleitem.service' 
 import { ArticleListComponent } from '../article-list/article-list.component'
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { SessionService } from '../services/session.service';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+
+
+interface IArticleDuplicateToggle {
+  item: IArticleDuplicate,
+  active: boolean
+}
+
 
 @Component({
   selector: 'app-article-duplicate-editor',
@@ -38,23 +47,104 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatFormFieldModule,
     WaitingCursorComponent,
     ArticleListComponent,
-    MatTooltipModule
+    MatTooltipModule,
+    MatProgressBarModule
   ],
   templateUrl: './article-duplicate-editor.component.html',
   styleUrl: './article-duplicate-editor.component.css'
 })
-export class ArticleDuplicateEditorComponent {
+export class ArticleDuplicateEditorComponent implements OnInit, AfterViewInit {
   
+  sessionService = inject(SessionService)
   service = inject(ArticleInputService)
   articleitemService = inject(ArticleitemService)
   router = inject(Router)
-  getAllPrograms = () => this.service.programMap.getAllPrograms()
-  isProgramActive = (program: string) => this.service.programMap.isActive(program)
-  toggleActive = (program: string) => this.service.programMap.toggleActive(program)
-  
-  async confirmSelection() {
+  isProgramActive = (program: string) => this.activePrograms.has(program)
+  toggleActive(program: string) {
+    if (this.isProgramActive(program)) this.activePrograms.delete(program)
+    else this.activePrograms.add(program)
 
-      const activePrograms = this.service.programMap.getActivePrograms()
+    const active = this.isProgramActive(program)
+    this.articles.forEach(a => {
+      if (a.item.sql_db_program === program)
+        a.active = active
+    })
+
+  }
+  
+  articles: IArticleDuplicateToggle[] = []
+  articlesGroupedByArticleNr: any = {}
+  articlesNrUnique: string[] = []
+  activePrograms: Set<string> = new Set()
+  session!: Session 
+  isProcessing: boolean = false
+  programs() {
+    const p = this.articles.map(a => a.item.sql_db_program)
+    const unqieue =  new Set(p)
+    return Array.from(unqieue)
+  }
+
+  groupby(): object {
+    return this.articles.reduce((x, y) => {
+      if (x[y.item.article_nr]) x[y.item.article_nr].push(y)
+      else x[y.item.article_nr] = [y]
+      return x;
+    	}, {} as any)
+  }
+  
+  uniqueArticlesByArticleNr() {
+    return Array.from(new Set(this.articles.map(a => a.item.article_nr)))
+  }
+
+  activeArticlesByArticleNr() {
+    return this.articles.filter(a => a.active)//.map(a => a.item.article_nr)
+  }
+
+  uniqueActiveArticlesByArticleNr() {
+    return Array.from(new Set(this.articles.filter(a => a.active).map(a => a.item.article_nr)))
+  }
+
+  async toggleArticle(article: IArticleDuplicateToggle) {
+    article.active = !article.active
+    //this.articlesGroupedByArticleNr = this.groupby()
+    //this.articlesNrUnique = this.uniqueArticlesByArticleNr()
+    //this.activePrograms = new Set(this.programs())
+  }
+
+
+  async ngAfterViewInit() {
+    console.log("ArticleDuplicateEditorComponent ngAfterViewInit")
+  }
+
+
+  async ngOnInit() {
+    
+    console.log("ArticleDuplicateEditorComponent ngOnInit")
+    console.log(this.sessionService.articleDuplicates4Session$.value)
+    this.session = this.sessionService.currentSession$.value!
+    console.log(this.session)
+    this.sessionService.articleDuplicates4Session$.subscribe(articles => {
+        
+        console.log("subscribe:", articles)
+        if (articles) {
+          this.articles = articles.map(a => ({item: a, active: true} as IArticleDuplicateToggle))
+          this.articlesGroupedByArticleNr = this.groupby()
+          this.articlesNrUnique = this.uniqueArticlesByArticleNr()
+          this.activePrograms = new Set(this.programs())
+        }
+        
+        
+              
+    })
+  }
+
+  async confirmSelection() {
+    const articleAndPrograms: IArticleProgramTuple[] = this.activeArticlesByArticleNr()
+    .map( a=> ({article: a.item.article_nr, program: a.item.sql_db_program}) as IArticleProgramTuple)
+    this.isProcessing = true
+    await this.sessionService.createSession(this.session, articleAndPrograms)
+    this.isProcessing = false
+      /*const activePrograms = this.service.programMap.getActivePrograms()
       
       await Promise.all(
         this.getAllArticleRefs()
@@ -67,7 +157,7 @@ export class ArticleDuplicateEditorComponent {
 
       
 
-      this.service.behaviorSubjectProgramMap.next(this.service.programMap)
+      this.service.behaviorSubjectProgramMap.next(this.service.programMap)*/
       
       this.router.navigate(['/'])
   }
@@ -78,7 +168,7 @@ export class ArticleDuplicateEditorComponent {
   }
 
   selectionIsValid() {
-    const noDuplicates = this.notUniqueArticles().length == 0
+    const noDuplicates = (this.activeArticlesByArticleNr().length - this.uniqueActiveArticlesByArticleNr().length) == 0
     return noDuplicates
   }
 

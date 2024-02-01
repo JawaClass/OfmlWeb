@@ -16,12 +16,15 @@ import { WaitingCursorComponent } from '../waiting-cursor/waiting-cursor.compone
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialogRef } from '@angular/material/dialog';
-import { ErrorMessage } from '../models/models'
+ 
+
 import { HttpErrorResponse } from '@angular/common/http';
 import { interval } from 'rxjs';
 import { MatSelectModule } from '@angular/material/select';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { ArticleItem, SessionAndOwner, Session, User } from '../models/models'
+import { getShortTextFromArticle, getLongTextFromArticle } from '../models/helper'
+
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SessionService } from '../services/session.service'
 import { ArticleitemService } from '../services/articleitem.service';
@@ -54,7 +57,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 })
 export class ArticleComponent implements OnInit {
 
-  articleItem!: ArticleItem
+  articleItem!: any
   articleitemService = inject(ArticleitemService)
   dialogRef = inject(MatDialogRef<ArticleComponent>)
   articleForm = new FormGroup({
@@ -73,34 +76,17 @@ export class ArticleComponent implements OnInit {
     ]),
   })
 
-  constructor(@Inject(MAT_DIALOG_DATA) articleItem: ArticleItem) {
+  constructor(@Inject(MAT_DIALOG_DATA) articleItem: any) {
     this.articleItem = articleItem
-    console.log("ArticleComponent :: ", articleItem);
-
-    this.articleForm.controls.articleNr.setValue(this.articleItem.articleNrAlias)
-    this.articleForm.controls.shortText.setValue(this.articleItem.shorttext)
-    if (this.articleItem.price !== null) this.articleForm.controls.articlePrice.setValue(this.articleItem.price)
-    if (this.articleItem.longText !== null) this.articleForm.controls.longText.setValue(this.articleItem.longText.join("\n"))
+    this.articleForm.controls.articleNr.setValue(this.articleItem.article_nr)
+    this.articleForm.controls.shortText.setValue(getShortTextFromArticle(this.articleItem))
+    this.articleForm.controls.longText.setValue(getLongTextFromArticle(this.articleItem).join("\n"))
   }
 
   async ngOnInit() {
-    
-    if (this.articleItem.price === null || this.articleItem.longText === null) {
-      console.log("ArticleComponent :: ngOnInit fetchArticlePriceAndLongtext because not yet fetched")
-      
-      const priceAndLongtet = await this.articleitemService.fetchArticlePriceAndLongtext(this.articleItem)
-      const price = priceAndLongtet["price"]
-      this.articleForm.controls.articlePrice.setValue(price) 
-      const longText = priceAndLongtet["longtext"].join("\n")
-      this.articleForm.controls.longText.setValue(longText)
-    } else {
-      console.log("ArticleComponent :: skip ngOnInit (already fetched)")
-    }
-
-    console.log("JSON ARTICLE ITEM ::::", JSON.stringify(this.articleItem));
-    console.log("price", typeof  this.articleItem.price, typeof  this.articleItem.price?.toString());
-    
-    
+    const priceItem = await this.articleitemService.fetchArticlePrice(this.articleItem)
+    const price = parseFloat(priceItem["price"])
+    this.articleForm.controls.articlePrice.setValue(price)
   }
 
   async submitArticleChanges() {
@@ -113,4 +99,5 @@ export class ArticleComponent implements OnInit {
     await this.articleitemService.saveArticleItem(this.articleItem)
     this.dialogRef.close()
   }
-}
+} 
+
