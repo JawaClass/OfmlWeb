@@ -56,7 +56,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   styleUrl: './article.component.css'
 })
 export class ArticleComponent implements OnInit {
-
+  
+  priceItem: any
   articleItem!: any
   articleitemService = inject(ArticleitemService)
   dialogRef = inject(MatDialogRef<ArticleComponent>)
@@ -77,6 +78,7 @@ export class ArticleComponent implements OnInit {
   })
 
   constructor(@Inject(MAT_DIALOG_DATA) articleItem: any) {
+    // set form value articleNr, shortText, longText
     this.articleItem = articleItem
     this.articleForm.controls.articleNr.setValue(this.articleItem.article_nr)
     this.articleForm.controls.shortText.setValue(getShortTextFromArticle(this.articleItem))
@@ -84,19 +86,39 @@ export class ArticleComponent implements OnInit {
   }
 
   async ngOnInit() {
-    const priceItem = await this.articleitemService.fetchArticlePrice(this.articleItem)
-    const price = parseFloat(priceItem["price"])
+    // fetch price and set form value price
+    this.priceItem = await this.articleitemService.fetchArticlePrice(this.articleItem)
+    const price = parseFloat(this.priceItem["price"])
     this.articleForm.controls.articlePrice.setValue(price)
   }
 
   async submitArticleChanges() {
-    this.articleItem.articleNrAlias = this.articleForm.controls.articleNr.value!!
-    this.articleItem.shorttext = this.articleForm.controls.shortText.value!!
-    console.log("submitArticleChanges", this.articleItem.price, typeof this.articleItem.price, "===>", this.articleForm.controls.articlePrice.value!!, typeof this.articleForm.controls.articlePrice.value!!);
+    //this.articleItem.ar = this.articleForm.controls.articleNr.value!!
+    //this.articleItem.shorttext = this.articleForm.controls.shortText.value!!
+    console.log("submitArticleChanges")
+    console.log("articleNr", this.articleForm.controls.articleNr.value)
+    console.log("price", this.articleForm.controls.articlePrice.value)
+    console.log("short", this.articleForm.controls.shortText.value)
+    console.log("long", this.articleForm.controls.longText.value)
     
-    this.articleItem.price = Number(this.articleForm.controls.articlePrice.value!!) // form value is string?
-    this.articleItem.longText = this.articleForm.controls.longText.value!!.split("\n")
-    await this.articleitemService.saveArticleItem(this.articleItem)
+    await this.articleitemService.patchArticlePrice({
+      "db_key": this.priceItem.db_key,
+      "price": Number(this.articleForm.controls.articlePrice.value)
+    })
+
+    console.log("PATCH", this.articleItem);
+    
+    await this.articleitemService.patchArticleShortText({
+      "db_key": this.articleItem.kurztext.db_key,
+      "text": this.articleForm.controls.shortText.value
+    })
+    this.articleItem.kurztext.text = this.articleForm.controls.shortText.value
+
+    await this.articleitemService.patchArticleLongText(
+      this.articleItem,
+      this.articleForm.controls.longText.value as string
+      )
+
     this.dialogRef.close()
   }
 } 

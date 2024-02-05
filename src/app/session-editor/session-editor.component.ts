@@ -58,6 +58,8 @@ export class SessionEditorComponent implements OnInit {
   articleItems: AlteredArticleItem[] = []
   addArticleFailed = false
 
+  formErrorMessage: string = ""
+
   router = inject(Router)
 
   constructor(@Inject(MAT_DIALOG_DATA) sessionAndOwner: SessionAndOwner) {
@@ -125,6 +127,13 @@ export class SessionEditorComponent implements OnInit {
   }
 
   async saveSession() {
+    const sessionOrNull = await this.service.fetchSessionByName(this.sessionAndOwner.session.name)
+    console.log("sessionOrNull 4 name", this.sessionAndOwner.session.name, ":::", sessionOrNull)
+    if (sessionOrNull) {
+      this.formErrorMessage = "Name bereits vergeben."
+      return
+    }
+    
     switch (this.editorMode) {
       case EditorMode.Create:
         await this.createNewSession()

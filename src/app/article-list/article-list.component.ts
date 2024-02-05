@@ -19,6 +19,7 @@ import { CreateProgramComponent } from '../create-program/create-program.compone
 import { MatExpansionModule } from '@angular/material/expansion';
 import { ArticleComponent } from '../article/article.component';
 import { Subscription } from 'rxjs';
+import { MatCheckboxModule, MatCheckboxChange } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-article-list',
@@ -35,7 +36,8 @@ import { Subscription } from 'rxjs';
     MatIconModule,
     MatButtonModule,
     MatDialogModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatCheckboxModule
   ],
   templateUrl: './article-list.component.html',
   styleUrl: './article-list.component.css'
@@ -58,9 +60,11 @@ export class ArticleListComponent implements OnInit, AfterViewInit, OnDestroy {
   program2pClass2ArticlesMap: any = {}
   subscription$: Subscription | null = null
 
+  alternativeView = false
+
   getShortText(article: any) {
-    if (article["kurztext"].length) 
-      return article["kurztext"][0]["text"]
+    if (article["kurztext"]) 
+      return article["kurztext"]["text"]
     else "KEIN KURZTEXT"
   }
 
@@ -117,6 +121,7 @@ export class ArticleListComponent implements OnInit, AfterViewInit, OnDestroy {
     
     this.articleList = await this.service.fetchWebOcdArticleWithDetails()
     this.articleListGroupedBy = this.groupby(this.articleList, "sql_db_program")
+    this.program2pClass2ArticlesMap = {} 
     //console.log("groupby", this.articleListGroupedBy)
 
     //console.log("groupby", this.getGroupKeys(this.articleListGroupedBy))

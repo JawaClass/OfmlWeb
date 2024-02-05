@@ -7,7 +7,7 @@ import { SessionService } from './session.service'
   providedIn: 'root'
 })
 export class ArticleitemService extends BaseService {
-
+ 
   sessionService = inject(SessionService)
 
   async fetchArticlePrice(article: any) {
@@ -16,7 +16,67 @@ export class ArticleitemService extends BaseService {
     const url = this.baseUrl +  "/web_ofml/ocd/web_ocd_price?where=web_program_name=%22" + web_program_name +"%22%20AND%20article_nr=%22"+article_nr+"%22%20AND%20price_type=%22S%22%20AND%20price_level=%22B%22&limit=1"
     return await this.fetchAndParseFromUrl<any>(url)
   }
- 
+
+  async patchArticlePrice(patchItem: any) {
+    const url = this.baseUrl +  "/web_ofml/ocd/web_ocd_price?where=db_key=" + patchItem.db_key
+    return await this.fetchAndParseFromUrl<any>(url, this.buildPatchRequestOptions(JSON.stringify(patchItem)))
+  }
+
+  async patchResourceByKey(table: string, dbKey: number, patchItem: any) {
+    const url = this.baseUrl +  "/web_ofml/ocd/" + table + "?where=db_key=" + dbKey
+    return await this.fetchAndParseFromUrl<any>(url, this.buildPatchRequestOptions(JSON.stringify(patchItem)))
+  }
+
+  async patchArticleShortText(patchItem: any) {
+    const url = this.baseUrl +  "/web_ofml/ocd/web_ocd_artshorttext?where=db_key=" + patchItem.db_key
+    return await this.fetchAndParseFromUrl<any>(url, this.buildPatchRequestOptions(JSON.stringify(patchItem)))
+  }
+  async postArticleLongTextLine(item: any) {
+    const url = this.baseUrl +  "/web_ofml/ocd/web_ocd_artlongtext"
+    return await this.fetchAndParseFromUrl<any>(url, this.buildPostRequestOptions(JSON.stringify(item)))
+  }
+
+  async patchArticleLongText(
+    articleItem: any,
+    longTextNew: string) {
+    // delete old long text
+    const oldIDs = articleItem.langtext?.map((line: any) => line.db_key)
+    if (oldIDs && oldIDs.length) {
+      await this.deleteArticleLongText(oldIDs)
+    } 
+    // patch long_textnr in article table
+    const patchItem = {
+      "long_textnr": "LONGTEXTNR_" + articleItem.article_nr
+    }
+    await this.patchResourceByKey("web_ocd_article", articleItem.db_key, patchItem)
+    // insert new long text
+    const lines = longTextNew.split("\n")
+    const items = lines.map((text, idx) => ({
+      "textnr": patchItem["long_textnr"],
+      "language": "de",
+      "line_nr": idx + 1,
+      "line_fmt": "\\",
+      "text": text,
+      "sql_db_program": articleItem.sql_db_program,
+      "web_program_name": articleItem.web_program_name,
+      "web_filter": 0
+    }))
+    const createdArtlongTextItems = await Promise.all(items.map(item => this.postArticleLongTextLine(item)))
+    console.log("createdItems...", createdArtlongTextItems)
+    
+    // update local
+    articleItem.long_textnr = patchItem.long_textnr
+    articleItem.langtext = createdArtlongTextItems
+  }
+
+  private async deleteArticleLongText(ids: number[]) {
+    const idsJoined = ids.join(",")
+    const url = this.baseUrl +  "/web_ofml/ocd/web_ocd_artlongtext?where=db_key IN (" + idsJoined +")"
+    console.log("deleteArticleLongText", url)
+    return await this.fetchAndParseFromUrl(url, this.buildDeleteRequestOptions())
+    
+  }
+
   async fetchArticlePriceAndLongtext(articleItem: ArticleItem) {
     const url = this.baseUrl + "/ocd/longtext_and_price/" + articleItem.articleNr + "/" + articleItem.program
     const response = await fetch(url)

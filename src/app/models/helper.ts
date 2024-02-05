@@ -4,8 +4,10 @@
 
 
 export function getShortTextFromArticle(article: any): string {
-    if (article["kurztext"].length) 
-      return article["kurztext"][0]["text"]
+  console.log("getShortTextFromArticle", article);
+  
+    if (article["kurztext"]) 
+      return article["kurztext"]["text"]
     else 
         return ""
   }

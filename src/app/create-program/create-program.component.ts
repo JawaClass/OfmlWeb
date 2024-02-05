@@ -19,7 +19,9 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { HttpErrorResponse } from '@angular/common/http';
 import { interval } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
-
+import { SessionService } from '../services/session.service';
+import { Session } from '../models/models';
+import {MatSelectModule} from '@angular/material/select';
 
 @Component({
   selector: 'app-create-program',
@@ -40,15 +42,22 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     WaitingCursorComponent,
     ClipboardModule,
     MatProgressBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatSelectModule
   ],
   templateUrl: './create-program.component.html',
   styleUrl: './create-program.component.css'
 })
 export class CreateProgramComponent {
 
+  exportPathOptions = [
+    "Testumgebung", "B://ofml_development//Tools//ofml_datenmacher"
+  ]
+
+  currentSession = inject(SessionService).currentSession$.value as Session
+
   createProgramForm = new FormGroup({
-    programName: new FormControl("", [
+    programName: new FormControl(this.currentSession.name.toLowerCase().replace(" ", "_"), [
       Validators.required,
       Validators.pattern(/^[a-z][a-z0-9_]{1,24}$/)]),
     programId: new FormControl("", [
@@ -60,7 +69,16 @@ export class CreateProgramComponent {
     exportOam: new FormControl(true),
     exportOfml: new FormControl(true),
     exportGo: new FormControl(true),
+    exportRegistry: new FormControl(true),
+    buildEbase: new FormControl(true),
+    exportPath: new FormControl(this.exportPathOptions[0]),
   })
+
+  buildCurrentExportPath() {
+    const root = this.createProgramForm.get("exportPath")!!.value!
+    const folder = this.createProgramForm.get("programName")!!.value!
+    return root + "//" + folder
+  }
 
   dialogRef = inject(MatDialogRef<CreateProgramComponent>)
   createService = inject(CreateProgramService)
@@ -76,18 +94,22 @@ export class CreateProgramComponent {
     this.isProcessing = true
     this.resultExportPath = ""
     const subscription = interval(1000).subscribe(x => this.secondsPassed = x)
-    this.createService.postCreate(
-      this.createProgramForm.get("programName")!!.value!!,
-      this.createProgramForm.get("programId")!!.value!,
-      {
-        "ocd": this.createProgramForm.get("exportOcd")!!.value!,
-        "oam": this.createProgramForm.get("exportOam")!!.value!,
-        "oas": this.createProgramForm.get("exportOas")!!.value!,
-        "ofml": this.createProgramForm.get("exportOfml")!!.value!,
-        "go": this.createProgramForm.get("exportGo")!!.value!,
-        "odb": this.createProgramForm.get("exportOdb")!!.value!,
-      }
-    )
+
+    const params = {
+      "web_program_name": this.currentSession.name,
+      "program_name": this.createProgramForm.get("programName")!!.value!!,
+      "program_id": this.createProgramForm.get("programId")!!.value!,
+      "export_path": this.createProgramForm.get("exportPath")!!.value!,
+      "export_ocd": this.createProgramForm.get("exportOcd")!!.value!,
+      "export_oam": this.createProgramForm.get("exportOam")!!.value!,
+      "export_oas": this.createProgramForm.get("exportOas")!!.value!,
+      "export_ofml": this.createProgramForm.get("exportOfml")!!.value!,
+      "export_go": this.createProgramForm.get("exportGo")!!.value!,
+      "export_odb": this.createProgramForm.get("exportOdb")!!.value!,
+      "export_registry": this.createProgramForm.get("exportRegistry")!!.value!,
+      "build_ebase": this.createProgramForm.get("buildEbase")!!.value!,
+    }
+    this.createService.postCreate(params)
       .subscribe({
         next: (result) => {
           this.isProcessing = false

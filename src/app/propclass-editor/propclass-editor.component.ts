@@ -11,6 +11,8 @@ import { PropertyClass, PropertyItem, PropValueItem } from '../models/models';
 import { WaitingCursorComponent } from '../waiting-cursor/waiting-cursor.component'
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { getTextFromProperty } from '../models/helper';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import {MatButtonModule} from '@angular/material/button';
 
 
 
@@ -24,7 +26,9 @@ import { getTextFromProperty } from '../models/helper';
     MatExpansionModule,
     RouterModule,
     WaitingCursorComponent,
-    MatTooltipModule
+    MatTooltipModule,
+    MatProgressSpinnerModule,
+    MatButtonModule
   ],
   templateUrl: './propclass-editor.component.html',
   styleUrl: './propclass-editor.component.css'
@@ -45,11 +49,23 @@ export class PropclassEditorComponent implements OnInit, OnDestroy, AfterViewIni
 
   pClassItem!: any 
   
+  getActiveValuesFromProperty(propItem: any) {
+    return propItem.values.filter((v: any) => v.web_filter === 0)
+  }
+
+  getPropertyClassText(pClassItem: any) {
+    if (pClassItem.text)
+      return pClassItem.text.text
+    else
+      return ""
+  }
+
   getPropertyHeaderText(p: any) {
-    return `# ${p.pos_prop} ${p.property} : ${this.getPropertyText(p)} (${p.scope})`
+    return `# ${p.pos_prop} ${p.property} : ${this.getPropertyText(p)} [Scope=${p.scope}, Type=${p.prop_type}]`
   }
 
   getPropertyValueText(v: any) {
+    if (!v) return "UNDEFINED ???"
     return `${v.value_from} : ${this.getPropertyText(v)}`
   }
 
@@ -100,18 +116,68 @@ export class PropclassEditorComponent implements OnInit, OnDestroy, AfterViewIni
       this.route.params.subscribe(async (params) => {
         this.program = params['program']
         this.pClass = params['propClass']
-        this.initialize()
+        await this.initialize()
       })
     } else {
-      this.initialize()
+      await this.initialize()
     }
     
 
   }
 
-  onChangeAll(propertyItem: PropertyItem, event: any) {
-    //propertyItem.values.forEach((x: PropValueItem) => { x.active = event.checked })
-    //this.propClass.edited = true
+  async setAllValuesFilter(propItem: any, filterValue: boolean, event: any) {
+    event.stopPropagation()
+    propItem.values.forEach((valItem: any) => {
+      valItem.web_filter = filterValue
+    })
+    const promises = propItem.values.map((valItem: any) => {
+      this.patchPropertyValue(valItem)
+    })
+    await Promise.all(promises)
   }
 
+  async onTogglePropertyScope(propItem: any, event: any) {
+    // disable property (set scope = G)
+    // activate property (set scope = C)
+    event.stopPropagation()
+    console.log("onChangeFilterAll", propItem.web_filter)
+
+    if (propItem.scope == "C") {
+      propItem.scope = "G"
+    } else {
+      propItem.scope = "C"
+    }
+
+    const patch = {
+      "db_key": propItem.db_key,
+      "scope": propItem.scope
+    }
+
+    await this.propertyitemService.patchProperty(patch)
+  }
+
+  private async patchPropertyValue(valItem: any) {
+    const patch = {
+      "db_key": valItem.db_key,
+      "web_filter": valItem.web_filter
+    }
+    valItem["isUpdating"] = true
+    await this.propertyitemService.patchPropertyValue(patch)
+    setTimeout(() => {valItem["isUpdating"] = false}, 300)
+  }
+
+  async onToggleValue(valItem: any, event: any) {
+    console.log("onToggleValue...", valItem.property, valItem.value_from);
+    valItem.web_filter = !valItem.web_filter
+    await this.patchPropertyValue(valItem)
+  }
+
+  isPropertyVisible(propItem: any) {
+    return propItem.scope == "C"
+  }
+
+  getPropertyVisibleText(scope: string) {
+    return scope == "C" ? "Sichtbar (C)": "Unsichtbar (G)"
+  }
+ 
 }

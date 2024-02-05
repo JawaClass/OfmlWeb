@@ -11,15 +11,8 @@ export class CreateProgramService extends BaseService {
 
   private service = inject(ArticleInputService)
 
-  postCreate(programName: string, programID: string, exports: any): Observable<any> {
+  postCreate(params: any): Observable<any> {
     const url = this.baseUrl + "/program_creation/create"
-    const programMap: ProgramMap = this.service.programMap
-    return this.httpClient.post(url, {
-      "programName": programName,
-      "programID": programID,
-      "articleItems": programMap.jsonify(),
-      "propertyItems": programMap.jsonifyProperties(),
-      "exports": exports
-    })
+    return this.httpClient.post(url, params)
   }
 }

@@ -36,8 +36,12 @@ export class SessionService extends BaseService {
       )
     )
     const response = await fetch(url, requestOptions)
-    const createdSession: Session = await response.json()
+    const json = await response.json()
+    console.log("deepcopy repsonce json", json);
+    
+    const createdSession: Session = Session.fromJSON(json)
     localStorage.setItem("sessionId", createdSession.id!!.toString())
+    this.currentSession$.next(createdSession)
     //await this.saveInitialArticleItems(session)
     this.snackBar.open("Sitzung erstellt", "Ok", { duration: 2000 })
     //return createdSession
@@ -114,8 +118,19 @@ export class SessionService extends BaseService {
     const url = this.baseUrl + "/web_ofml/ocd/web_program?where=id=" + sessionId + "&limit=1"
     const response = await fetch(url)
     const session: any = await response.json()
+    
+    if (session)
+      return Session.fromJSON(session)
+    else
+      return null
+    
+  }
 
-    //console.log("fetchSessionById RESULT_______", session);
+  async fetchSessionByName(name: string): Promise<Session | null> {
+
+    const url = this.baseUrl + "/web_ofml/ocd/web_program?where=name=\"" + name + "\"&limit=1"
+    const response = await fetch(url)
+    const session: any = await response.json()
     
     if (session)
       return Session.fromJSON(session)

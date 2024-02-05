@@ -1,25 +1,30 @@
-<h1> Artbase für...</h1>
+<h2> Artbase </h2>
 @if(articleItem) {
 
-  <h1> {{ articleItem.article_nr }}</h1>
+  <h3> {{ articleItem.article_nr }}</h3>
 
   @for (pClass of getPropClasses(); track pClass; let idx = $index) {
     
+    <mat-expansion-panel style="margin-bottom: 10px;">
+      <mat-expansion-panel-header style="display: flex;">
+          <mat-panel-title style="flex: 4;">
+              {{ pClass.prop_class }}
+          </mat-panel-title>
+          <mat-panel-description style="flex: 1;" matTooltip="aktive Merkmalswerte">
     
-    <!--
-      <app-propclass-editor
-      [program]="pClass.sql_db_program"
-      [pClass]="pClass.prop_class"
-      ></app-propclass-editor> 
-    -->
-    
+          </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      
     <app-artbase4proplass
     [program]="pClass.sql_db_program"
     [pClass]="pClass.prop_class"
     [articleItem]="articleItem"
     ></app-artbase4proplass> 
-  }
+  
+</mat-expansion-panel>
 
+}
 }
 
 <!--

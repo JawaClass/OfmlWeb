@@ -10,6 +10,17 @@ export class PropertyitemService extends BaseService {
 
   private sessionService = inject(SessionService)
 
+  
+  async patchPropertyValue(patchItem: any) {
+    const url = this.baseUrl + "/web_ofml/ocd/web_ocd_propertyvalue?where=db_key=" + patchItem.db_key
+    return this.fetchAndParseFromUrl(url, this.buildPatchRequestOptions(JSON.stringify(patchItem)))
+  }
+
+  async patchProperty(patchItem: any) {
+    const url = this.baseUrl + "/web_ofml/ocd/web_ocd_property?where=db_key=" + patchItem.db_key
+    return this.fetchAndParseFromUrl(url, this.buildPatchRequestOptions(JSON.stringify(patchItem)))
+  }
+
   async fetchPropertyItems(): Promise<PropertyItem[]> {
     const session = this.sessionService.currentSession$.value!!
     const sessionId = session!!.id

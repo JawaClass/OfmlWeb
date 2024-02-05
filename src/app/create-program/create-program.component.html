@@ -1,7 +1,8 @@
 <div style="padding: 30px; border-radius: 5px;">
+    <h3 style="color: whitesmoke;">Export</h3>
     <form [formGroup]="createProgramForm">
 
-        <mat-form-field style="width: 100%;">
+        <mat-form-field style="width: 100%;" appearance="outline">
             <mat-label>Programmname</mat-label>
             <input matInput [formControl]="createProgramForm.controls.programName"
                 oninput="this.value = this.value.toLowerCase()" maxlength="25" />
@@ -9,64 +10,106 @@
             }
         </mat-form-field>
     
-        <mat-form-field style="width: 100%;">
-            <mat-label>Programmn ID</mat-label>
+        <mat-form-field style="width: 100%;" appearance="outline">
+            <mat-label>Programm ID</mat-label>
             <input #input matInput [formControl]="createProgramForm.controls.programId"
                 oninput="this.value = this.value.toUpperCase()" maxlength="2" />
             @if (createProgramForm.controls.programId.invalid) { <mat-error>Eine Programm ID besteht aus zwei
                 Ziffern</mat-error> }
         </mat-form-field>
             
-        <section style="display: flex; flex-direction: column;">
+        <div style="display: flex; flex-direction: column; color: whitesmoke;">
             
             <p style="color: whitesmoke;">
                 Welche Daten sollen erstellt und exportiert werden?
             </p>
 
-            <mat-checkbox
-            [formControl]="createProgramForm.controls.exportOdb"
-            matTooltip="Grafische Daten und Grafiken im 2er Ordner">
-            ODB
-            </mat-checkbox>
+            <section style="display: flex; align-items: center; gap: 20px;">
+                <mat-checkbox [formControl]="createProgramForm.controls.exportOcd" style="flex: 1;">
+                    OCD
+                </mat-checkbox>
+                <span style="flex: 5;">Kaufmännische Daten</span>
+            </section>
 
-            <mat-checkbox
-            [formControl]="createProgramForm.controls.exportOcd"
-            matTooltip="Kaufmännische Daten im DE 2er Ordner">
-            OCD
-            </mat-checkbox>
+            <section style="display: flex; align-items: center; gap: 20px;">
+                <mat-checkbox [formControl]="createProgramForm.controls.exportOam" style="flex: 1;">
+                    OAM
+                </mat-checkbox>
+                <span style="flex: 5;">Grafik Mapping</span>
+            </section>
             
-            <mat-checkbox
-            [formControl]="createProgramForm.controls.exportOam"
-            matTooltip="OAM Mapping Daten im DE 2er Ordner">
-            OAM
-            </mat-checkbox>
+            <section style="display: flex; align-items: center; gap: 20px;">
+                <mat-checkbox [formControl]="createProgramForm.controls.exportOas" style="flex: 1;">
+                    OAS
+                </mat-checkbox>
+                <span style="flex: 5;">Katalogdaten</span>
+            </section>
             
-            <mat-checkbox
-            [formControl]="createProgramForm.controls.exportOfml"
-            matTooltip="OFML Daten im 2er Ordner">
-            OFML
-            </mat-checkbox>
+            <section style="display: flex; align-items: center; gap: 20px;">
+                <mat-checkbox [formControl]="createProgramForm.controls.exportOfml" style="flex: 1;">
+                    OFML
+                </mat-checkbox>
+                <span style="flex: 5;">OFML Konfiguration</span>
+            </section>
 
-            <mat-checkbox
-            [formControl]="createProgramForm.controls.exportOas"
-            matTooltip="Katalogdaten im DE 2er Ordner">
-            OAS
-            </mat-checkbox>
-            
-            <mat-checkbox
-            [formControl]="createProgramForm.controls.exportGo"
-            matTooltip="Metatypen im 2er Ordner">
-            GO
+            <section style="display: flex; align-items: center; gap: 20px;">
+                <mat-checkbox [formControl]="createProgramForm.controls.exportOdb" style="flex: 1;">
+                    ODB
+                </mat-checkbox>
+                <span style="flex: 5;">Grafische Daten und Grafiken</span>
+            </section>
+                         
+            <section style="display: flex; align-items: center; gap: 20px;">
+                <mat-checkbox [formControl]="createProgramForm.controls.exportGo" style="flex: 1;">
+                    GO
+                </mat-checkbox>
+                <span style="flex: 5;">Metatypen</span>
+            </section>
+
+            <section style="display: flex; align-items: center; gap: 20px;">
+                <mat-checkbox [formControl]="createProgramForm.controls.exportRegistry" style="flex: 1;">
+                    Registry
+                </mat-checkbox>
+                <span style="flex: 5;">...</span>
+            </section>
+
+        </div>
+        
+        <section>
+            <p style="color: whitesmoke;">
+                Nachdem Export die .ebase-Dateien automatisch bauen?
+            </p>
+            <mat-checkbox [formControl]="createProgramForm.controls.buildEbase">
+                ebase bauen
             </mat-checkbox>
         </section>
 
-        <p style="color: whitesmoke;">
-            Daten stehen nach Programmerzeugung unter <br> B:\ofml_development\Tools\ofml_datenmacher <br>bereit.
-        </p>
+        <mat-divider style="margin-top: 20px; margin-bottom: 10px;"></mat-divider>
+
+
+        <div style="margin-top: 20px; margin-bottom: 20px;">
+            <mat-form-field appearance="outline">
+                <mat-label>Exportverzeichnis</mat-label>
+                <select matNativeControl required [formControl]="createProgramForm.controls.exportPath">
+                    
+                    @for (exportPath of exportPathOptions; track exportPath; let idx = $index) {
+                        <option [value]="exportPath">{{exportPath}}</option>
+                    }
+                </select>
+            </mat-form-field>
+             
+            <section style="display: flex; align-items: center; gap: 20px; color: whitesmoke;">
+                <mat-icon>
+                    notifications
+                </mat-icon>
+    
+                <span>Daten stehen nach Programmerzeugung unter <br> <strong>{{buildCurrentExportPath()}}</strong> <br>bereit.</span>
+            </section>
+        </div>
     
         <button type="submit" [disabled]="!createProgramForm.valid" (click)="createProgram()" mat-raised-button
-            color="accent" style="display: inline-block; width: 100%;">
-            Programm erzeugen
+            color="accent" style="display: inline-block; width: 100%; height: 50px;">
+            Programm exportieren
         </button>
     </form>
     

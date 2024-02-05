@@ -78,8 +78,10 @@ $my-theme: mat.define-dark-theme((
    primary: $my-primary,
    accent: $my-accent,
  ),
- typography: mat.define-typography-config(),
- density: -1, // default is 0
+ typography: mat.define-typography-config(
+  $font-family: 'Arial',
+ ),
+ density: -3//-1, // default is 0
 ));
 
 @include mat.all-component-themes($my-theme);
@@ -91,3 +93,7 @@ $my-theme: mat.define-dark-theme((
   --primary: red;
   --accent: $my-accent;
 }
+
+body{
+  font-family: 'Arial';
+  }

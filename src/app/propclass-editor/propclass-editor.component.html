@@ -1,44 +1,77 @@
 
-<h1>Merkmale für Klasse <strong>{{pClass}}</strong> von <strong>{{program}}</strong></h1>
+<h1>Merkmalsklasse <strong>{{pClass}}</strong> aus <strong>{{program | uppercase}}</strong></h1>
 
 @if (isLoading) {
+    loading
     <app-waiting-cursor></app-waiting-cursor>
 } @else {
 
+    <h2>{{getPropertyClassText(pClassItem)}}</h2>
     
 @for (propItem of getProperties(); track propItem.property; let idx = $index) {
    
         <mat-expansion-panel style="margin-bottom: 10px;">
         <mat-expansion-panel-header style="display: flex;">
-            <mat-panel-title style="flex: 4;">
+            <mat-panel-title style="flex: 4; gap: 10px;"> 
                 
                 <section style="display: flex; flex: 3; gap: 10px;">
                     <span>{{ getPropertyHeaderText(propItem) }}</span>
                 </section>
-    
-                <!--
+
+                <button
+                style="width: fit-content;"
+                mat-stroked-button
+                color="accent"
+                (click)="setAllValuesFilter(propItem, false, $event)"
+               >
+                Alle an
+                </button>
+
+                <button
+                style="width: fit-content;"
+                mat-stroked-button
+                color="primary"
+                (click)="setAllValuesFilter(propItem, true, $event)"
+               >
+                Alle aus
+                </button>
+                
                 <mat-checkbox
-                style="flex: 1;"
-                (click)="$event.stopPropagation()"
-                (change)="onChangeAll(propItem, $event)"
-                [(ngModel)]="propItem.active" 
-                [matTooltip]="propItem.active ? 'Merkmal unsichtbar schalten' : 'Merkmal sichtbar schalten'">
+                (click)="onTogglePropertyScope(propItem, $event)"
+                [checked]="isPropertyVisible(propItem)"
+                >
+                <span>
+                    {{ getPropertyVisibleText(propItem.scope) }}
+                </span>
+                
                 </mat-checkbox>
-                -->
                 
     
             </mat-panel-title>
             <mat-panel-description style="flex: 1;" matTooltip="aktive Merkmalswerte">
-                <!-- {{ propItem.getActiveValues().length }} / {{ propItem.values.length }} -->
-                TODO...
+                  {{ getActiveValuesFromProperty(propItem).length }} / {{ propItem.values.length }} 
+                 
             </mat-panel-description>
         </mat-expansion-panel-header>
     
         @for (valItem of propItem.values; track valItem; let idx = $index) {
         <section>
-            <mat-checkbox (change)="propClass.edited = true; propItem.active= true;"
-                [(ngModel)]="valItem.active">
-                <span>{{ getPropertyValueText(valItem) }}</span>
+            <mat-checkbox style="display: flex; flex-direction: row;"
+            (click)="onToggleValue(valItem, $event)"
+            [checked]="!valItem.web_filter" >
+                <section style="display: flex; flex-direction: row; gap: 10px;">
+                    <section style="width: 20px; height: 20px;">
+                        @if(valItem["isUpdating"]) {
+                            <mat-spinner style="width: 20px; height: 20px;"></mat-spinner>
+                        }
+                    </section>
+                    <span style="margin-right: 10px;">{{ getPropertyValueText(valItem) }}</span>
+                    @if(valItem.web_filter) {
+                        <span style="color: red;">zum Löschen vorgemerkt</span>
+                    } @else {
+                        <span style="color: green;">aktiv</span>
+                    }
+                </section>
             </mat-checkbox>
         </section>
         }
@@ -51,6 +84,9 @@
             <p>
                 <strong> Leere Klasse </strong>
             </p>
+        } @else {
+            loading
+            <mat-spinner></mat-spinner>
         }
     }
  

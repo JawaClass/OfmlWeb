@@ -43,6 +43,7 @@ export class ArtbaseEditorComponent implements OnInit, OnDestroy, AfterViewInit 
   isFetchingData = false
 
   ngAfterViewInit() {
+    /*if (!document) return
     const elem = document.querySelector('.mat-sidenav-content')
     elem!!.scroll(
       {
@@ -50,7 +51,7 @@ export class ArtbaseEditorComponent implements OnInit, OnDestroy, AfterViewInit 
         top: 0,
         behavior: 'instant',
       }
-    )
+    )*/
   }
 
   onToggleAll(propItem: PropertyItem, e: MatCheckboxChange) {
@@ -118,7 +119,7 @@ export class ArtbaseEditorComponent implements OnInit, OnDestroy, AfterViewInit 
         this.router.navigate(['/'])
       }
       console.log("ArtbaseEditor INIT ::", item)
-      console.log(item.klassen)
+      //console.log(item.klassen)
       this.articleItem = item
     })
     /**
