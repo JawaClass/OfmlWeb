@@ -12,6 +12,10 @@ import { UserService } from './user.service';
   providedIn: 'root'
 })
 export class SessionService extends BaseService {
+  async mergeNewArticleWithProgram(articleNr: string, program: string, webProgramName: string) {
+    const url = this.baseUrl + "/deepcopy/ocd/merge?article=" + articleNr + "&program=" + program + "&merge_with=" + webProgramName
+    return await this.fetchAndParseFromUrl(url)
+  }
 
   private injector = inject(Injector)
   private articleItemService = () => this.injector.get(ArticleitemService)

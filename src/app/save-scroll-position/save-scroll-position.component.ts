@@ -23,15 +23,15 @@ export class SaveScrollPositionComponent {
   }
   
   protected storeScrollPos() {
-    afterNextRender(() => {
+    /*afterNextRender(() => {
       const elem = document.querySelector('.mat-sidenav-content')
       this._service.scrollY = elem!!.scrollTop
     }
-    )
+    )*/
   }
 
   protected restoreScrollPos() {
-    afterNextRender(() => {
+    /*afterNextRender(() => {
       const elem = document.querySelector('.mat-sidenav-content')
       elem!!.scroll(
         {
@@ -40,7 +40,7 @@ export class SaveScrollPositionComponent {
         behavior: 'instant',
       }
       )
-    })
+    })*/
     
   }
 

@@ -29,7 +29,15 @@ export class ArticleInputService extends BaseService {
     
     return await this.fetchAndParseFromUrl(url)
   }
-
+  private webOcdArticleWithDetails: any[] = []
+  async getWebOcdArticleWithDetails() {
+    if (this.webOcdArticleWithDetails.length == 0) {
+      const data = await this.fetchWebOcdArticleWithDetails()
+      this.webOcdArticleWithDetails = data
+    } 
+    return this.webOcdArticleWithDetails
+    
+  }
   async fetchWebOcdArticleWithDetails(): Promise<any[]> {
     const program: string = this.sessionService().currentSession$.value!.name
     const url = this.baseUrl +  "/web_ofml/ocd/web_ocd_article/details?where=web_program_name=%22" + program + "%22"

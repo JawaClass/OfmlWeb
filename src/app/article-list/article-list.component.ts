@@ -52,8 +52,16 @@ export class ArticleListComponent extends SaveScrollPositionComponent {
   router = inject(Router)
   persistArticleItemPromises = new Map<string, any[]>()
   dialogOpener = inject(MatDialog)
-
   filter = this.service.filter
+  
+  // data from backend
+  articleListBackend: any[] = []
+  // filtered data
+  articleList: any[] = []
+  // grouped based on 
+  articleListGroupedBy: any = {}
+  program2pClass2ArticlesMap: any = {}
+  subscription$: Subscription | null = null
 
   testArticleAgainstFilter(articlrNr: string) {
     const filter = this.filter.article.toUpperCase()
@@ -66,15 +74,6 @@ export class ArticleListComponent extends SaveScrollPositionComponent {
     const regexPattern = new RegExp(`^${filter}`)
     return regexPattern.test(program.toUpperCase())
   }
-
-  // data from backend
-  articleListBackend: any[] = []
-  // filtered data
-  articleList: any[] = []
-  // grouped based on 
-  articleListGroupedBy: any = {}
-  program2pClass2ArticlesMap: any = {}
-  subscription$: Subscription | null = null
 
   resetData() {
     this.articleListBackend = []
@@ -132,7 +131,9 @@ export class ArticleListComponent extends SaveScrollPositionComponent {
   async setArticlesFromBackendData() {
     
     this.articleList = this.articleListBackend.filter((item: any) =>
-    this.testArticleAgainstFilter(item.article_nr) && this.testProgramAgainstFilter(item.sql_db_program))
+      this.testArticleAgainstFilter(item.article_nr) &&
+      this.testProgramAgainstFilter(item.sql_db_program)
+    )
     
     this.articleListGroupedBy = this.groupListbyKey(this.articleList, "sql_db_program")
     this.program2pClass2ArticlesMap = {} 
@@ -158,7 +159,7 @@ export class ArticleListComponent extends SaveScrollPositionComponent {
     this.resetData()
     this.subscription$ = this.service.sessionService().currentSession$.subscribe(async (sessionOrNull: any) => {
       if (sessionOrNull) {
-        this.articleListBackend = await this.service.fetchWebOcdArticleWithDetails()
+        this.articleListBackend = await this.service.getWebOcdArticleWithDetails()
         console.log("this.articleListBackend LEN", this.articleListBackend.length)
         this.setArticlesFromBackendData()
       }

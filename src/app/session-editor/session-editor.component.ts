@@ -14,7 +14,7 @@ import { SessionService } from '../services/session.service'
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { Router } from '@angular/router';
-
+import { MergeArticleComponent } from '../merge-article/merge-article.component'
 
 interface AlteredArticleItem {
   articleItem: ArticleItem;
@@ -41,7 +41,8 @@ enum EditorMode {
     MatCheckboxModule,
     TextFieldModule,
     MatIconModule,
-    MatDividerModule
+    MatDividerModule,
+    MergeArticleComponent
   ],
   templateUrl: './session-editor.component.html',
   styleUrl: './session-editor.component.css'
@@ -65,13 +66,13 @@ export class SessionEditorComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) sessionAndOwner: SessionAndOwner) {
     this.editorMode = sessionAndOwner.session.id ? EditorMode.Edit : EditorMode.Create
     if (this.editorMode === EditorMode.Edit) {
-      const sessionCopy = Session.fromJSON(JSON.parse(JSON.stringify(sessionAndOwner.session)))
+      const sessionCopy = sessionAndOwner.session //Session.fromJSON(JSON.parse(JSON.stringify(sessionAndOwner.session)))
       this.sessionAndOwner = {session: sessionCopy, owner: sessionAndOwner.owner}
     } else {
       this.sessionAndOwner = sessionAndOwner
     }
-    this.sessionAndOwner.session.articleInput = "TLTN16880A TLTN20880A WPBTN WPBTT Q3HO1WE Q3HO2WE"
-    this.sessionAndOwner.session.name = "test_dasdkflk"
+    //this.sessionAndOwner.session.articleInput = "TLTN16880A TLTN20880A WPBTN WPBTT Q3HO1WE Q3HO2WE"
+    //this.sessionAndOwner.session.name = "test_dasdkflk"
     this.textResource = {
       "header": this.isEditMode() ? `Sitzung editieren [${sessionAndOwner.session.id}]` : "Sitzung anlegen",
       "button": this.isEditMode() ? "Änderungen bestätigten" : "Mit Sitzung erstellen fortfahren",
@@ -83,18 +84,10 @@ export class SessionEditorComponent implements OnInit {
     this.dialogRef.disableClose = true
     if (this.isEditMode()) {
       await this.service.setCurrentSession(this.sessionAndOwner.session)
-      this.articleItems = (await this.service.fetchArticleItems()).map((item: ArticleItem) => ({articleItem: item, deleted: false, added: false}))
+      this.articleItems = []
     }
   }
 
-  async addArticle(articleNr: string, program: string) { 
-    const maybeArticleItem = await this.service.fetchProgramMapOnly(articleNr, program)
-    const canAdd = maybeArticleItem !== undefined && this.articleItems.find(item => item.articleItem.articleNr === maybeArticleItem.articleNr) === undefined
-    this.addArticleFailed = !canAdd
-    if (canAdd) {
-      this.articleItems.push(({articleItem: maybeArticleItem, deleted: false, added: true}))
-    }
-  }
 
   isEditMode = () => this.editorMode == EditorMode.Edit
   isCreateMode = () => this.editorMode == EditorMode.Create
@@ -116,11 +109,7 @@ export class SessionEditorComponent implements OnInit {
   }
 
   private async editSession() {
-    const addedItems = this.articleItems.filter(item => item.added)
-    const deletedItems = this.articleItems.filter(item => item.deleted)
-    await addedItems.map(item => this.service.saveArticleItem(item.articleItem))
-    await deletedItems.map(item => this.service.removeArticleItem(item.articleItem))
-    const session = await this.service.editSession(this.sessionAndOwner.session)
+    const session = this.sessionAndOwner.session
     this.dialogRef.close({
       session: session
     })
@@ -144,7 +133,7 @@ export class SessionEditorComponent implements OnInit {
     }
   }
 
-  signupFormValid() {
+  isFormValid() {
     const namelen = this.sessionAndOwner.session.name.trim().length
     const tokens = this.sessionAndOwner.session.getInputTokens()
     return namelen > 2 && namelen < 25 && tokens.length
