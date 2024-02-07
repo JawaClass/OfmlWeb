@@ -11,6 +11,8 @@ export class ArticleInputService extends BaseService {
 
   scrollY = 0
 
+  alternativeView = false
+
   filter = {
     "program": "",
     "pClass": "",

@@ -1,0 +1,15 @@
+<div style="display: flex; gap: 10px; align-items: center; justify-content: start; max-width: 50%;">  
+    <span style="width: 12rem">{{ article.article_nr }}</span>
+    <span style="width: 2rem">{{ article.series }}</span>
+    <span style="width: 45rem">{{ getShortText(article) }}</span>
+    <button mat-button matTooltip="Artikel öffnen" (click)="openEditArticle(article)">
+        <mat-icon color="accent">
+        edit
+    </mat-icon>
+    </button>
+    <button mat-button matTooltip="Artbase öffnen" (click)="navigateToEditArtbase(article)">
+        <mat-icon color="accent">
+            label_important
+    </mat-icon>
+    </button>
+</div>

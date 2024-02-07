@@ -14,6 +14,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SessionService } from './services/session.service';
 import { HeaderComponent } from './header/header.component';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { CreateProgramComponent } from './create-program/create-program.component';
 
 @Component({
   selector: 'app-root',
@@ -32,11 +34,22 @@ export class AppComponent implements OnInit {
   
   sessionService = inject(SessionService)
   routesActivated = true
+  dialogOpener = inject(MatDialog)
 
   ngOnInit(): void {
-    this.sessionService.currentSession$.subscribe(session => {
+    console.log("BASE URL ::", this.sessionService.baseUrl);
+    
+    this.sessionService.currentSession$.subscribe((session: any) => {
       this.routesActivated = (session !== null)
     })
+  }
+
+  
+  openCreateProgramDialog() {
+    this.dialogOpener.open(CreateProgramComponent, {height: '95%',})
+        .afterClosed()
+        .subscribe((result: any) => {
+        })
   }
 
 }

@@ -2,7 +2,6 @@
 <h1>Merkmalsklasse <strong>{{pClass}}</strong> aus <strong>{{program | uppercase}}</strong></h1>
 
 @if (isLoading) {
-    loading
     <app-waiting-cursor></app-waiting-cursor>
 } @else {
 
@@ -15,7 +14,8 @@
             <mat-panel-title style="flex: 4; gap: 10px;"> 
                 
                 <section style="display: flex; flex: 3; gap: 10px;">
-                    <span>{{ getPropertyHeaderText(propItem) }}</span>
+                    <strong>{{ getPropertyHeaderTextMain(propItem) }}</strong>
+                    <span>{{ getPropertyHeaderTextDetail(propItem) }}</span>
                 </section>
 
                 <button
@@ -85,7 +85,6 @@
                 <strong> Leere Klasse </strong>
             </p>
         } @else {
-            loading
             <mat-spinner></mat-spinner>
         }
     }

@@ -1,4 +1,4 @@
-<div style="padding: 30px; border-radius: 5px;">
+<div style="padding: 30px; border-radius: 5px; overflow-y: auto;">
     <h3 style="color: whitesmoke;">Export</h3>
     <form [formGroup]="createProgramForm">
 
@@ -91,9 +91,8 @@
             <mat-form-field appearance="outline">
                 <mat-label>Exportverzeichnis</mat-label>
                 <select matNativeControl required [formControl]="createProgramForm.controls.exportPath">
-                    
                     @for (exportPath of exportPathOptions; track exportPath; let idx = $index) {
-                        <option [value]="exportPath">{{exportPath}}</option>
+                        <option [value]="exportPath[0]">{{exportPath[1]}}</option>
                     }
                 </select>
             </mat-form-field>
@@ -133,11 +132,9 @@
         </p>
     
         <section style="display: flex; justify-content: space-evenly;">
-            <p>
-                <a [href]="resultExportPath" target="_blank">
-                    <strong>{{resultExportPath}}</strong>
-                </a>
-            </p>
+            <a [href]="resultExportPath" target="_blank" style="color: whitesmoke; max-width: 350px;">
+                <strong style=" overflow-wrap: break-word;">{{resultExportPath}}</strong>
+            </a>
             <button mat-button [cdkCopyToClipboard]="resultExportPath" style="background-color: transparent; border: none;">
                 <mat-icon style="color: whitesmoke">
                     content_copy

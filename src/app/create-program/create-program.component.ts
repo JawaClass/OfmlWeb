@@ -22,6 +22,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { SessionService } from '../services/session.service';
 import { Session } from '../models/models';
 import {MatSelectModule} from '@angular/material/select';
+import { OnDestroy } from '@angular/core';
 
 @Component({
   selector: 'app-create-program',
@@ -48,40 +49,62 @@ import {MatSelectModule} from '@angular/material/select';
   templateUrl: './create-program.component.html',
   styleUrl: './create-program.component.css'
 })
-export class CreateProgramComponent {
+export class CreateProgramComponent implements OnDestroy {
 
-  exportPathOptions = [
-    "Testumgebung", "B://ofml_development//Tools//ofml_datenmacher"
-  ]
+  get exportPathOptions() {
+    return this.createService.exportPathOptions
+  }
+
+  resolveExportPathKeyToValue(key: string) {
+    for (let item of this.exportPathOptions) {
+      if (key === item[0])
+        return item[1]
+      }
+    throw Error("key not found: " + key)
+  }
+
+  ngOnDestroy() {
+    this.createService.programName = this.createProgramForm.get("programName")!!.value!!
+    this.createService.programId = this.createProgramForm.get("programId")!!.value!!
+    this.createService.exportOcd = this.createProgramForm.get("exportOcd")!!.value!!
+    this.createService.exportOdb = this.createProgramForm.get("exportOdb")!!.value!!
+    this.createService.exportOas = this.createProgramForm.get("exportOas")!!.value!!
+    this.createService.exportOam = this.createProgramForm.get("exportOam")!!.value!!
+    this.createService.exportOfml = this.createProgramForm.get("exportOfml")!!.value!!
+    this.createService.exportGo = this.createProgramForm.get("exportGo")!!.value!!
+    this.createService.exportRegistry = this.createProgramForm.get("exportRegistry")!!.value!!
+    this.createService.buildEbase = this.createProgramForm.get("buildEbase")!!.value!!
+    this.createService.exportPath = this.createProgramForm.get("exportPath")!!.value!!
+  }
 
   currentSession = inject(SessionService).currentSession$.value as Session
+  createService = inject(CreateProgramService)
 
   createProgramForm = new FormGroup({
-    programName: new FormControl(this.currentSession.name.toLowerCase().replace(" ", "_"), [
+    programName: new FormControl(this.createService.programName || this.currentSession.name.toLowerCase().replace(" ", "_"), [
       Validators.required,
       Validators.pattern(/^[a-z][a-z0-9_]{1,24}$/)]),
-    programId: new FormControl("", [
+    programId: new FormControl(this.createService.programId || "", [
       Validators.required,
       Validators.pattern(/^[A-Z][A-Z0-9]{1}$/)]),
-    exportOcd: new FormControl(true),
-    exportOdb: new FormControl(true),
-    exportOas: new FormControl(true),
-    exportOam: new FormControl(true),
-    exportOfml: new FormControl(true),
-    exportGo: new FormControl(true),
-    exportRegistry: new FormControl(true),
-    buildEbase: new FormControl(true),
-    exportPath: new FormControl(this.exportPathOptions[0]),
+    exportOcd: new FormControl(this.createService.exportOcd),
+    exportOdb: new FormControl(this.createService.exportOdb),
+    exportOas: new FormControl(this.createService.exportOas),
+    exportOam: new FormControl(this.createService.exportOam),
+    exportOfml: new FormControl(this.createService.exportOfml),
+    exportGo: new FormControl(this.createService.exportGo),
+    exportRegistry: new FormControl(this.createService.exportRegistry),
+    buildEbase: new FormControl(this.createService.buildEbase),
+    exportPath: new FormControl(this.createService.exportPath),
   })
 
   buildCurrentExportPath() {
-    const root = this.createProgramForm.get("exportPath")!!.value!
+    const root = this.resolveExportPathKeyToValue(this.createProgramForm.get("exportPath")!!.value!)
     const folder = this.createProgramForm.get("programName")!!.value!
     return root + "//" + folder
   }
 
   dialogRef = inject(MatDialogRef<CreateProgramComponent>)
-  createService = inject(CreateProgramService)
   httpErrorResponse: HttpErrorResponse | null = null
   isProcessing = false
   resultExportPath = ""
@@ -111,7 +134,7 @@ export class CreateProgramComponent {
     }
     this.createService.postCreate(params)
       .subscribe({
-        next: (result) => {
+        next: (result: any) => {
           this.isProcessing = false
           this.resultExportPath = "file://" + result["export_path"]
           this.dialogRef.disableClose = false

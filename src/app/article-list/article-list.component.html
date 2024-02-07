@@ -1,8 +1,23 @@
+<div style="display: flex; flex-direction: row;">
+    <mat-checkbox
+    [(ngModel)]="alternativeView">
+    Ansicht ändern
+    </mat-checkbox>
 
-<mat-checkbox
-[(ngModel)]="alternativeView">
-Ansicht ändern
-</mat-checkbox>
+    <section style="display: flex; justify-content: left; gap: 1px;">
+        <button mat-stroked-button color="accent" (click)="resetFilter()" style="height: 22px;">
+            <mat-icon color="accent">filter_list</mat-icon>
+            <span>{{articleList.length}}</span>
+        </button>
+
+        <input [(ngModel)]="filter.program" matInput placeholder="Program"
+            oninput="this.value = this.value.toUpperCase()"
+            (ngModelChange)="onFilterSet()">
+        <input [(ngModel)]="filter.article" matInput placeholder="Artikel"
+            oninput="this.value = this.value.toUpperCase()"
+            (ngModelChange)="onFilterSet()">
+    </section>
+</div>
 
 @for (program of getGroupKeys(program2pClass2ArticlesMap); track program; let idx = $index) {
     <section>
@@ -20,68 +35,26 @@ Ansicht ändern
                 </button>
                 <mat-card-content>
                     
-                <table>
-                    
-                @for (article of program2pClass2ArticlesMap[program][pClass]; track article; let idx = $index) {
-                    <tr>
-                        <td style="padding-right: 10px;">{{ article.article_nr }}</td>
-                        <td style="padding-right: 10px;">{{ article.series }}</td>
-                        <td style="padding-right: 10px;">{{ getShortText(article) }}</td>
-                        <td>
-                            <button mat-button matTooltip="Artikel öffnen" (click)="openEditArticle(article)">
-                                <mat-icon color="accent" style="vertical-align: middle;">
-                                edit
-                            </mat-icon>
-                            </button>
-                            <button mat-button matTooltip="Artbase öffnen" (click)="navigateToEditArtbase(article)">
-                                <mat-icon color="accent" style="vertical-align: middle;">
-                                    label_important
-                            </mat-icon>
-                            </button>
-                        </td>
-                    </tr>
+                @for (article of program2pClass2ArticlesMap[program][pClass]; track article; let idx = $index) { 
+                    <app-article-list-item [article]="article"></app-article-list-item> 
                 }
-                </table>
-        
         
             </mat-card-content>
-            </mat-card> 
-                    
+            </mat-card>        
             } 
     } @else {
-        
         <mat-card style="margin-bottom: 15px;">
             <mat-card-content>
-        <table>
+                
         @for (article of articleListGroupedBy[program]; track article; let idx = $index) {
-            <tr>
-                <td style="padding-right: 10px;">{{ article.article_nr }}</td>
-                <td style="padding-right: 10px;">{{ article.series }}</td>
-                <td style="padding-right: 10px;">{{ getShortText(article) }}</td>
-                <td>
-                    <button mat-button matTooltip="Artikel öffnen" (click)="openEditArticle(article)">
-                        <mat-icon color="accent" style="vertical-align: middle;">
-                        edit
-                    </mat-icon>
-                    </button>
-                    <button mat-button matTooltip="Artbase öffnen" (click)="navigateToEditArtbase(article)">
-                        <mat-icon color="accent" style="vertical-align: middle;">
-                            label_important
-                    </mat-icon>
-                    </button>
-                </td>
-            </tr>
+            <app-article-list-item [article]="article"></app-article-list-item>
         }
-    </table>
+        
 </mat-card-content>
     </mat-card>
     }
 }
 
-<button mat-fab color="primary" matTooltip="Program erstellen" style="position: fixed; bottom: 30px; right: 30px;"
-    (click)="openCreateProgramDialog()">
-    <mat-icon>build</mat-icon>
-</button>
 
 
 <!--

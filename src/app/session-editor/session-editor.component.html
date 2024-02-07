@@ -5,7 +5,7 @@
     <section style="color: whitesmoke; margin: 16px;">
         <strong>Sitzungseigentümer: {{ geUser() }} </strong>
     </section>
-    <mat-form-field style="width: 100%;">
+    <mat-form-field appearance="outline" style="width: 100%; margin-top: 20px;">
         <mat-label>Sitzungsname</mat-label>
         <input matInput [(ngModel)]="sessionAndOwner.session.name" name="sessionName" maxlength="20" />
     </mat-form-field>
@@ -14,13 +14,14 @@
     </section>
 
     @if (isCreateMode()) {
-        <mat-form-field style="width: 100%;">
+        <mat-form-field appearance="outline" style="width: 100%; margin-top: 20px;">
             <mat-label>Artikelnummern</mat-label>
             <textarea  style="width: 100%;" [(ngModel)]="sessionAndOwner.session.articleInput"
             matInput [rows]="5" name="textAreaArticles"
             oninput="this.value = this.value.toUpperCase()">
           </textarea>
           </mat-form-field>
+          <span style="color: whitesmoke;">Artikeltnummern*: {{sessionAndOwner.session.getInputTokens().length}}</span>
     } @else {
         
         <mat-divider style="margin-top: 10px; margin-bottom: 10px;"></mat-divider>
@@ -53,14 +54,14 @@
                 
                 <legend>Artikel hinzufügen</legend>
 
-                <mat-form-field>
+                <mat-form-field appearance="outline">
                     <mat-label>Artikelnummer</mat-label>
                     <input matInput name="addArticle"
                     #newArticleNr
                     oninput="this.value = this.value.toUpperCase()">
                 </mat-form-field>
     
-                <mat-form-field style="flex: 1;">
+                <mat-form-field appearance="outline" style="flex: 1;">
                     <mat-label>Programname</mat-label>
                     <input matInput name="addArticleProgram"
                     #newArticleProgram

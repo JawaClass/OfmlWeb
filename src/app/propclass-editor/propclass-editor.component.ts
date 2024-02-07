@@ -60,8 +60,13 @@ export class PropclassEditorComponent implements OnInit, OnDestroy, AfterViewIni
       return ""
   }
 
-  getPropertyHeaderText(p: any) {
-    return `# ${p.pos_prop} ${p.property} : ${this.getPropertyText(p)} [Scope=${p.scope}, Type=${p.prop_type}]`
+  getPropertyHeaderTextMain(p: any) {
+    return `# ${p.pos_prop} ${p.property} : ${this.getPropertyText(p)}`
+  }
+
+  
+  getPropertyHeaderTextDetail(p: any) {
+    return `[Scope=${p.scope}, Type=${p.prop_type}]`
   }
 
   getPropertyValueText(v: any) {

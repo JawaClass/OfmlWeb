@@ -10,7 +10,11 @@
     </mat-toolbar>
     <div class="content">
       @if (routesActivated) {
-        <router-outlet></router-outlet>
+        <router-outlet></router-outlet> 
+        <button mat-fab color="primary" matTooltip="Program erstellen" style="position: fixed; bottom: 30px; right: 30px;"
+        (click)="openCreateProgramDialog()">
+        <mat-icon>build</mat-icon>
+        </button>
       } @else {
         <h3>Nichts anzuzeigen.</h3>
         <p>Wählen Sie entweder eine vorhandene Sitzung aus oder erstellen Sie eine neue Sitzung.</p>

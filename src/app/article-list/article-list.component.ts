@@ -15,11 +15,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog'; 
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { CreateProgramComponent } from '../create-program/create-program.component';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { ArticleComponent } from '../article/article.component';
 import { Subscription } from 'rxjs';
 import { MatCheckboxModule, MatCheckboxChange } from '@angular/material/checkbox';
+import { ArticleListItemComponent } from '../article-list-item/article-list-item.component'
+import { SaveScrollPositionComponent } from '../save-scroll-position/save-scroll-position.component';
+
 
 @Component({
   selector: 'app-article-list',
@@ -37,15 +38,14 @@ import { MatCheckboxModule, MatCheckboxChange } from '@angular/material/checkbox
     MatButtonModule,
     MatDialogModule,
     MatExpansionModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    ArticleListItemComponent
   ],
   templateUrl: './article-list.component.html',
   styleUrl: './article-list.component.css'
 })
-export class ArticleListComponent implements OnInit, AfterViewInit, OnDestroy {
-  ngOnDestroy(): void {
-    this.subscription$?.unsubscribe()
-  }
+export class ArticleListComponent extends SaveScrollPositionComponent {
+ 
   artbaseService = inject(ArtbaseService)
   service = inject(ArticleInputService)
   articleitemService = inject(ArticleitemService)
@@ -55,20 +55,44 @@ export class ArticleListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   filter = this.service.filter
 
+  testArticleAgainstFilter(articlrNr: string) {
+    const filter = this.filter.article.toUpperCase()
+    const regexPattern = new RegExp(`^${filter}`)
+    return regexPattern.test(articlrNr.toUpperCase())
+  }
+
+  testProgramAgainstFilter(program: string) {
+    const filter = this.filter.program.toUpperCase()
+    const regexPattern = new RegExp(`^${filter}`)
+    return regexPattern.test(program.toUpperCase())
+  }
+
+  // data from backend
+  articleListBackend: any[] = []
+  // filtered data
   articleList: any[] = []
+  // grouped based on 
   articleListGroupedBy: any = {}
   program2pClass2ArticlesMap: any = {}
   subscription$: Subscription | null = null
 
-  alternativeView = false
-
-  getShortText(article: any) {
-    if (article["kurztext"]) 
-      return article["kurztext"]["text"]
-    else "KEIN KURZTEXT"
+  resetData() {
+    this.articleListBackend = []
+    this.articleList = []
+    this.articleListGroupedBy = {}
+    this.program2pClass2ArticlesMap = {}
   }
+  get alternativeView() {
+    return this.service.alternativeView
+  } 
 
-  groupby(list: any[], key: string): object {
+  set alternativeView(value: boolean) {
+    this.service.alternativeView = value
+  } 
+
+  setAlternativeView = (v: boolean) => this.service.alternativeView = v
+  
+  groupListbyKey(list: any[], key: string): object {
     return list.reduce((x, y) => {
       if (x[y[key]]) x[y[key]].push(y)
       else x[y[key]] = [y]
@@ -83,7 +107,6 @@ export class ArticleListComponent implements OnInit, AfterViewInit, OnDestroy {
     articles.forEach((a: any) => {
       a["klassen"].forEach((pClass: any) => {
         const pClassName: string = pClass["prop_class"]
-        //console.log("pClassName", pClassName)
         if (groups[pClassName]) {
           groups[pClassName].push(a)
         } else {
@@ -91,136 +114,55 @@ export class ArticleListComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       })
     })
-    //console.log("groups....")
-    //console.log(groups);
     return groups
   }
 
-  storeScrollPos() {
-    const elem = document.querySelector('.mat-sidenav-content')
-    this.service.scrollY = elem!!.scrollTop
+  
+
+  onFilterSet() {
+    this.setArticlesFromBackendData()
+  }
+  resetFilter() {
+    this.filter.program =''
+    this.filter.pClass=''
+    this.filter.article=''
+    this.setArticlesFromBackendData()
   }
 
-  restoreScrollPos() {
-    return
-    const elem = document.querySelector('.mat-sidenav-content')
-    elem!!.scroll(
-      {
-        left: 0,
-        top: this.service.scrollY,
-        behavior: 'instant',
-      }
-    )
-  }
-
-  ngAfterViewInit() {
-    this.restoreScrollPos() 
-  }
-
-  async initFromSession() {
+  async setArticlesFromBackendData() {
     
-    this.articleList = await this.service.fetchWebOcdArticleWithDetails()
-    this.articleListGroupedBy = this.groupby(this.articleList, "sql_db_program")
+    this.articleList = this.articleListBackend.filter((item: any) =>
+    this.testArticleAgainstFilter(item.article_nr) && this.testProgramAgainstFilter(item.sql_db_program))
+    
+    this.articleListGroupedBy = this.groupListbyKey(this.articleList, "sql_db_program")
     this.program2pClass2ArticlesMap = {} 
-    //console.log("groupby", this.articleListGroupedBy)
-
-    //console.log("groupby", this.getGroupKeys(this.articleListGroupedBy))
-
     this.getGroupKeys(this.articleListGroupedBy).forEach(program => {
       this.program2pClass2ArticlesMap[program] = {} 
-      //console.log(program, "........")
-      //console.log(this.articleListGroupedBy[program]);
+      //console.log("this.articleListGroupedBy[program]", program , this.articleListGroupedBy[program]);
       
+      console.log("1) groupArticlesByClassName", this.articleListGroupedBy[program]);
       const pClassGroups = this.groupArticlesByClassName(this.articleListGroupedBy[program])
-
+      console.log("2) pClassGroups", pClassGroups);
+      
       this.getGroupKeys(pClassGroups).forEach(pClass => {
         this.program2pClass2ArticlesMap[program][pClass] = [] 
-       // console.log("   ", pClass)
         pClassGroups[pClass].forEach((article: any) => {
-         // console.log("      ", article.article_nr);
-          this.program2pClass2ArticlesMap[program][pClass].push(article)
+          //console.log("push article", article.article_nr, article.sql_db_program, article.web_program_name)
           
+          this.program2pClass2ArticlesMap[program][pClass].push(article)
         })
       })
-      
     })
-          //@for (item of groupArticlesByClassName(this.articleListGroupedBy[program]); t
   }
   async ngOnInit() {
-    console.log("ArticleListComponent::ngOnInit");
-    
-    this.subscription$ = this.service.sessionService().currentSession$.subscribe(async sessionOrNull => {
-      console.log("SUB :: sessionOrNull", sessionOrNull);
+    this.resetData()
+    this.subscription$ = this.service.sessionService().currentSession$.subscribe(async (sessionOrNull: any) => {
       if (sessionOrNull) {
-        console.log(" initFromSession =>", sessionOrNull);
-        this.initFromSession()
+        this.articleListBackend = await this.service.fetchWebOcdArticleWithDetails()
+        console.log("this.articleListBackend LEN", this.articleListBackend.length)
+        this.setArticlesFromBackendData()
       }
     })
-
-    //await this.service.fetchWebOcdArticleWithDetails()
-
-    this.service.behaviorSubjectProgramMap.subscribe(_ => {
-      if (this.notUniqueArticles().length) {
-        this.navigateToEditDuplicates()  
-      }
-    })
-  }
-
-  allFilteredArticles() {
-    const a = this.getActivePrograms().map(program => this.getFilteredPropClasses(program).map(pClass => this.getFilteredArticleItems(pClass))).flat(3)
-    console.log("allFilteredArticles", a.length, a);
-    return a
-  }
-
-  getActivePrograms()  {
-    const programFilter = this.filter.program.toUpperCase()
-    const regexPattern = new RegExp(`^${programFilter}`)
-    return this.service.programMap.getActivePrograms().filter(p => regexPattern.test(p.toUpperCase()) && this.getFilteredPropClasses(p).length)
-  }
-
-  getPropClasses(program: string)  {
-    return this.service.programMap.getPropClassesFromProgram(program)
-  }
-
-  getFilteredPropClasses(program: string) {
-    const pClasses: PropertyClass[] = this.service.programMap.getPropClassesFromProgram(program)
-    return pClasses.filter(pClass => this.getFilteredArticleItems(pClass).length)
-  }
-  getFilteredArticleItems(pClass: PropertyClass) {
-    const articleFilter = this.filter.article.toUpperCase()
-    const regexPattern = new RegExp(`^${articleFilter}`)
-    return pClass.articleItems.filter(item => regexPattern.test(item.articleNr.toUpperCase()))
-  }
-
-  notUniqueArticles = () => this.service.programMap.notUniqueArticles()
-
-  onInputChangeArticle(articleItem: ArticleItem) {
-
-    const delayPersist = 2000
-
-    this.persistArticleItemPromises.get(articleItem.articleNr)
-    ?.forEach(timeoutId => clearTimeout(timeoutId))
-
-    const timeoutId = setTimeout(async (item: ArticleItem) => {
-
-      console.log("write articleItem to Database!", item)
-      
-      
-      await this.articleitemService.saveArticleItem(item)
-      
-    }, delayPersist, articleItem)
-
-    if (!this.persistArticleItemPromises.get(articleItem.articleNr))
-      this.persistArticleItemPromises.set(articleItem.articleNr, [])
-    
-    this.persistArticleItemPromises.get(articleItem.articleNr)!!.push(timeoutId)
-
-  }
-
-  navigateToEditArtbase(articleItem: any) {
-    this.storeScrollPos()
-    this.artbaseService.currentArticleItem$.next(articleItem)
-    this.router.navigate(['/editor-artbase']);
   }
 
   navigateToEditPropClass(program: string, pClass: string) {
@@ -231,26 +173,9 @@ export class ArticleListComponent implements OnInit, AfterViewInit, OnDestroy {
     }]);
   }
 
-  navigateToEditDuplicates() {
-    //this.router.navigate(['/duplicates', { }]);
-  }
-
   navigateToEditArtbaseAll() {
     this.service.scrollY = 0
     this.router.navigate(['/editor-all']);
   }
 
-  openCreateProgramDialog() {
-    this.dialogOpener.open(CreateProgramComponent)
-        .afterClosed()
-        .subscribe((result: any) => {
-        })
-  }
-
-  openEditArticle(article: any) {
-    this.dialogOpener.open(ArticleComponent, {
-      data: article,
-      width: '35vw',
-    })
-  }
 }
