@@ -81,22 +81,22 @@ export class HeaderComponent {
   }
 
   async ngOnInit() {
+   
 
-    this.userService.currentUser$.subscribe( user => {
+    this.userService.currentUser$.subscribe( (user: any) => {
       setTimeout(() => {
         this.currentUser = user
       })
     } )
-    this.sessionService.currentSession$.subscribe( session => {
+    this.sessionService.currentSession$.subscribe( (session: any) => {
       setTimeout(() => {
         this.currentSession = session
       })
     })
-
-    await this.fetchAndSetMiscData()
-
+    
     // to avoid SSR clash
     if (typeof window !== 'undefined') {
+      await this.fetchAndSetMiscData()
       const succ = await this.userService.tryAutoLogin()
       console.log("succ - tryAutoLogin", succ)
       
@@ -107,6 +107,5 @@ export class HeaderComponent {
         if (!succ) this.openSessionList()
       }
     } 
- 
   }
 }

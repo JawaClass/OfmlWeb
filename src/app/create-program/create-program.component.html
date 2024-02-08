@@ -106,7 +106,7 @@
             </section>
         </div>
     
-        <button type="submit" [disabled]="!createProgramForm.valid" (click)="createProgram()" mat-raised-button
+        <button type="submit" [disabled]="!createProgramForm.valid || isProcessing" (click)="createProgram()" mat-raised-button
             color="accent" style="display: inline-block; width: 100%; height: 50px;">
             Programm exportieren
         </button>

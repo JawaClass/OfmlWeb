@@ -29,15 +29,20 @@ export class ArticleInputService extends BaseService {
     
     return await this.fetchAndParseFromUrl(url)
   }
+
   private webOcdArticleWithDetails: any[] = []
   async getWebOcdArticleWithDetails() {
     if (this.webOcdArticleWithDetails.length == 0) {
-      const data = await this.fetchWebOcdArticleWithDetails()
-      this.webOcdArticleWithDetails = data
+      this.setWebOcdArticleWithDetailsFromBackend()
     } 
     return this.webOcdArticleWithDetails
-    
   }
+
+  async setWebOcdArticleWithDetailsFromBackend() {
+    const data = await this.fetchWebOcdArticleWithDetails()
+    this.webOcdArticleWithDetails = data
+  } 
+
   async fetchWebOcdArticleWithDetails(): Promise<any[]> {
     const program: string = this.sessionService().currentSession$.value!.name
     const url = this.baseUrl +  "/web_ofml/ocd/web_ocd_article/details?where=web_program_name=%22" + program + "%22"
@@ -76,7 +81,9 @@ export class ArticleInputService extends BaseService {
   async fetchMiscData(): Promise<any> {
     const url = this.baseUrl + "/misc/all"
     const response = await fetch(url)
-    const misc: string = await response.json()
+    const misc: any = await response.json()
+    console.log("misc", misc);
+    
     return misc
   }
 

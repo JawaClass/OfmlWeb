@@ -38,7 +38,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     console.log("BASE URL ::", this.sessionService.baseUrl);
-    
+      
     this.sessionService.currentSession$.subscribe((session: any) => {
       this.routesActivated = (session !== null)
     })

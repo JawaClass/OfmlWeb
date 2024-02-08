@@ -17,6 +17,20 @@ export class ArticleitemService extends BaseService {
     return await this.fetchAndParseFromUrl<any>(url)
   }
 
+  async fetchArticleLongText(article: any) {
+    const web_program_name = article["web_program_name"]
+    const long_textnr = article["long_textnr"]
+    const url = this.baseUrl +  "/web_ofml/ocd/web_ocd_artlongtext?where=web_program_name=%22" + web_program_name +"%22%20AND%20textnr=%22"+long_textnr+"%22 AND language = \"de\" "
+    console.log("url...", url);
+    const textItems = await this.fetchAndParseFromUrl<any>(url)
+    return textItems.sort((a: any, b: any) => {
+      if(a["line_nr"] < b["line_nr"]) { return -1; }
+      if(a["line_nr"] > b["line_nr"]) { return 1; }
+      return 0;
+  })
+
+  }
+
   async patchArticlePrice(patchItem: any) {
     const url = this.baseUrl +  "/web_ofml/ocd/web_ocd_price?where=db_key=" + patchItem.db_key
     return await this.fetchAndParseFromUrl<any>(url, this.buildPatchRequestOptions(JSON.stringify(patchItem)))
@@ -38,9 +52,10 @@ export class ArticleitemService extends BaseService {
 
   async patchArticleLongText(
     articleItem: any,
+    oldLongTextItems: any[],
     longTextNew: string) {
     // delete old long text
-    const oldIDs = articleItem.langtext?.map((line: any) => line.db_key)
+    const oldIDs = oldLongTextItems?.map((line: any) => line.db_key)
     if (oldIDs && oldIDs.length) {
       await this.deleteArticleLongText(oldIDs)
     } 
@@ -63,10 +78,9 @@ export class ArticleitemService extends BaseService {
     }))
     const createdArtlongTextItems = await Promise.all(items.map(item => this.postArticleLongTextLine(item)))
     console.log("createdItems...", createdArtlongTextItems)
-    
-    // update local
-    articleItem.long_textnr = patchItem.long_textnr
-    articleItem.langtext = createdArtlongTextItems
+    // patch local
+    articleItem.long_textnr = patchItem["long_textnr"]
+
   }
 
   private async deleteArticleLongText(ids: number[]) {

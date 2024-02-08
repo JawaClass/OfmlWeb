@@ -143,6 +143,7 @@ export class ArticleDuplicateEditorComponent implements OnInit, AfterViewInit {
     .map( a=> ({article: a.item.article_nr, program: a.item.sql_db_program}) as IArticleProgramTuple)
     this.isProcessing = true
     await this.sessionService.createSession(this.session, articleAndPrograms)
+    await this.service.setWebOcdArticleWithDetailsFromBackend()
     this.isProcessing = false
       /*const activePrograms = this.service.programMap.getActivePrograms()
       

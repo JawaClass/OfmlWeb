@@ -12,9 +12,9 @@ export function getShortTextFromArticle(article: any): string {
         return ""
   }
 
-  export function getLongTextFromArticle(article: any): string[] {
-    if (article["langtext"].length) 
-      return article["langtext"].map((line: any) => line["text"])
+  export function getArticleLongText(textItem: any): string[] {
+    if (textItem && textItem.length) 
+      return textItem.map((line: any) => line["text"])
     else
         return []
   }

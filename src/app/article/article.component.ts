@@ -23,7 +23,7 @@ import { interval } from 'rxjs';
 import { MatSelectModule } from '@angular/material/select';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { ArticleItem, SessionAndOwner, Session, User } from '../models/models'
-import { getShortTextFromArticle, getLongTextFromArticle } from '../models/helper'
+import { getShortTextFromArticle, getArticleLongText } from '../models/helper'
 
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SessionService } from '../services/session.service'
@@ -57,6 +57,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 })
 export class ArticleComponent implements OnInit {
   
+  longTextItem: any
   priceItem: any
   articleItem!: any
   articleitemService = inject(ArticleitemService)
@@ -82,7 +83,6 @@ export class ArticleComponent implements OnInit {
     this.articleItem = articleItem
     this.articleForm.controls.articleNr.setValue(this.articleItem.article_nr)
     this.articleForm.controls.shortText.setValue(getShortTextFromArticle(this.articleItem))
-    this.articleForm.controls.longText.setValue(getLongTextFromArticle(this.articleItem).join("\n"))
   }
 
   async ngOnInit() {
@@ -90,6 +90,9 @@ export class ArticleComponent implements OnInit {
     this.priceItem = await this.articleitemService.fetchArticlePrice(this.articleItem)
     const price = parseFloat(this.priceItem["price"])
     this.articleForm.controls.articlePrice.setValue(price)
+    // fetch longText and set form value longText
+    this.longTextItem = await this.articleitemService.fetchArticleLongText(this.articleItem)
+    this.articleForm.controls.longText.setValue(getArticleLongText(this.longTextItem).join("\n"))
   }
 
   async submitArticleChanges() {
@@ -116,6 +119,7 @@ export class ArticleComponent implements OnInit {
 
     await this.articleitemService.patchArticleLongText(
       this.articleItem,
+      this.longTextItem,
       this.articleForm.controls.longText.value as string
       )
 

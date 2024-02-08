@@ -86,7 +86,8 @@ export class SessionService extends BaseService {
     const requestOptions = this.buildDeleteRequestOptions()
     await fetch(url, requestOptions)
     if (session.id === this.currentSession$.value?.id) {
-      this.articleService.clearMap()
+      this.currentSession$.next(null)
+      //this.articleService.clearMap()
       localStorage.removeItem("sessionId")
       this.snackBar.open("Ihre Sitzung wurde gelöscht", "Ok", { duration: 2000 })
     }
