@@ -1,0 +1,13 @@
+version: '3'
+services:
+  ofml_web_service_frontend:
+    restart: always
+    container_name: ofml_web_service_frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ofml_web_service_frontend
+    ports:
+      - "4200:4200"
+    volumes:
+      - /mnt/knps_testumgebung:/mnt/knps_testumgebung
