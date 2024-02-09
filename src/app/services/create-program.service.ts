@@ -29,7 +29,7 @@ export class CreateProgramService extends BaseService {
   exportPath = this.exportPathOptions[0][0]
 
   postCreate(params: any): Observable<any> {
-    const url = this.baseUrl + "/program_creation/create"
+    const url = this.baseUrl + "/export_program/create"
     return this.httpClient.post(url, params)
   }
 }
