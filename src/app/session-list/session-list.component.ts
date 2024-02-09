@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { HoldableDirective } from '../directives/holdable.directive';
 import { SessionService } from '../services/session.service';
 import { UserService } from '../services/user.service';
+import { RouterModule, Router } from '@angular/router';
 
 @Component({
   selector: 'app-session-list',
@@ -22,7 +23,8 @@ import { UserService } from '../services/user.service';
     MatListModule,
     MatButtonModule,
     MatTooltipModule,
-    HoldableDirective
+    HoldableDirective,
+    RouterModule
   ],
   templateUrl: './session-list.component.html',
   styleUrl: './session-list.component.css',
@@ -34,6 +36,7 @@ export class SessionListComponent implements OnInit {
   sessions: SessionAndOwner[] = []
   currentSession!: Session | null
   currentUser!: User
+  private router = inject(Router)
 
   dialogRef = inject(MatDialogRef<SessionListComponent>)
   dialogOpener = inject(MatDialog)
@@ -60,6 +63,7 @@ export class SessionListComponent implements OnInit {
 
   async selectSession(item: SessionAndOwner) {
     this.sessionService.setCurrentSession(item.session)
+    this.router.navigate(['/'])
     this.dialogRef.close({ session: item.session })
   }
 

@@ -26,6 +26,20 @@ export abstract class BaseService {
   protected httpClient: HttpClient = inject(HttpClient)
   snackBar = inject(MatSnackBar)
 
+  async doBackendHealthcheck() {
+    const url = this.baseUrl
+    return await this.fetchAndParseFromUrl(url)
+  }
+
+  async isBackendAvailable() {
+    try {
+      await this.doBackendHealthcheck()
+      return true
+    } catch (error) {
+      return false
+    }
+  }
+
   protected buildPostRequestOptions(body: string) {
     return {
       method: 'POST',

@@ -1,58 +1,71 @@
-<div style="display: flex; flex-direction: row;">
-    <mat-checkbox
-    [(ngModel)]="alternativeView">
-    Ansicht ändern
-    </mat-checkbox>
+@if (!isLoading) {
 
-    <section style="display: flex; justify-content: left; gap: 1px;">
-        <button mat-stroked-button color="accent" (click)="resetFilter()" style="height: 22px;">
-            <mat-icon color="accent">filter_list</mat-icon>
-            <span>{{articleList.length}}</span>
-        </button>
-
-        <input [(ngModel)]="filter.program" matInput placeholder="Program"
-            oninput="this.value = this.value.toUpperCase()"
-            (ngModelChange)="onFilterSet()">
-        <input [(ngModel)]="filter.article" matInput placeholder="Artikel"
-            oninput="this.value = this.value.toUpperCase()"
-            (ngModelChange)="onFilterSet()">
-    </section>
-</div>
-
-@for (program of getGroupKeys(program2pClass2ArticlesMap); track program; let idx = $index) {
-    <section>
-        <h2>{{idx+1}}. {{ program | uppercase }} </h2>
-    </section>
-
-    @if (!alternativeView) {
-        @for (pClass of getGroupKeys(program2pClass2ArticlesMap[program]); track pClass; let idx = $index) {
-
+    <div style="display: flex; flex-direction: row; align-items: stretch; gap: 15px; height: 60px;">
+        <section style="display: flex; flex-direction: column; justify-content: space-between;">
+            <mat-checkbox  [(ngModel)]="alternativeView">Ansicht ändern</mat-checkbox>
+            <strong style="margin-left: 5px;">@if (alternativeView) {Artikelansicht} @else {Klassenansicht}</strong>
+        </section>
+ 
+        
+        <section style="display: flex; flex-direction: row; align-items: stretch; gap: 5px;">
+            <button style="height: 100%" mat-stroked-button color="accent" (click)="resetFilter()">
+                <mat-icon color="accent">filter_list</mat-icon>
+                <span>{{articleList.length}}</span>
+            </button>
+    
+            <section style="display: flex; flex-direction: column; justify-content: space-between;">
+                <strong>Filtern nach:</strong>
+                <section style="display: flex; flex-direction: row; align-items: stretch; gap: 5px; height: 35px;">
+                    <input [(ngModel)]="filter.program" matInput placeholder="Program"
+                    oninput="this.value = this.value.toUpperCase()"
+                    (ngModelChange)="onFilterSet()">
+    
+                    <input [(ngModel)]="filter.article" matInput placeholder="Artikel"
+                    oninput="this.value = this.value.toUpperCase()"
+                    (ngModelChange)="onFilterSet()">
+                </section>
+            </section>
+        </section>
+       
+    </div>
+    
+    @for (program of getGroupKeys(program2pClass2ArticlesMap); track program; let idx = $index) {
+        <section>
+            <h2>{{idx+1}}. {{ program | uppercase }} </h2>
+        </section>
+    
+        @if (!alternativeView) {
+            @for (pClass of getGroupKeys(program2pClass2ArticlesMap[program]); track pClass; let idx = $index) {
+    
+                
+                <mat-card style="margin-bottom: 15px;">
+                    <button mat-stroked-button color="accent" style="user-select: text;  width: max-content"
+                        (click)="navigateToEditPropClass(program, pClass)">
+                        {{ pClass }}
+                    </button>
+                    <mat-card-content>
+                        
+                    @for (article of program2pClass2ArticlesMap[program][pClass]; track article; let idx = $index) { 
+                        <app-article-list-item [article]="article"></app-article-list-item> 
+                    }
             
+                </mat-card-content>
+                </mat-card>        
+                } 
+        } @else {
             <mat-card style="margin-bottom: 15px;">
-                <button mat-stroked-button color="accent" style="user-select: text;  width: max-content"
-                    (click)="navigateToEditPropClass(program, pClass)">
-                    {{ pClass }}
-                </button>
                 <mat-card-content>
                     
-                @for (article of program2pClass2ArticlesMap[program][pClass]; track article; let idx = $index) { 
-                    <app-article-list-item [article]="article"></app-article-list-item> 
-                }
-        
-            </mat-card-content>
-            </mat-card>        
-            } 
-    } @else {
-        <mat-card style="margin-bottom: 15px;">
-            <mat-card-content>
-                
-        @for (article of articleListGroupedBy[program]; track article; let idx = $index) {
-            <app-article-list-item [article]="article"></app-article-list-item>
+            @for (article of articleListGroupedBy[program]; track article; let idx = $index) {
+                <app-article-list-item [article]="article"></app-article-list-item>
+            }
+            
+    </mat-card-content>
+        </mat-card>
         }
-        
-</mat-card-content>
-    </mat-card>
     }
+} @else {
+    loading...
 }
 
 

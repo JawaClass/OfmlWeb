@@ -36,9 +36,14 @@ export class AppComponent implements OnInit {
   routesActivated = true
   dialogOpener = inject(MatDialog)
 
-  ngOnInit(): void {
+  async ngOnInit() {
     console.log("BASE URL ::", this.sessionService.baseUrl);
-      
+     /*
+     if (!(await this.sessionService.isBackendAvailable())) {
+        try { alert("Fehler: Backend nicht erreichbar!")  } catch(error) {}
+     }
+     */
+    
     this.sessionService.currentSession$.subscribe((session: any) => {
       this.routesActivated = (session !== null)
     })

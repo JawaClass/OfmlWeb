@@ -53,6 +53,7 @@ export class ArticleListComponent extends SaveScrollPositionComponent {
   persistArticleItemPromises = new Map<string, any[]>()
   dialogOpener = inject(MatDialog)
   filter = this.service.filter
+  isLoading = false
   
   // data from backend
   articleListBackend: any[] = []
@@ -159,9 +160,11 @@ export class ArticleListComponent extends SaveScrollPositionComponent {
     this.resetData()
     this.subscription$ = this.service.sessionService().currentSession$.subscribe(async (sessionOrNull: any) => {
       if (sessionOrNull) {
+        this.isLoading = true
         this.articleListBackend = await this.service.getWebOcdArticleWithDetails()
         console.log("this.articleListBackend LEN", this.articleListBackend.length)
         this.setArticlesFromBackendData()
+        this.isLoading = false
       }
     })
   }
