@@ -142,25 +142,11 @@ export class ArticleDuplicateEditorComponent implements OnInit, AfterViewInit {
     const articleAndPrograms: IArticleProgramTuple[] = this.activeArticlesByArticleNr()
     .map( a=> ({article: a.item.article_nr, program: a.item.sql_db_program}) as IArticleProgramTuple)
     this.isProcessing = true
-    await this.sessionService.createSession(this.session, articleAndPrograms)
+    const createdSession = await this.sessionService.createSession(this.session, articleAndPrograms)
     await this.service.setWebOcdArticleWithDetailsFromBackend()
+    this.sessionService.currentSession$.next(createdSession)
     this.isProcessing = false
-      /*const activePrograms = this.service.programMap.getActivePrograms()
-      
-      await Promise.all(
-        this.getAllArticleRefs()
-        .filter(item => !activePrograms.includes(item.program))
-        .map(item => this.removeArticleItem(item))
-      )
-      
-      this.service.programMap.clearInActivePrograms()
-      this.service.programMap.clearEmptyPrograms()
-
-      
-
-      this.service.behaviorSubjectProgramMap.next(this.service.programMap)*/
-      
-      this.router.navigate(['/'])
+     this.router.navigate(['/'])
   }
  
   async removeArticleItem(articleItem: ArticleItem) {

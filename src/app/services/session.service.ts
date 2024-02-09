@@ -12,8 +12,14 @@ import { UserService } from './user.service';
   providedIn: 'root'
 })
 export class SessionService extends BaseService {
+
   async mergeNewArticleWithProgram(articleNr: string, program: string, webProgramName: string) {
     const url = this.baseUrl + "/deepcopy/ocd/merge?article=" + articleNr + "&program=" + program + "&merge_with=" + webProgramName
+    return await this.fetchAndParseFromUrl(url)
+  }
+
+  async mergeNewArticleWithProgramAsAlias(articleNr: string, program: string, webProgramName: string, mergeAsArticleNr: string) {
+    const url = this.baseUrl + "/deepcopy/ocd/merge_as?article=" + articleNr + "&program=" + program + "&merge_with=" + webProgramName + "&merge_as=" + mergeAsArticleNr
     return await this.fetchAndParseFromUrl(url)
   }
 
@@ -25,7 +31,7 @@ export class SessionService extends BaseService {
   currentSession$ = new BehaviorSubject<Session | null>(null)
   articleDuplicates4Session$ = new BehaviorSubject<IArticleDuplicate[] | null>(null)
  
-  async createSession(session: Session, articleAndPrograms: IArticleProgramTuple[]): Promise<void> {
+  async createSession(session: Session, articleAndPrograms: IArticleProgramTuple[]): Promise<any> {
     console.log("createSession...");
     
     const url = this.baseUrl + "/deepcopy/ocd/" //"/web_ofml/session/create"
@@ -44,11 +50,12 @@ export class SessionService extends BaseService {
     console.log("deepcopy repsonce json", json);
     
     const createdSession: Session = Session.fromJSON(json)
-    localStorage.setItem("sessionId", createdSession.id!!.toString())
-    this.currentSession$.next(createdSession)
+    //localStorage.setItem("sessionId", createdSession.id!!.toString())
+    //this.currentSession$.next(createdSession)
+    await this.setCurrentSession(createdSession)
     //await this.saveInitialArticleItems(session)
     this.snackBar.open("Sitzung erstellt", "Ok", { duration: 2000 })
-    //return createdSession
+    return createdSession
   }
 
   async fetchArticleDuplicates(articleTokens: string[]) {
@@ -61,10 +68,10 @@ export class SessionService extends BaseService {
   }
 
   async setCurrentSession(session: Session) {
-    console.log("setCurrentSession", session.name, session.id);
-    this.currentSession$.next(session)
+    console.log("setCurrentSession", session.name, session.id)
     localStorage.setItem('sessionId', session.id!!.toString())
-    //await this.fetchAndSetSessionData()
+    this.articleService.clearWebOcdArticleWithDetailsFromBackend()
+    this.currentSession$.next(session)
   }
 
 

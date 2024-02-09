@@ -33,7 +33,7 @@ export class ArticleInputService extends BaseService {
   private webOcdArticleWithDetails: any[] = []
   async getWebOcdArticleWithDetails() {
     if (this.webOcdArticleWithDetails.length == 0) {
-      this.setWebOcdArticleWithDetailsFromBackend()
+      await this.setWebOcdArticleWithDetailsFromBackend()
     } 
     return this.webOcdArticleWithDetails
   }
@@ -42,6 +42,10 @@ export class ArticleInputService extends BaseService {
     const data = await this.fetchWebOcdArticleWithDetails()
     this.webOcdArticleWithDetails = data
   } 
+
+  clearWebOcdArticleWithDetailsFromBackend() {
+    this.webOcdArticleWithDetails = []
+  }
 
   async fetchWebOcdArticleWithDetails(): Promise<any[]> {
     const program: string = this.sessionService().currentSession$.value!.name

@@ -15,7 +15,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { Router } from '@angular/router';
 import { MergeArticleComponent } from '../merge-article/merge-article.component'
-
+import { MergeArticleAsAliasComponent } from '../merge-article-as-alias/merge-article-as-alias.component'
+ 
 interface AlteredArticleItem {
   articleItem: ArticleItem;
   deleted: boolean;
@@ -42,13 +43,15 @@ enum EditorMode {
     TextFieldModule,
     MatIconModule,
     MatDividerModule,
-    MergeArticleComponent
+    MergeArticleComponent,
+    MergeArticleAsAliasComponent
   ],
   templateUrl: './session-editor.component.html',
   styleUrl: './session-editor.component.css'
 })
 export class SessionEditorComponent implements OnInit {
 
+  selected = ""
   sessionAndOwner!: SessionAndOwner
   editorMode: EditorMode
   textResource: any
