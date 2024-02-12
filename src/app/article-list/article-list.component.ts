@@ -142,9 +142,9 @@ export class ArticleListComponent extends SaveScrollPositionComponent {
       this.program2pClass2ArticlesMap[program] = {} 
       //console.log("this.articleListGroupedBy[program]", program , this.articleListGroupedBy[program]);
       
-      console.log("1) groupArticlesByClassName", this.articleListGroupedBy[program]);
+      // console.log("1) groupArticlesByClassName", this.articleListGroupedBy[program]);
       const pClassGroups = this.groupArticlesByClassName(this.articleListGroupedBy[program])
-      console.log("2) pClassGroups", pClassGroups);
+      //console.log("2) pClassGroups", pClassGroups);
       
       this.getGroupKeys(pClassGroups).forEach(pClass => {
         this.program2pClass2ArticlesMap[program][pClass] = [] 
@@ -156,15 +156,16 @@ export class ArticleListComponent extends SaveScrollPositionComponent {
       })
     })
   }
-  async ngOnInit() {
+   async ngOnInit() {
     this.resetData()
     this.subscription$ = this.service.sessionService().currentSession$.subscribe(async (sessionOrNull: any) => {
       if (sessionOrNull) {
         this.isLoading = true
         this.articleListBackend = await this.service.getWebOcdArticleWithDetails()
-        console.log("this.articleListBackend LEN", this.articleListBackend.length)
+        // console.log("this.articleListBackend LEN", this.articleListBackend.length)
         this.setArticlesFromBackendData()
         this.isLoading = false
+        //this.restoreScrollPos()
       }
     })
   }

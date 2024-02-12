@@ -11,37 +11,47 @@ import { SaveScrollPositionService } from '../services/save-scroll-position.serv
 })
 export class SaveScrollPositionComponent {
 
-  
+  private scrollingRestored = false
   private _service = inject(SaveScrollPositionService)
 
-  ngAfterViewInit() {
-    this.restoreScrollPos() 
+  ngAfterViewChecked() {
+    if (this.scrollingRestored)
+      return
+    if (this._service.scrollY < 0)
+      return
+    if (typeof window !== 'undefined')
+      this.restoreScrollPos() 
   }
 
   ngOnDestroy() {
-    this.storeScrollPos()
+    if (typeof window !== 'undefined')
+      this.storeScrollPos()
   }
   
   protected storeScrollPos() {
-    /*afterNextRender(() => {
-      const elem = document.querySelector('.mat-sidenav-content')
-      this._service.scrollY = elem!!.scrollTop
-    }
-    )*/
+    this._service.scrollY = this.getScrollPos()
+  }
+  private getScrollElem() {
+    return document.querySelector('.mat-sidenav-content')
+  }
+
+  private getScrollPos() {
+    const elem = this.getScrollElem()
+    return elem!!.scrollTop
   }
 
   protected restoreScrollPos() {
-    /*afterNextRender(() => {
-      const elem = document.querySelector('.mat-sidenav-content')
-      elem!!.scroll(
-        {
-        left: 0,
-        top: this._service.scrollY,
-        behavior: 'instant',
+    const oldPos = this.getScrollPos()
+    const elem = this.getScrollElem()
+    const command = {
+      left: 0,
+      top: this._service.scrollY,
+      behavior: undefined,
+      } as any
+      elem!!.scroll(command) 
+      const newPos = this.getScrollPos()
+      if (oldPos !== newPos) {
+        this.scrollingRestored = true
       }
-      )
-    })*/
-    
-  }
-
+    }
 }

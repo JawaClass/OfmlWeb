@@ -4,7 +4,6 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class SaveScrollPositionService {
-
-  scrollY = 0
-  scrollX = 0
+  scrollY = -1
+  scrollX = -1
 }

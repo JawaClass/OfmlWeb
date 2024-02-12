@@ -34,7 +34,7 @@ export class SessionService extends BaseService {
   async createSession(session: Session, articleAndPrograms: IArticleProgramTuple[]): Promise<any> {
     console.log("createSession...");
     
-    const url = this.baseUrl + "/deepcopy/ocd/" //"/web_ofml/session/create"
+    const url = this.baseUrl + "/deepcopy/ocd/"
     const requestOptions = this.buildPostRequestOptions(JSON.stringify(
       {
         name: session.name,
@@ -47,13 +47,8 @@ export class SessionService extends BaseService {
     )
     const response = await fetch(url, requestOptions)
     const json = await response.json()
-    console.log("deepcopy repsonce json", json);
-    
     const createdSession: Session = Session.fromJSON(json)
-    //localStorage.setItem("sessionId", createdSession.id!!.toString())
-    //this.currentSession$.next(createdSession)
     await this.setCurrentSession(createdSession)
-    //await this.saveInitialArticleItems(session)
     this.snackBar.open("Sitzung erstellt", "Ok", { duration: 2000 })
     return createdSession
   }
