@@ -26,7 +26,17 @@
                 </section>
             </section>
         </section>
-       
+        
+        <button style="height: 100%" mat-stroked-button color="accent">
+            <mat-icon color="accent">euro_symbol</mat-icon> 
+            <a routerLink="/price-multiplier"style="text-decoration: none; color: inherit;">Multiplizierer</a> 
+        </button>
+
+        <button style="height: 100%" mat-stroked-button color="accent">
+            <mat-icon color="accent">label_important</mat-icon> 
+            <a routerLink="/editor-all"style="text-decoration: none; color: inherit;">Globale Artbase</a> 
+        </button>
+
     </div>
     
     @for (program of getGroupKeys(program2pClass2ArticlesMap); track program; let idx = $index) {
@@ -36,12 +46,12 @@
     
         @if (!alternativeView) {
             @for (pClass of getGroupKeys(program2pClass2ArticlesMap[program]); track pClass; let idx = $index) {
-    
-                
                 <mat-card style="margin-bottom: 15px;">
-                    <button mat-stroked-button color="accent" style="user-select: text;  width: max-content"
-                        (click)="navigateToEditPropClass(program, pClass)">
+                    <button mat-stroked-button color="accent" style="user-select: text;  width: max-content">
+                        <a [routerLink]="['/editor-propclass', { program: program, propClass: pClass }]"
+                        style="text-decoration: none; color: inherit;">
                         {{ pClass }}
+                        </a> 
                     </button>
                     <mat-card-content>
                         
@@ -68,134 +78,4 @@
     loading...
 }
 
-
-
-<!--
-    <div style="display: flex; justify-content: left; gap: 10px;">
-
-    <button mat-stroked-button color="accent" (click)="navigateToEditArtbaseAll()">
-        globale Artbase
-    </button>
-
-
-    <section style="display: flex; justify-content: left; gap: 1px;">
-        <button mat-stroked-button color="accent" (click)="filter.program =''; filter.pClass=''; filter.article='';">
-            <mat-icon color="accent">filter_list</mat-icon>
-            <span>{{ allFilteredArticles().length }}</span>
-        </button>
-
-        <input [(ngModel)]="filter.program" matInput placeholder="Program"
-            oninput="this.value = this.value.toUpperCase()"
-            matTooltip="$ am Ende hilft evtl.">
-        <input [(ngModel)]="filter.article" matInput placeholder="Artikel"
-            oninput="this.value = this.value.toUpperCase()"
-            matTooltip="$ am Ende hilft evtl.">
-
-          
-    </section>
-
-</div>
-
-
-<mat-divider style="margin-top: 20px; margin-bottom: 10px;"></mat-divider>
-
-
-@for (program of getActivePrograms(); track program; let idx = $index) {
-
-
-<h2>{{idx+1}}. {{ program | uppercase }} </h2>
-
-@for (pClass of getFilteredPropClasses(program); track pClass; let idx2 = $index) {
-
-<mat-card style="margin-bottom: 15px;">
-    <mat-card-content>
-
-        <button mat-stroked-button color="accent" style="user-select: text;"
-            (click)="navigateToEditPropClass(program, pClass.name)">
-            {{ pClass.name }}
-        </button>
-        @if (pClass.seen) {
-        <mat-icon color="accent" style="vertical-align: middle; margin-left: 10px;"
-            matTooltip="Klasse bereits angesehen">
-            remove_red_eye
-        </mat-icon>
-        }
-        @if (pClass.edited) {
-        <mat-icon color="accent" style="vertical-align: middle; margin-left: 10px;"
-            matTooltip="Klasse wurde bereits geändert">
-            check
-        </mat-icon>
-        }
-
-        <table style="margin-left: 10px;">
-
-            @for (article of getFilteredArticleItems(pClass); track article.articleNr;) {
-
-            <tr>
-
-                <td>
-                    {{ article.series | uppercase }}
-                </td>
-
-                <td>
-                    <input matInput class="input-edit" matInput [ngClass]="{
-                        'edit-highlighted': article.articleNrEdited
-                    }" [size]="article.articleNrAlias.length" [(ngModel)]="article.articleNrAlias"
-                        (input)="onInputChangeArticle(article)" oninput="this.value = this.value.toUpperCase()"
-                        maxlength="30" style="max-width: 20rem;" />
-                </td>
-
-                <td>
-                    <input matInput class="input-edit" matInput [ngClass]="{
-                    'edit-highlighted': article.shorttextEdited
-                }" [size]="article.shorttext.length" [(ngModel)]="article.shorttext"
-                        (input)="onInputChangeArticle(article)" oninput="this.value = this.value.toUpperCase()"
-                        maxlength="50" style="max-width: 20rem;" />
-                </td>
-
-
-                <td>
-                    <button mat-button matTooltip="Artikel ändern" (click)="openEditArticle(article)">
-                        <mat-icon color="accent" style="vertical-align: middle;">
-                        edit
-                    </mat-icon>
-                    </button>
-                    <button mat-stroked-button color="accent"
-                        (click)="navigateToEditArtbase(program, article.articleNr, pClass.name)">
-                        Artbase
-                    </button>
-                    @if (article.seen) {
-                    <mat-icon color="accent" style="vertical-align: middle; margin-left: 10px;"
-                        matTooltip="Artbase bereits angesehen">
-                        remove_red_eye
-                    </mat-icon>
-                    }
-                    @if (article.edited) {
-                    <mat-icon color="accent" style="vertical-align: middle; margin-left: 10px;"
-                        matTooltip="Artbase wurde bereits geändert">
-                        check
-                    </mat-icon>
-                    }
-                </td>
-
-
-
-            </tr>
-            }
-
-        </table>
-
-    </mat-card-content>
-</mat-card>
-
-<button mat-fab color="primary" matTooltip="Program erstellen" style="position: fixed; bottom: 30px; right: 30px;"
-    (click)="openCreateProgramDialog()">
-    <mat-icon>build</mat-icon>
-</button>
-
-}
-
-} @empty {
-<p>Kein Auswahl</p>
-}
--->
+ 

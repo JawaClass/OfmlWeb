@@ -1,0 +1,50 @@
+<div style="display: flex; justify-content: space-between;">
+    
+    <section style="display: flex; gap: 50px;">        
+        <mat-form-field style="width: 150px;" appearance="outline">
+            <mat-label>Preisfaktor</mat-label>
+            <input matInput [(ngModel)]="pricingFactor" maxlength="15" (change)="onPricingFactorChange()" />
+            <mat-icon matSuffix>close</mat-icon>
+        </mat-form-field>
+        <h2>Preis Multiplier</h2>
+    </section>
+    
+    <button style="height: 44px;" mat-flat-button color="accent" (click)="savePrices()">Preisänderungen speichern</button>
+</div>
+
+<p style="font-weight: bold;"> {{ this.filteredPriceItems.length }} Preise</p>
+
+@if (isFilterActive()) {
+    <p style="font-weight: bold; color: red;">Filter aktiv</p>
+} 
+
+<table mat-table [dataSource]="filteredPriceItems" class="mat-elevation-z8">
+    @for (column of displayedColumns; track column; let idx = $index) {
+        <ng-container [matColumnDef]="column[0]">
+            <th mat-header-cell *matHeaderCellDef>
+                 
+                <br>
+                   
+                <mat-form-field style="width: 150px;" appearance="outline">
+                    <mat-label>{{column[1]}}</mat-label>
+                    <input matInput  [(ngModel)]="column[2]" (change)="filterPriceItems()" />
+                </mat-form-field>
+
+             </th>
+             @if (column[0] === "newPrice") {
+                <td mat-cell *matCellDef="let element" style="color: green; font-weight: bold;">
+                    {{ element[column[0]] | currency :'EUR':'symbol':'1.2-5' }} 
+                    <span style="font-weight: bold; font-size: 10px; color: yellowgreen;">+{{ calculatePercentageChange(element) }}%</span>
+                </td>
+             } @else if  (column[0] === "price")  {
+                <td mat-cell *matCellDef="let element"> {{ element[column[0]] | currency :'EUR':'symbol':'1.2-5' }}  </td>
+             } @else {
+                <td mat-cell *matCellDef="let element"> {{ element[column[0]] }}   </td>
+             }
+          </ng-container>
+    }
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+  </table>
+  
+ 

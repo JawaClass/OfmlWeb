@@ -6,6 +6,7 @@ import { ArticleDuplicateEditorComponent } from './article-duplicate-editor/arti
 import { ArtbaseEditorComponent } from './artbase-editor/artbase-editor.component';
 import { ArtbaseEditorAllComponent } from './artbase-editor-all/artbase-editor-all.component';
 import { PropclassEditorComponent } from './propclass-editor/propclass-editor.component';
+import { PriceMultiplierComponent } from './price-multiplier/price-multiplier.component';
 export const routes: Routes = [
     // TODO: set names for each page etc., see https://angular.dev/guide/routing/common-router-tasks
     { path: '', component: ArticleListComponent },
@@ -13,6 +14,8 @@ export const routes: Routes = [
     { path: 'editor-artbase', component: ArtbaseEditorComponent },
     { path: 'editor-all', component: ArtbaseEditorAllComponent },
     { path: 'editor-propclass', component: PropclassEditorComponent },
+    { path: 'price-multiplier', component: PriceMultiplierComponent },
+    
     //  { path: '**', component: PageNotFoundComponent },
     
 ];

@@ -1,6 +1,5 @@
-import { AfterViewChecked, AfterViewInit, Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ArticleItem, PropertyClass } from './../models/models'
 import { RouterModule, Router } from '@angular/router';
 import { ArticleitemService } from '../services/articleitem.service'; 
 import { ArticleInputService } from '../services/article-input.service'; 
@@ -20,7 +19,7 @@ import { Subscription } from 'rxjs';
 import { MatCheckboxModule, MatCheckboxChange } from '@angular/material/checkbox';
 import { ArticleListItemComponent } from '../article-list-item/article-list-item.component'
 import { SaveScrollPositionComponent } from '../save-scroll-position/save-scroll-position.component';
-
+import { PriceMultiplierComponent } from '../price-multiplier/price-multiplier.component'
 
 @Component({
   selector: 'app-article-list',
@@ -39,7 +38,8 @@ import { SaveScrollPositionComponent } from '../save-scroll-position/save-scroll
     MatDialogModule,
     MatExpansionModule,
     MatCheckboxModule,
-    ArticleListItemComponent
+    ArticleListItemComponent,
+    PriceMultiplierComponent
   ],
   templateUrl: './article-list.component.html',
   styleUrl: './article-list.component.css'
@@ -116,7 +116,6 @@ export class ArticleListComponent extends SaveScrollPositionComponent {
     })
     return groups
   }
-
   
 
   onFilterSet() {
@@ -162,25 +161,10 @@ export class ArticleListComponent extends SaveScrollPositionComponent {
       if (sessionOrNull) {
         this.isLoading = true
         this.articleListBackend = await this.service.getWebOcdArticleWithDetails()
-        // console.log("this.articleListBackend LEN", this.articleListBackend.length)
         this.setArticlesFromBackendData()
-        this.isLoading = false
-        //this.restoreScrollPos()
+        this.isLoading = false 
       }
     })
-  }
-
-  navigateToEditPropClass(program: string, pClass: string) {
-    this.storeScrollPos()
-    this.router.navigate(['/editor-propclass', {
-      "program": program,
-      "propClass": pClass
-    }]);
-  }
-
-  navigateToEditArtbaseAll() {
-    this.service.scrollY = 0
-    this.router.navigate(['/editor-all']);
   }
 
 }
