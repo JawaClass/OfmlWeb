@@ -26,6 +26,10 @@ export abstract class BaseService {
   protected httpClient: HttpClient = inject(HttpClient)
   snackBar = inject(MatSnackBar)
 
+  showSnackbar(message: string, millis: number) {
+    this.snackBar.open(message, "Ok", { duration: millis })
+  }
+
   async doBackendHealthcheck() {
     const url = this.baseUrl
     return await this.fetchAndParseFromUrl(url)

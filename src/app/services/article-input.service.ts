@@ -30,7 +30,22 @@ export class ArticleInputService extends BaseService {
     return await this.fetchAndParseFromUrl(url)
   }
 
-  private webOcdArticleWithDetails: any[] = []
+  groupArticlesByClassName(articles: any[]) {
+    let groups: any = {}
+    articles.forEach((a: any) => {
+      a["klassen"].forEach((pClass: any) => {
+        const pClassName: string = pClass["prop_class"]
+        if (groups[pClassName]) {
+          groups[pClassName].push(a)
+        } else {
+          groups[pClassName] = [a]
+        }
+      })
+    })
+    return groups
+  }
+  
+  public webOcdArticleWithDetails: any[] = []
   async getWebOcdArticleWithDetails() {
     if (this.webOcdArticleWithDetails.length == 0) {
       await this.setWebOcdArticleWithDetailsFromBackend()

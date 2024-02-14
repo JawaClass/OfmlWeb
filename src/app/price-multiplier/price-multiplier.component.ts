@@ -41,22 +41,27 @@ export class PriceMultiplierComponent {
   priceItems: any[] = []
   filteredPriceItems: any[] = []
   pricingFactor = 1.00
+  isLoading = false
   async ngOnInit() {
+    await this.fetchPrices()
+  }
+
+  async fetchPrices() {
     this.priceItems = await this.service.fetchPrices()
     for (const item of this.priceItems) {
       item["newPrice"] = item["price"]
     }
-    this.filteredPriceItems = this.priceItems
+    this.filterPriceItems()
   }
 
   showItem(item: any) {
     for (const column of this.displayedColumns) { 
       const name = column[0]
-      const filterValue = column[2]
-      if (filterValue.length == 0)
+      const filterPattern = column[2]
+      if (filterPattern.length == 0)
         continue
 
-      const regexPattern = new RegExp(`^${filterValue.toUpperCase()}`)
+      const regexPattern = new RegExp(`^${filterPattern.toUpperCase()}`)
       
       if (!(regexPattern.test(item[name].toUpperCase())))
         return false
@@ -86,7 +91,23 @@ export class PriceMultiplierComponent {
     return 100 * ((element["newPrice"] - element["price"]) / element["price"])
   }
 
-  savePrices() {
+  getPriceItemsWithPriceChanges() {
+    return this.filteredPriceItems.filter((item: any) => item.price !== item.newPrice)
+  }
 
+  async savePrices() {
+    this.isLoading = true
+    const changedItems = this.getPriceItemsWithPriceChanges().map((item: any) => (
+      {
+        "db_key": item.db_key,
+        "price": item.newPrice
+      }
+    ))
+    if (changedItems) {
+      await this.service.savePrices(changedItems)
+      await this.fetchPrices()
+    }
+    this.service.snackBar.open(`${changedItems.length} Preis(e) persistiert.`, "OK", {duration: 5000})
+    this.isLoading = false
   }
 }

@@ -21,7 +21,6 @@ import {MatBadgeModule} from '@angular/material/badge';
 interface SimpleArtbase {
   property: string,
   value: string,
-  changeCounter: number
 }
 
 @Component({
@@ -34,21 +33,22 @@ interface SimpleArtbase {
   templateUrl: './artbase-editor-all.component.html',
   styleUrl: './artbase-editor-all.component.css'
 })
-export class ArtbaseEditorAllComponent implements OnInit, OnDestroy {
+export class ArtbaseEditorAllComponent {
 
   private service = inject(ArticleInputService)
   private articleitemService = inject(ArticleitemService)
   private router = inject(Router)
-
-  activePrograms = this.service.programMap.getActivePrograms()
-  selectedProgram = ""
-
   private MOCK = [
-    { property: "", value: "", changeCounter: 0 }
+    { property: "", value: "" }
   ]
   artbaseItems: SimpleArtbase[] = this.MOCK
-  artbaseChanges: ArtbaseItem[] = []
-  artbaseItemsResultCopy: SimpleArtbase[] = [] 
+  currentUserInput: SimpleArtbase = {
+    property: "",
+    value: "",
+  }
+  isLoading = false
+  showArtbaseChangesResult = false
+  resultMessage: any | null = null
 
   isUnique() {
     const seen: any = {}
@@ -67,116 +67,35 @@ export class ArtbaseEditorAllComponent implements OnInit, OnDestroy {
     return prop.trim().length > 0 && value.trim().length > 0 && prop === prop.toUpperCase() && value === value.toUpperCase()
   }
 
-  isFetchingData = false
-  showArtbaseChangesResult = false
-
-  currentUserInput: SimpleArtbase = {
-    property: "",
-    value: "",
-    changeCounter: -1, // nod needed
-  }
-
   onPropertyInput(value: string) {
     this.currentUserInput.property = value.trim().length ? value : ""
   }
 
   resetChanges() {
     this.showArtbaseChangesResult = false
-    this.artbaseChanges = []
-    this.artbaseItems.forEach(x => x.changeCounter = 0)
-  }
-
-  async addArtbaseItemsToAllArticles(enteredArtbaseItems: SimpleArtbase[]) {
-    
-    // collected articleItems that get updated
-    let affectedArticleItems = new Map()
-     
-    this.service.programMap.getAllActiveArticleRefs().forEach((articleItem: ArticleItem) => {
-      articleItem.pClasses.forEach((pClass: string) => {
-        this.service.programMap.getPropItems(articleItem.program, pClass)?.forEach((propItem: PropertyItem) => {
-          enteredArtbaseItems.forEach((artbaseItem: SimpleArtbase) => {
-            if (propItem.active && /* property on pClass is active */
-              artbaseItem.property == propItem.property && /* found property */
-              propItem.values.find((x: PropValueItem) => x.active && x.value == artbaseItem.value) && /* property has this value and its active */
-              articleItem.artbaseItems.find((x: ArtbaseItem) =>  
-                x.property === artbaseItem.property &&
-                x.value === artbaseItem.value
-              ) === undefined /*  property/value combo is not yet in artbase */
-            ) {
-              const newEntry = new ArtbaseItem(articleItem.articleNr, pClass, artbaseItem.property, artbaseItem.value)
-              articleItem.artbaseItems.push(newEntry)
-              articleItem.edited = true
-              
-              if (!affectedArticleItems.has(articleItem.articleNr)) {
-                affectedArticleItems.set(articleItem.articleNr, articleItem)
-              }
-              
-              this.artbaseChanges.push(newEntry)
-              artbaseItem.changeCounter += 1
-            }
-          })
-        })
-      })
-    })
-    
-    await Promise.all(Array.from([...affectedArticleItems.values()]).map(item => this.articleitemService.saveArticleItem(item)))
   }
 
   btnDisabled() {
     return (this.validArtbaseItems().length == 0) || 
     !this.isArtbaseItemValid(this.artbaseItems.length - 1) ||
-    this.isFetchingData ||
+    this.isLoading ||
     !this.isUnique()
   }
 
   btnAddDisabled() {
-    return (this.artbaseItems.length > 0 && !this.isArtbaseItemValid(this.artbaseItems.length - 1)) || !this.isUnique()
+    return (this.artbaseItems.length > 0 && !this.isArtbaseItemValid(this.artbaseItems.length - 1)) || !this.isUnique() || this.isLoading
   }
 
-  async updateAll() {
-    this.resetChanges()
-    const enteredArtbaseItems = this.validArtbaseItems()
-
-    if (enteredArtbaseItems.length > 0) {
-      console.log("addArtbaseItemsToAllArticles YES");
-      this.isFetchingData = true
-
-      let promises: Promise<any>[] = []
-      this.service.programMap.getAllActiveArticleRefs().forEach((articleItem: ArticleItem) => {
-        promises.push(this.service.fetchAndSetArtbase(articleItem))
-        promises.push(this.service.fetchPropertiesFromArticleItem(articleItem))
-      })
-      await Promise.all(promises)
-      
-      await this.addArtbaseItemsToAllArticles(enteredArtbaseItems)
-
-      this.isFetchingData = false
-    } else {
-      console.log("addArtbaseItemsToAllArticles NO");
-    }
-
-    this.showArtbaseChangesResult = true
-    this.artbaseItemsResultCopy = structuredClone(this.artbaseItems)
-
-  }
-
-  async ngOnDestroy() {
-    if (!this.service.hasProgramData())
-      this.router.navigate(['/'])
-  }
-
-  async ngOnInit() {
-    if (!this.service.hasProgramData())
-      this.router.navigate(['/'])
-    
-      this.selectedProgram = this.activePrograms[0]
+  async setArtbaseValues() {
+    this.isLoading = true
+    this.resultMessage = await this.articleitemService.execBatachArtbaseAll(this.artbaseItems)
+    this.isLoading = false
   }
 
   addEmptyItem() {
     this.artbaseItems.push({
       property: "",
-      value: "",
-      changeCounter: 0
+      value: ""
     })
     this.currentUserInput.property = ""
   }
@@ -185,8 +104,7 @@ export class ArtbaseEditorAllComponent implements OnInit, OnDestroy {
     const size = this.artbaseItems.length
     const newItem: SimpleArtbase = {
       property: item.propertyItem.property,
-      value: item.propValueItem.value,
-      changeCounter: 0
+      value: item.propValueItem.value
     }
     if (this.isArtbaseItemValid(size-1))  
       this.artbaseItems.push(newItem)
@@ -197,5 +115,5 @@ export class ArtbaseEditorAllComponent implements OnInit, OnDestroy {
   deleteItem(idx: number) {
     this.artbaseItems.splice(idx, 1)
   }
-
+ 
 } 

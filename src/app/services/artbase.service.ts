@@ -9,7 +9,7 @@ export class ArtbaseService extends BaseService {
   
   currentArticleItem$ = new BehaviorSubject<any>(null)
   async createArtbaseEntry(artbaseEntry: any) {
-    const url = this.baseUrl + "/web_ofml/ocd/web_ocd_artbase"
+    const url = this.baseUrl + "/web_ofml/ocd/web_ocd_artbase" 
     return this.fetchAndParseFromUrl(url, this.buildPostRequestOptions(JSON.stringify(artbaseEntry)))
 
   }

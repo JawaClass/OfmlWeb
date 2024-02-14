@@ -8,8 +8,12 @@
         </mat-form-field>
         <h2>Preis Multiplier</h2>
     </section>
+    @if (!isLoading) {
+        <button style="height: 44px;" mat-flat-button color="accent" (click)="savePrices()">Preisänderungen speichern</button>
+    } @else {
+        aktualisieren...
+    }
     
-    <button style="height: 44px;" mat-flat-button color="accent" (click)="savePrices()">Preisänderungen speichern</button>
 </div>
 
 <p style="font-weight: bold;"> {{ this.filteredPriceItems.length }} Preise</p>
@@ -17,6 +21,7 @@
 @if (isFilterActive()) {
     <p style="font-weight: bold; color: red;">Filter aktiv</p>
 } 
+<p style="font-weight: bold;">{{ getPriceItemsWithPriceChanges().length }} Preisänderungen</p>
 
 <table mat-table [dataSource]="filteredPriceItems" class="mat-elevation-z8">
     @for (column of displayedColumns; track column; let idx = $index) {
@@ -34,7 +39,7 @@
              @if (column[0] === "newPrice") {
                 <td mat-cell *matCellDef="let element" style="color: green; font-weight: bold;">
                     {{ element[column[0]] | currency :'EUR':'symbol':'1.2-5' }} 
-                    <span style="font-weight: bold; font-size: 10px; color: yellowgreen;">+{{ calculatePercentageChange(element) }}%</span>
+                    <span style="font-weight: bold; font-size: 10px; color: yellowgreen;">+{{ calculatePercentageChange(element) | number : '1.2-5' }}%</span>
                 </td>
              } @else if  (column[0] === "price")  {
                 <td mat-cell *matCellDef="let element"> {{ element[column[0]] | currency :'EUR':'symbol':'1.2-5' }}  </td>

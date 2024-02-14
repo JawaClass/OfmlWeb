@@ -14,4 +14,10 @@ export class PriceMultiplierService extends BaseService {
     const url = this.baseUrl + `/web_ofml/ocd/web_ocd_price?where=web_program_name="${webProgram}"`
     return await this.fetchAndParseFromUrl<any>(url)
   }
+
+  async savePrices(patchItems: any[]) {
+    const webProgram = this.sessionService.currentSession$.value!.name
+    const url = this.baseUrl + `/web_ofml/ocd/batch/web_ocd_price`
+    return await this.fetchAndParseFromUrl<any>(url, this.buildPatchRequestOptions(JSON.stringify(patchItems)))
+  }
 }

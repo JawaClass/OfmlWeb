@@ -34,7 +34,10 @@
 
         <button style="height: 100%" mat-stroked-button color="accent">
             <mat-icon color="accent">label_important</mat-icon> 
-            <a routerLink="/editor-all"style="text-decoration: none; color: inherit;">Globale Artbase</a> 
+            <a [routerLink]="['/editor-all', { }]"
+                        style="text-decoration: none; color: inherit;">
+                        Globale Artbase
+            </a> 
         </button>
 
     </div>
@@ -56,7 +59,7 @@
                     <mat-card-content>
                         
                     @for (article of program2pClass2ArticlesMap[program][pClass]; track article; let idx = $index) { 
-                        <app-article-list-item [article]="article"></app-article-list-item> 
+                        <app-article-list-item (onDeleted)="onArticledDeleted($event)" [article]="article"></app-article-list-item> 
                     }
             
                 </mat-card-content>
@@ -67,7 +70,7 @@
                 <mat-card-content>
                     
             @for (article of articleListGroupedBy[program]; track article; let idx = $index) {
-                <app-article-list-item [article]="article"></app-article-list-item>
+                <app-article-list-item (onDeleted)="onArticledDeleted($event)" [article]="article"></app-article-list-item>
             }
             
     </mat-card-content>

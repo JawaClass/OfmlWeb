@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { PropclassViewerComponent } from '../propclass-viewer/propclass-viewer.component'
 
 interface PClassProperty {
   pClass: PropertyClass,
@@ -31,14 +32,16 @@ interface PClassProperty {
     FormsModule,
     MatInputModule,
     MatFormFieldModule,
-    MatProgressSpinnerModule],
+    MatProgressSpinnerModule,
+    PropclassViewerComponent
+  ],
   templateUrl: './prop-summary.component.html',
   styleUrl: './prop-summary.component.css'
 })
 export class PropSummaryComponent implements OnInit {
 
   service = inject(ArticleInputService)
-
+  data: any[] = []
   @Input("selectedProgram") selectedProgram: string = ""
   @Input("currentPropertyInput") currentPropertyInput: string = ""
   @Output() onValueSected = new EventEmitter<PropertyAndValueItem>()
@@ -46,19 +49,20 @@ export class PropSummaryComponent implements OnInit {
   result: PClassProperty[] = []
   filteredResult: PClassProperty[] = []
   isLoading: boolean = false
-
+  propClassNames: string[] = []
   async ngOnInit(): Promise<void> {
-    if (this.selectedProgram.length)
-      await this.updateSummary()
+    this.data = await this.service.getWebOcdArticleWithDetails()
+    this.updateSummary()
   }
 
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
     const changeSelectedProgram: SimpleChange = changes["selectedProgram"]
     const changeCurrentPropertyInput: SimpleChange = changes["currentPropertyInput"]
+
     if (changeSelectedProgram && !changeSelectedProgram.isFirstChange())
       this.updateSummary()
-    if (changeCurrentPropertyInput && !changeCurrentPropertyInput.isFirstChange())
-      this.filterResult()
+//    if (changeCurrentPropertyInput && !changeCurrentPropertyInput.isFirstChange())
+  //    this.filterResult()
   }
 
   selectPropertyValue(event: any, propItem: PropertyItem, valueItem: PropValueItem) {
@@ -67,17 +71,11 @@ export class PropSummaryComponent implements OnInit {
   }
 
   async updateSummary() {
-    this.isLoading = true
-    const propClasses = this.service.programMap.getPropClassesFromProgram(this.selectedProgram)
-
-    const promises = propClasses.map(async (pClass) => {
-      const propItems = await this.service.fetchProperties(this.selectedProgram, pClass.name)
-      return { pClass, propItems } as PClassProperty;
-    })
-
-    this.result = await Promise.all(promises)
-    this.filteredResult = this.result
-    this.isLoading = false
+    const items = this.data.filter((item:any) => item.sql_db_program === this.selectedProgram).map((item:any) => item)
+    console.log("PropSummaryComponent", items);
+    const pClassGroups = this.service.groupArticlesByClassName(items)
+    this.propClassNames = Object.keys(pClassGroups)
+    console.log("propClassNames", this.propClassNames)    
   }
 
   filterResult() {

@@ -12,4 +12,9 @@
             label_important
     </mat-icon>
     </button>
+    <button mat-fab color="primary" style="color: white; width: 30px; height: 30px;"
+            matTooltip="Artikel löschen (lang drücken)" (click)="$event.stopImmediatePropagation()"
+            (holdFinished)="delete()" [timeToPass]="2500" appHoldable>
+            <mat-icon>delete</mat-icon>
+    </button>
 </div>

@@ -40,6 +40,7 @@ export class HoldableDirective {
     this.timePassed += interval
 
     if (this.timePassed >= this.timeToPass) {
+      this.renderer.setStyle(this.progressElementRef, "background-color", "green")
       this.holdFinished.emit()
     } else {
       this.cancelId = setTimeout(() => this.emit(interval), interval)

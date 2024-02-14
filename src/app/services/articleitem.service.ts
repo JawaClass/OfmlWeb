@@ -10,6 +10,12 @@ export class ArticleitemService extends BaseService {
  
   sessionService = inject(SessionService)
 
+  async execBatachArtbaseAll(artbaseItems: any) {
+    const programName = this.sessionService.currentSession$.value!!.name
+    const url = this.baseUrl + `/web_ofml/ocd/batch/web_ocd_artbase/exec_artbase_all?where=web_program_name="${programName}"` 
+    return this.fetchAndParseFromUrl<any>(url, this.buildPostRequestOptions(JSON.stringify(artbaseItems)))
+  }
+
   async fetchArticlePrice(article: any) {
     const web_program_name = article["web_program_name"]
     const article_nr = article["article_nr"]
@@ -29,6 +35,11 @@ export class ArticleitemService extends BaseService {
       return 0;
   })
 
+  }
+
+  async deleteArticle(articleItem: any) {
+    const url = this.baseUrl +  "/web_ofml/ocd/web_ocd_article?where=db_key=" + articleItem.db_key
+    return await this.fetchAndParseFromUrl<any>(url, this.buildDeleteRequestOptions())
   }
 
   async patchArticlePrice(patchItem: any) {
@@ -88,7 +99,6 @@ export class ArticleitemService extends BaseService {
     const url = this.baseUrl +  "/web_ofml/ocd/web_ocd_artlongtext?where=db_key IN (" + idsJoined +")"
     console.log("deleteArticleLongText", url)
     return await this.fetchAndParseFromUrl(url, this.buildDeleteRequestOptions())
-    
   }
 
   async fetchArticlePriceAndLongtext(articleItem: ArticleItem) {

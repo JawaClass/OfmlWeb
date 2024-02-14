@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, Output, EventEmitter } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog'; 
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ArticleComponent } from '../article/article.component';
@@ -7,6 +7,8 @@ import { ArtbaseService } from '../services/artbase.service';
 import { MatIconModule } from '@angular/material/icon'; 
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { HoldableDirective } from '../directives/holdable.directive';
+import { ArticleitemService } from '../services/articleitem.service';
 
 
 @Component({
@@ -17,7 +19,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     ArticleComponent,
     MatIconModule,
     MatButtonModule,
-    MatTooltipModule
+    MatTooltipModule,
+    HoldableDirective
   ],
   templateUrl: './article-list-item.component.html',
   styleUrl: './article-list-item.component.css'
@@ -25,10 +28,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class ArticleListItemComponent {
 
   @Input() article!: any
+  @Output() onDeleted: EventEmitter<any> = new EventEmitter()
   dialogOpener = inject(MatDialog)
   router = inject(Router)
   artbaseService = inject(ArtbaseService)
-
+  articleService = inject(ArticleitemService)
   
   getShortText(article: any) {
     if (article["kurztext"]) 
@@ -45,9 +49,14 @@ export class ArticleListItemComponent {
   }
 
   navigateToEditArtbase(articleItem: any) {
-    //this.storeScrollPos()
     this.artbaseService.currentArticleItem$.next(articleItem)
     this.router.navigate(['/editor-artbase']);
+  }
+
+  async delete() {
+    await this.articleService.deleteArticle(this.article)
+    this.onDeleted.emit(this.article)
+    this.articleService.showSnackbar(`${this.article.article_nr} gelöscht.`, 2500)
   }
 
 }

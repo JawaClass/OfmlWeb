@@ -102,22 +102,6 @@ export class ArticleListComponent extends SaveScrollPositionComponent {
 
   getGroupKeys = (obj: object) => Object.keys(obj)
 
-  groupArticlesByClassName(articles: any[]) {
-    let groups: any = {}
-    articles.forEach((a: any) => {
-      a["klassen"].forEach((pClass: any) => {
-        const pClassName: string = pClass["prop_class"]
-        if (groups[pClassName]) {
-          groups[pClassName].push(a)
-        } else {
-          groups[pClassName] = [a]
-        }
-      })
-    })
-    return groups
-  }
-  
-
   onFilterSet() {
     this.setArticlesFromBackendData()
   }
@@ -142,7 +126,7 @@ export class ArticleListComponent extends SaveScrollPositionComponent {
       //console.log("this.articleListGroupedBy[program]", program , this.articleListGroupedBy[program]);
       
       // console.log("1) groupArticlesByClassName", this.articleListGroupedBy[program]);
-      const pClassGroups = this.groupArticlesByClassName(this.articleListGroupedBy[program])
+      const pClassGroups = this.service.groupArticlesByClassName(this.articleListGroupedBy[program])
       //console.log("2) pClassGroups", pClassGroups);
       
       this.getGroupKeys(pClassGroups).forEach(pClass => {
@@ -165,6 +149,13 @@ export class ArticleListComponent extends SaveScrollPositionComponent {
         this.isLoading = false 
       }
     })
+  }
+
+  async onArticledDeleted(event: any) {
+    console.log("onArticledDeleted ...", event)
+    this.service.webOcdArticleWithDetails = this.service.webOcdArticleWithDetails.filter((item: any) => item.db_key !== event.db_key)
+    this.articleListBackend = await this.service.getWebOcdArticleWithDetails()
+    await this.setArticlesFromBackendData()
   }
 
 }

@@ -12,7 +12,7 @@ import { WaitingCursorComponent } from '../waiting-cursor/waiting-cursor.compone
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { getTextFromProperty } from '../models/helper';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import {MatButtonModule} from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
 
 
 

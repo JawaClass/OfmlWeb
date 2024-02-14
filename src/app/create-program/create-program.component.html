@@ -25,49 +25,60 @@
             </p>
 
             <section style="display: flex; align-items: center; gap: 20px;">
-                <mat-checkbox [formControl]="createProgramForm.controls.exportOcd" style="flex: 1;">
+                <mat-checkbox [formControl]="createProgramForm.controls.exportOcd" style="flex: 2;">
                     OCD
                 </mat-checkbox>
                 <span style="flex: 5;">Kaufmännische Daten</span>
             </section>
 
             <section style="display: flex; align-items: center; gap: 20px;">
-                <mat-checkbox [formControl]="createProgramForm.controls.exportOam" style="flex: 1;">
+                <mat-checkbox [formControl]="createProgramForm.controls.exportOam" style="flex: 2;">
                     OAM
                 </mat-checkbox>
-                <span style="flex: 5;">Grafik Mapping</span>
+                <section style="flex: 5; display: flex; flex-direction: column;">
+                    <span>Grafisches Mapping</span>
+                    @if (createProgramForm.controls.exportOdb.value) {
+                        <span style="color: red; font-size: smaller;">ODB ist aktiviert, d.h. die OAM wird angepasst.</span>
+                    }
+                </section>
             </section>
             
             <section style="display: flex; align-items: center; gap: 20px;">
-                <mat-checkbox [formControl]="createProgramForm.controls.exportOas" style="flex: 1;">
+                <mat-checkbox [formControl]="createProgramForm.controls.exportOas" style="flex: 2;">
                     OAS
                 </mat-checkbox>
                 <span style="flex: 5;">Katalogdaten</span>
             </section>
             
             <section style="display: flex; align-items: center; gap: 20px;">
-                <mat-checkbox [formControl]="createProgramForm.controls.exportOfml" style="flex: 1;">
+                <mat-checkbox [formControl]="createProgramForm.controls.exportOfml" style="flex: 2;">
                     OFML
                 </mat-checkbox>
                 <span style="flex: 5;">OFML Konfiguration</span>
             </section>
 
             <section style="display: flex; align-items: center; gap: 20px;">
-                <mat-checkbox [formControl]="createProgramForm.controls.exportOdb" style="flex: 1;">
+                <mat-checkbox [formControl]="createProgramForm.controls.exportOdb" style="flex: 2;">
                     ODB
                 </mat-checkbox>
-                <span style="flex: 5;">Grafische Daten und Grafiken</span>
+                <section style="flex: 5; display: flex; flex-direction: column;">
+                    <span>Grafische Daten und Grafiken</span>
+                    @if (createProgramForm.controls.exportOdb.value) {
+                        <span style="color: red; font-size: smaller;">Das Program erhält seine eigenen ODB Daten.<br>Benötigt mehr Zeit.</span>
+                    }
+                </section>
+                
             </section>
-                         
+                                     
             <section style="display: flex; align-items: center; gap: 20px;">
-                <mat-checkbox [formControl]="createProgramForm.controls.exportGo" style="flex: 1;">
+                <mat-checkbox [formControl]="createProgramForm.controls.exportGo" style="flex: 2;">
                     GO
                 </mat-checkbox>
                 <span style="flex: 5;">Metatypen</span>
             </section>
 
             <section style="display: flex; align-items: center; gap: 20px;">
-                <mat-checkbox [formControl]="createProgramForm.controls.exportRegistry" style="flex: 1;">
+                <mat-checkbox [formControl]="createProgramForm.controls.exportRegistry" style="flex: 2;">
                     Registry
                 </mat-checkbox>
                 <span style="flex: 5;">...</span>
