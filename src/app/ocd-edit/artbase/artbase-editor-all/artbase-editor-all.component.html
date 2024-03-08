@@ -1,0 +1,42 @@
+<div class="items">
+    <table>
+        <tr>
+            <th><mat-label>Merkmal</mat-label></th>
+            <th><mat-label>Wert</mat-label></th>
+        </tr>
+        @for(item of artbaseItems; track item; let idx = $index) {
+        <tr>
+            <td>
+                <mat-form-field>
+                    <input matInput (ngModelChange)="onPropertyInput($event)" [(ngModel)]="item.property"
+                        oninput="this.value = this.value.toUpperCase()" placeholder="z.B. F1" />
+                </mat-form-field>
+            </td>
+            <td>
+                <mat-form-field style="vertical-align: middle;">
+                    <input matInput [(ngModel)]="item.value" placeholder="z.B. WI"
+                        oninput="this.value = this.value.toUpperCase()" />
+                </mat-form-field>
+            </td>
+            @if(idx > 0) {
+            <button mat-mini-fab color="primary" style="vertical-align: middle;" (click)="deleteItem(idx)">
+                <mat-icon style="vertical-align: middle;">delete</mat-icon>
+            </button>
+            }
+        </tr>
+        }
+    </table>
+    <div class="centered-div" style="display: flex; flex-direction: column; gap: 20px;">
+        <button class="add-button" mat-mini-fab (click)="addEmptyItem()" [disabled]="btnAddDisabled()">
+            <mat-icon>plus_one</mat-icon>
+        </button>
+
+        <button type="submit" mat-raised-button color="accent" [disabled]="btnDisabled()" (click)="setArtbaseValues()"
+            style="width: 100%; height: 50px;">
+            Bestätigen
+        </button>
+    </div>
+
+    @if (resultMessage) {
+    <p>Änderungen {{ resultMessage["insert_rows"] }}</p>
+    }

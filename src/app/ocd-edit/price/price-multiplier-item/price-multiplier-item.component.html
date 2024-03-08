@@ -1,0 +1,11 @@
+<div style="display: flex; gap: 10px;">
+    <span style="flex: 5">{{ priceItem.article_nr }}</span>
+    <span style="flex: 5">{{ priceItem.sql_db_program }}</span>
+    <span style="flex: 2">{{ priceItem.price | currency :'EUR':'symbol':'1.2-2' }}</span>
+    <span style="flex: 2; color: green;">{{ calculateNewPrice(priceItem.price) | currency :'EUR':'symbol':'1.2-2'
+        }}</span>
+    <span style="flex: 1">{{ priceItem.price_level }}</span>
+    <span style="flex: 1">{{ priceItem.price_type }}</span>
+    <span style="flex: 2">{{ priceItem.date_from }}</span>
+    <span style="flex: 2">{{ priceItem.date_to }}</span>
+</div>

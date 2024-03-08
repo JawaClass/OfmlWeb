@@ -1,0 +1,93 @@
+
+<h1>Merkmalsklasse <strong>{{pClass}}</strong> aus <strong>{{program | uppercase}}</strong></h1>
+
+@if (isLoading) {
+    <mat-spinner></mat-spinner>
+} @else {
+
+    <h2>{{getPropertyClassText(pClassItem)}}</h2>
+    
+@for (propItem of getProperties(); track propItem.property; let idx = $index) {
+   
+        <mat-expansion-panel style="margin-bottom: 10px;">
+        <mat-expansion-panel-header style="display: flex;">
+            <mat-panel-title style="flex: 4; gap: 10px;"> 
+                
+                <section style="display: flex; flex: 3; gap: 10px;">
+                    <strong>{{ getPropertyHeaderTextMain(propItem) }}</strong>
+                    <span>{{ getPropertyHeaderTextDetail(propItem) }}</span>
+                </section>
+
+                <button
+                style="width: fit-content;"
+                mat-stroked-button
+                color="accent"
+                (click)="setAllValuesFilter(propItem, false, $event)"
+               >
+                Alle an
+                </button>
+
+                <button
+                style="width: fit-content;"
+                mat-stroked-button
+                color="primary"
+                (click)="setAllValuesFilter(propItem, true, $event)"
+               >
+                Alle aus
+                </button>
+                
+                <mat-checkbox
+                (click)="onTogglePropertyScope(propItem, $event)"
+                [checked]="isPropertyVisible(propItem)"
+                >
+                <span>
+                    {{ getPropertyVisibleText(propItem.scope) }}
+                </span>
+                
+                </mat-checkbox>
+                
+    
+            </mat-panel-title>
+            <mat-panel-description style="flex: 1;" matTooltip="aktive Merkmalswerte">
+                  {{ getActiveValuesFromProperty(propItem).length }} / {{ propItem.values.length }} 
+                 
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+    
+        @for (valItem of propItem.values; track valItem; let idx = $index) {
+        <section>
+            <mat-checkbox style="display: flex; flex-direction: row;"
+            (click)="onToggleValue(valItem, $event)"
+            [checked]="!valItem.web_filter" >
+                <section style="display: flex; flex-direction: row; gap: 10px;">
+                    <section style="width: 20px; height: 20px;">
+                        @if(valItem["isUpdating"]) {
+                            <mat-spinner style="width: 20px; height: 20px;"></mat-spinner>
+                        }
+                    </section>
+                    <span style="margin-right: 10px;">{{ getPropertyValueText(valItem) }}</span>
+                    @if(valItem.web_filter) {
+                        <span style="color: red;">wird nicht exportiert</span>
+                    } @else {
+                        <span style="color: green;">wird exportiert</span>
+                    }
+                </section>
+            </mat-checkbox>
+        </section>
+        }
+    
+    </mat-expansion-panel>
+    
+    
+    } @empty {
+        @if (!isLoading) {
+            <p>
+                <strong> Leere Klasse </strong>
+            </p>
+        } @else {
+            <mat-spinner></mat-spinner>
+        }
+    }
+ 
+    
+}

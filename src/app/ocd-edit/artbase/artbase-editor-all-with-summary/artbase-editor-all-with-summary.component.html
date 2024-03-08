@@ -1,0 +1,27 @@
+<h1>Programmübergreifend Artbase Einträge setzen</h1>
+<div style="display: flex; flex-direction: row; justify-content: space-around;">
+    <section>
+        <h3>Infos:</h3>
+        <ul>
+            <li>Merkmal und Wert müssen existieren.</li>
+            <li>Artbaseeintrag wird nicht vorgneommen falls dieser bereits existiert.</li>
+            <li>Merkmalsklasse wird automatische ermittelt.</li>
+            <li>Bereits existierende Artbase Einträge bleiben erhalten.</li>
+            <li>Nach Bestätigung wird die Anzahl der eingefügten Artbaseeinträge angezeigt.</li>
+            <li>Die Übersicht rechts dient nur Erinnerung von Merkmalsnamen und ist kein Programmfilter.</li>
+        </ul>  
+        <app-artbase-editor-all></app-artbase-editor-all>
+    </section>
+    <section style="min-width: 50%;">
+        <mat-chip-listbox>
+            @for(program of programs; track program) {
+            <mat-chip-option [selected]="selectedProgram == program" (click)="selectedProgram = program">
+                {{ program }}
+            </mat-chip-option>
+            }
+        </mat-chip-listbox>
+        <h2>Merkmalsübersicht {{ selectedProgram }}</h2>
+        <app-prop-summary [selectedProgram]="selectedProgram" currentPropertyInput="">
+        </app-prop-summary>
+    </section>
+</div>

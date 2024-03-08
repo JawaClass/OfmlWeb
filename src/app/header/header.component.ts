@@ -2,13 +2,10 @@ import { Component, OnChanges, OnInit, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, RouterModule, Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { ArticleInputService } from '../services/article-input.service';
-import { WaitingCursorComponent } from '../waiting-cursor/waiting-cursor.component'
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDialog } from '@angular/material/dialog';
-import { LoginComponent } from '../login/login.component'
-import { SessionListComponent } from '../session-list/session-list.component'
+import { SessionListComponent } from '../session/session-list/session-list.component'
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -16,16 +13,17 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
 import { Session, User } from '../models/models';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { UserService } from '../services/user.service';
-import { SessionService } from '../services/session.service';
 import { FormsModule } from '@angular/forms';
-
+import { LoginComponent } from '../session/login/login.component'
+import { ArticleInputService } from '../ocd-edit/article-input.service';
+import { SessionService } from '../session/session.service';
+import { UserService } from '../session/user.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [CommonModule, RouterOutlet, MatToolbarModule,
-    RouterLink, RouterLinkActive, WaitingCursorComponent,
+    RouterLink, RouterLinkActive,
     MatIconModule, RouterModule, MatDialogModule,
     FormsModule, MatInputModule, MatFormFieldModule,
     MatSelectModule, MatSidenavModule, MatButtonModule,

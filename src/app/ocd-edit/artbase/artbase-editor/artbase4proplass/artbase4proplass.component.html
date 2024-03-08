@@ -1,0 +1,66 @@
+@if (isLoading) {
+<mat-spinner></mat-spinner>
+} @else {
+
+@for (propItem of getProperties(); track propItem.property; let idx = $index) {
+
+<mat-expansion-panel style="margin-bottom: 10px;">
+    <mat-expansion-panel-header style="display: flex;">
+        <mat-panel-title style="flex: 4; gap: 10px;">
+
+            <section style="display: flex; flex: 3; gap: 10px;">
+                <strong>{{ getPropertyHeaderTextMain(propItem) }}</strong>
+                <span>{{ getPropertyHeaderTextDetail(propItem) }}</span>
+            </section>
+
+            <button style="width: fit-content;" mat-stroked-button color="accent"
+                (click)="setAllArtbaseValues(propItem, true, $event)">
+                Alle an
+            </button>
+
+            <button style="width: fit-content;" mat-stroked-button color="primary"
+                (click)="setAllArtbaseValues(propItem, false, $event)">
+                Alle aus
+            </button>
+
+
+        </mat-panel-title>
+        <mat-panel-description style="flex: 1;" matTooltip="aktive Merkmalswerte">
+            <!-- {{ propItem.getActiveValues().length }} / {{ propItem.values.length }} -->
+            {{ getArtbaseItems4Property(propItem).length }} / {{ propItem.values.length }} Werte sind festbewertet
+        </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    @for (valArtbaseItem of propItem.values; track valArtbaseItem; let idx = $index) {
+
+    <section>
+        <mat-checkbox (change)="onArtbaseValueChange(valArtbaseItem)" [(ngModel)]="valArtbaseItem.isArtbase">
+            <section style="display: flex; flex-direction: row; gap: 10px;">
+                <section style="width: 20px; height: 20px;">
+                    @if(valArtbaseItem["isUpdating"]) {
+                    <mat-spinner style="width: 20px; height: 20px;"></mat-spinner>
+                    }
+                </section>
+                <span>{{ getPropertyValueText(valArtbaseItem.item) }}</span>
+                @if (valArtbaseItem.isArtbase) {
+                <span style="color: green;">fest bewertet</span>
+                }
+            </section>
+
+        </mat-checkbox>
+    </section>
+    }
+
+</mat-expansion-panel>
+
+
+} @empty {
+@if (!isLoading) {
+<p>
+    <strong> Leere Klasse </strong>
+</p>
+}
+}
+
+
+}

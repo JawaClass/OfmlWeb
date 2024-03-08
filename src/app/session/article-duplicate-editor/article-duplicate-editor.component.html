@@ -1,0 +1,72 @@
+<section>
+  <h2>Session erstellen: {{ session.name }}</h2>
+</section>
+<div>
+  <mat-checkbox [(ngModel)]="showAll">
+    Alle doppelten Artikel anzeigen
+  </mat-checkbox>
+  <p> Alle Artikelnummern {{ articles.length }}</p>
+  <p> Eindeutige Artikelnummern {{ uniqueArticlesByArticleNr().length}}</p>
+  <p> Doppelte Artikelnummern {{ activeArticlesByArticleNr().length - uniqueActiveArticlesByArticleNr().length}}</p>
+  <p>Aktive Programme {{ this.activePrograms.size }}</p>
+</div>
+
+<button type="submit" [disabled]="!selectionIsValid()" mat-raised-button color="primary"
+  matTooltip="Ohne Duplikate fortfahren" style="display: inline-block; width: 20%; height: 50px; margin-bottom: 25px;"
+  (click)="confirmSelection()">
+  Auswahl bestätigen
+</button>
+
+@if (isProcessing) {
+<section style="color: white; margin-top: 15px; padding: 0 0 30px 30px; display: flex; justify-content: space-evenly;">
+  <strong>Session wird mit OCD Daten erstellt...</strong>
+</section>
+<div style="display: flex; justify-content: center; margin-bottom: 15px;">
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+}
+
+<mat-chip-listbox multiple>
+  @for (program of programs(); track program; let idx = $index) {
+  <mat-chip-option [selected]="isProgramActive(program)" (click)="toggleActive(program)">
+    {{ program }}
+  </mat-chip-option>
+  }
+</mat-chip-listbox>
+
+<table>
+  <tr>
+    <th>Artikel</th>
+    <th>Kürzel</th>
+    <th>Serie</th>
+    <th>Kruztext</th>
+    <th>aktiv</th>
+  </tr>
+  @for (articleNr of articlesNrUnique; track articleNr; let idx = $index) {
+
+  @if (showAll || sameActiveLength(articleNr).length > 1) {
+  <tr>
+    <strong style="display: flex; gap: 10px;">
+      <span>{{ articleNr }}</span>
+      <span>{{ articlesGroupedByArticleNr[articleNr].length }}x</span>
+    </strong>
+  </tr>
+
+  @for (a of articlesGroupedByArticleNr[articleNr]; track a; let idx = $index) {
+  <tr>
+    <td style="padding: 0 10px 0 10px">{{ a.item.article_nr }}</td>
+    <td style="padding: 0 10px 0 10px">{{ a.item.series }}</td>
+    <td style="padding: 0 10px 0 10px">{{ a.item.sql_db_program }}</td>
+    <td style="padding: 0 10px 0 10px">{{ a.item.ocd_artshorttext }}</td>
+    <td>
+      <mat-checkbox style="padding: 0 10px 0 10px" [(ngModel)]="a.active"></mat-checkbox>
+    </td>
+  </tr>
+  }
+  }
+
+
+  <tr style="height: 10px;"></tr>
+
+  }
+</table>

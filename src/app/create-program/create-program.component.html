@@ -156,28 +156,14 @@
     } @else if(httpErrorResponse) {
     <div style="margin-top: 5px; padding: 5px 30px 5px 30px; background-color: yellow; color: red; max-width: 50vw;">
         <p>
-            <strong style="font-weight: 900; font-size: larger;">Es ist ein Fehler aufgetreten</strong>
+            <strong style="font-weight: 900; font-size: larger;">
+                Es ist ein Fehler aufgetreten
+            </strong>
         </p>
         
-        @if (httpErrorResponse.error.error) {
-            <p>
-                Fehler: {{ httpErrorResponse.error.error }}
-            </p>
-        }
-        
-        @if (httpErrorResponse.error.message) {
-            <p>
-                Detail: {{ httpErrorResponse.error.message }}
-            </p>
-        }
-        
-        <p>
-            {{ httpErrorResponse.statusText }}
-        </p>
-    
-        <p>
-            {{ httpErrorResponse.message }}
-        </p>
+        <p> Fehler: {{ httpErrorResponse.status }}</p>
+        <p>{{ httpErrorResponse.statusText }}</p>
+        <p>{{ httpErrorResponse.text }}</p>
         
     </div>
     }

@@ -5,10 +5,11 @@
   top: 0;
   bottom: 0;
   left: 0;
-  right: 0; 
-  /*border: solid 3px yellow;  */ /* for debugging purposes */
+  right: 0;
+  /*border: solid 3px yellow;  */
+  /* for debugging purposes */
 }
- 
+
 
 .content {
   padding-top: 2vh;
@@ -16,7 +17,7 @@
   padding-right: 1vw;
   padding-bottom: 2vh;
 }
- 
+
 mat-sidenav-container {
   position: absolute;
   top: 0;

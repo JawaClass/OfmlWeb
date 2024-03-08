@@ -1,0 +1,48 @@
+<form [formGroup]="articleForm" style="display: flex; flex-direction: column;">
+
+    <h3 style="color: whitesmoke;">
+        Artikel ändern
+    </h3>
+
+    <mat-form-field appearance="outline">
+        <mat-label>Artikelnummer</mat-label>
+        <input readonly  matInput [formControl]="articleForm.controls.articleNr"
+            oninput="this.value = this.value.toUpperCase()" />
+        @if (articleForm.controls.articleNr.invalid) { <mat-error>Keine valide Artikelnummer</mat-error>
+        }
+    </mat-form-field>
+
+    <!--
+    <mat-form-field appearance="outline">
+        <mat-label>Artikelnummer Alias</mat-label>
+        <input readonly  matInput [formControl]="articleForm.controls.articleNrAlias"
+            oninput="this.value = this.value.toUpperCase()" />
+        @if (articleForm.controls.articleNrAlias.invalid) { <mat-error>Keine valide Artikelnummer</mat-error>
+        }
+    </mat-form-field>
+    -->
+
+    <mat-form-field appearance="outline">
+        <mat-label>Artikelpreis</mat-label>
+        <input #input matInput [formControl]="articleForm.controls.articlePrice" /> <!--  [value]="articleForm.get('articlePrice')!!.value | currency:'EUR':'symbol':'1.2-10'"  -->
+        @if (articleForm.controls.articlePrice) { <mat-error>Kein valider Preis. Zahl mit oder ohne Dezimalpunkt erwartet.</mat-error> } 
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+        <mat-label>Artikelkurztext</mat-label>
+        <input #input matInput [formControl]="articleForm.controls.shortText"
+            oninput="this.value = this.value.toUpperCase()"/>
+        @if (articleForm.controls.shortText) { <mat-error>Kein valider Kurztext</mat-error> }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+        <mat-label>Artikellangtext</mat-label>
+        <textarea #input matInput [formControl]="articleForm.controls.longText" [rows]="5" ></textarea>
+        @if (articleForm.controls.longText) { <mat-error>Kein valider Langtext</mat-error> }
+    </mat-form-field>
+
+    <button type="submit" [disabled]="!articleForm.valid" (click)="submitArticleChanges()" mat-raised-button
+        color="accent" style="height: 3rem;">
+        Änderungen bestätigen
+    </button>
+</form>

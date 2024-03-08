@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CreateProgramService } from '../services/create-program.service';
+import { CreateProgramService } from './create-program.service';
 import { RouterModule, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
@@ -12,14 +12,13 @@ import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { WaitingCursorComponent } from '../waiting-cursor/waiting-cursor.component'
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialogRef } from '@angular/material/dialog';
 import { HttpErrorResponse } from '@angular/common/http';
 import { interval } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { SessionService } from '../services/session.service';
+import { SessionService } from '../session/session.service';
 import { Session } from '../models/models';
 import {MatSelectModule} from '@angular/material/select';
 import { OnDestroy } from '@angular/core';
@@ -40,7 +39,6 @@ import { OnDestroy } from '@angular/core';
     MatInputModule,
     FormsModule,
     MatFormFieldModule,
-    WaitingCursorComponent,
     ClipboardModule,
     MatProgressBarModule,
     MatTooltipModule,
@@ -77,7 +75,7 @@ export class CreateProgramComponent implements OnDestroy {
     this.createService.exportPath = this.createProgramForm.get("exportPath")!!.value!!
   }
 
-  currentSession = inject(SessionService).currentSession$.value as Session
+  currentSession = inject(SessionService).getCurrentSession()!!
   createService = inject(CreateProgramService)
 
   createProgramForm = new FormGroup({
@@ -105,12 +103,12 @@ export class CreateProgramComponent implements OnDestroy {
   }
 
   dialogRef = inject(MatDialogRef<CreateProgramComponent>)
-  httpErrorResponse: HttpErrorResponse | null = null
+  httpErrorResponse: any | null = null
   isProcessing = false
   resultExportPath = ""
   secondsPassed: number = 0
 
-  createProgram() {
+  async createProgram() {
     this.secondsPassed = 0
     this.httpErrorResponse = null
     this.dialogRef.disableClose = true
@@ -132,25 +130,23 @@ export class CreateProgramComponent implements OnDestroy {
       "export_registry": this.createProgramForm.get("exportRegistry")!!.value!,
       "build_ebase": this.createProgramForm.get("buildEbase")!!.value!,
     }
-    this.createService.postCreate(params)
-      .subscribe({
-        next: (result: any) => {
-          this.isProcessing = false
-          this.resultExportPath = "file://" + result["export_path"]
-          this.dialogRef.disableClose = false
-          subscription.unsubscribe()
-        },
-        error: (httpErrorResponse: HttpErrorResponse) => {
-          //console.log("createProgram HttpErrorResponse::", err.error);
-          //console.error('Error:', err.error); // The error details provided by the server
-          //console.error('Status:', err.status); // The HTTP status code
-          //console.error('Status Text:', err.statusText); // The status text
-          this.httpErrorResponse = httpErrorResponse
-          this.isProcessing = false
-          this.dialogRef.disableClose = false
-          subscription.unsubscribe()
-        }
-      })
+    
+   const response: Response = await this.createService.postCreate(params)
+   this.isProcessing = false
+   this.dialogRef.disableClose = false
+   subscription.unsubscribe()
 
+   console.log("createProgram::response", response);
+   if (response.ok) {
+    const result = await response.json()
+    this.resultExportPath = "file://" + result["export_path"]
+  } else {
+    this.httpErrorResponse = {
+      text: (await response.text()),//await response.text(),
+      status: response.status,
+      statusText: response.statusText,
+    }
+    
+  }
   }
 }

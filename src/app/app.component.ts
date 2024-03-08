@@ -2,7 +2,6 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, RouterModule, Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { WaitingCursorComponent } from './waiting-cursor/waiting-cursor.component'
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
@@ -12,16 +11,18 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { SessionService } from './services/session.service';
 import { HeaderComponent } from './header/header.component';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { CreateProgramComponent } from './create-program/create-program.component';
+import { SessionService } from './session/session.service';
+import { BaseService } from './util/base.service';
+
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, RouterOutlet, MatToolbarModule,
-    RouterLink, RouterLinkActive, WaitingCursorComponent,
+    RouterLink, RouterLinkActive,
     MatIconModule, RouterModule, MatDialogModule,
     FormsModule, MatInputModule, MatFormFieldModule,
     MatSelectModule, MatSidenavModule, MatButtonModule,
@@ -31,30 +32,24 @@ import { CreateProgramComponent } from './create-program/create-program.componen
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  
+
   sessionService = inject(SessionService)
   routesActivated = true
   dialogOpener = inject(MatDialog)
 
   async ngOnInit() {
-    console.log("BASE URL ::", this.sessionService.baseUrl);
-     /*
-     if (!(await this.sessionService.isBackendAvailable())) {
-        try { alert("Fehler: Backend nicht erreichbar!")  } catch(error) {}
-     }
-     */
-    
+    console.log("BASE URL ::", BaseService.BASE_URL)
     this.sessionService.currentSession$.subscribe((session: any) => {
-      this.routesActivated = (session !== null)
+      this.routesActivated = Boolean(session)
     })
   }
 
-  
+
   openCreateProgramDialog() {
-    this.dialogOpener.open(CreateProgramComponent, {height: '95%',})
-        .afterClosed()
-        .subscribe((result: any) => {
-        })
+    this.dialogOpener.open(CreateProgramComponent, { height: '95%', })
+      .afterClosed()
+      .subscribe((result: any) => {
+      })
   }
 
 }
