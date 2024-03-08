@@ -41,16 +41,19 @@ export abstract class BaseService {
   }): Promise<T | null> {
 
     const response = await this.makeSafeFetch(init.url, init.requestOptions)
+
     if (response.ok) {
-      if (response.status != 204)
-        return await response.json()
+      const canParse = (response.status != 204)
+      return canParse ? (await response.json()) : null
     }
+
     console.log("fetchAndParseFromUrl ERROR", response.status, "::", response.statusText)
+    
     if (init.throwError) {
       throw new Error(`ERROR:${init.url} could'nt be fetched and parsed.`)
-    } else {
-      return null
-    }
+    } 
+
+    return null
   }
 
   showSnackbar(message: string, millis: number) {
