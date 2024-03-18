@@ -13,7 +13,7 @@ export class HoldableDirective {
   @Output() holdFinished: EventEmitter<void> = new EventEmitter()
   @Input() intervalMillis: number = this.intervalMillisDefault
   @Input() timeToPass: number = this.timeToPassDefault
-
+  private hasFinished = false
   timePassed: number = 0
   cancelId: any = null
   progressElementRef: any = null
@@ -39,8 +39,10 @@ export class HoldableDirective {
     this.timePassed += interval
 
     if (this.timePassed >= this.timeToPass) {
-      this.renderer.setStyle(this.progressElementRef, "background-color", "green")
+      this.hasFinished = true
+      //this.renderer.setStyle(this.progressElementRef, "background-color", "green")
       this.holdFinished.emit()
+      this.destoryProgress()
     } else {
       this.cancelId = setTimeout(() => this.emit(interval), interval)
     }
@@ -48,12 +50,14 @@ export class HoldableDirective {
 
   @HostListener("mousedown", ["$event"])
   onMouseDown(event: any) {
+    //if (this.hasFinished) return
     this.createProgress()
     this.emit(this.intervalMillis)
   }
 
   @HostListener("mouseup", ["$event"])
   onMouseUp(event: any) {
+    //if (this.hasFinished) return
     this.timePassed = 0
     this.destoryProgress()
     clearTimeout(this.cancelId)

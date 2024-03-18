@@ -1,4 +1,8 @@
 <h1>Programmübergreifend Artbase Einträge setzen</h1>
+
+
+@if (programs$ | async; as programs) {
+
 <div style="display: flex; flex-direction: row; justify-content: space-around;">
     <section>
         <h3>Infos:</h3>
@@ -9,7 +13,7 @@
             <li>Bereits existierende Artbase Einträge bleiben erhalten.</li>
             <li>Nach Bestätigung wird die Anzahl der eingefügten Artbaseeinträge angezeigt.</li>
             <li>Die Übersicht rechts dient nur Erinnerung von Merkmalsnamen und ist kein Programmfilter.</li>
-        </ul>  
+        </ul>
         <app-artbase-editor-all></app-artbase-editor-all>
     </section>
     <section style="min-width: 50%;">
@@ -25,3 +29,5 @@
         </app-prop-summary>
     </section>
 </div>
+
+}

@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { BehaviorSubject, Subject, debounceTime } from 'rxjs';
 
 @Component({
   selector: 'app-price-multiplier',
@@ -42,8 +43,18 @@ export class PriceMultiplierComponent {
   filteredPriceItems: any[] = []
   pricingFactor = 1.00
   isLoading = false
+  filterPriceItems$ = new Subject<void>()
+
   async ngOnInit() {
+
+    this.filterPriceItems$.pipe(
+      debounceTime(200)
+    ).subscribe(
+      () => this.filteredPriceItems = this.priceItems.filter((item: any) => this.showItem(item))
+    )
+
     await this.fetchPrices()
+
   }
 
   async fetchPrices() {
@@ -51,6 +62,7 @@ export class PriceMultiplierComponent {
     for (const item of this.priceItems) {
       item["newPrice"] = item["price"]
     }
+
     this.filterPriceItems()
   }
 
@@ -69,8 +81,9 @@ export class PriceMultiplierComponent {
     return true
   }
 
+
   filterPriceItems() {
-    this.filteredPriceItems = this.priceItems.filter((item: any) => this.showItem(item))
+    this.filterPriceItems$.next()
   }
 
   onPricingFactorChange() {

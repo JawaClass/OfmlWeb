@@ -12,7 +12,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PropclassViewerComponent } from '../propclass-viewer/propclass-viewer.component'
-import { first, firstValueFrom, take } from 'rxjs';
+import { BehaviorSubject, filter, first, firstValueFrom, map, take } from 'rxjs';
 
 @Component({
   selector: 'app-prop-summary',
@@ -33,29 +33,26 @@ import { first, firstValueFrom, take } from 'rxjs';
   templateUrl: './prop-summary.component.html',
   styleUrl: './prop-summary.component.css'
 })
-export class PropSummaryComponent implements OnInit {
+export class PropSummaryComponent {
 
   @Input("selectedProgram") selectedProgram: string = ""
   @Input("currentPropertyInput") currentPropertyInput: string = ""
   service = inject(ArticleInputService)
-  data: any[] = []
-  propClassNames: string[] = []
-
-  async ngOnInit(): Promise<void> {
-    this.data = await firstValueFrom(this.service.articleItems$.pipe(first())) || []
-    this.updateSummary()
-  }
+  propClassNames$ = new BehaviorSubject<string[]>([])
 
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
-    const changeSelectedProgram: SimpleChange = changes["selectedProgram"]
-    if (changeSelectedProgram && !changeSelectedProgram.isFirstChange())
-      this.updateSummary()
-  }
 
-  async updateSummary() {
-    const items = this.data.filter((item: any) => item.sql_db_program === this.selectedProgram)
-    const pClassGroups = this.service.groupArticlesByClassName(items)
-    this.propClassNames = Object.keys(pClassGroups)
+    this.service.articleItemsSubjectBackend$.pipe(
+      map((items: any[]) => items.filter(item => item.sql_db_program === this.selectedProgram)),
+      first()
+    ).subscribe((items: any[]) => {
+
+      console.log("ngOnChanges...", items)
+      const pClasses = Object.keys(this.service.groupArticlesByClassName(items))
+      this.propClassNames$.next(pClasses)
+
+    })
+
   }
 
 }

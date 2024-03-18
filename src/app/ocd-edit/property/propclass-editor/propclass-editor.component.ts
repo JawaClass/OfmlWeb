@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { MatCheckboxModule, MatCheckboxChange } from '@angular/material/checkbox';
@@ -32,6 +32,11 @@ export class PropclassEditorComponent implements OnInit {
   @Input() program!: string
   @Input() pClass!: string
 
+
+  async ngOnChanges(changes: SimpleChanges) {
+    await this.init()
+  }
+
   route = inject(ActivatedRoute)
   propertyitemService = inject(PropertyitemService)
   router = inject(Router)
@@ -50,12 +55,12 @@ export class PropclassEditorComponent implements OnInit {
   }
 
   getPropertyHeaderTextMain(p: any) {
-    return `# ${p.pos_prop} ${p.property} : ${this.getPropertyText(p)}`
+    return `#${p.pos_prop} ${p.property} : ${this.getPropertyText(p)}`
   }
 
 
   getPropertyHeaderTextDetail(p: any) {
-    return `[Scope=${p.scope}, Type=${p.prop_type}]`
+    return `${p.scope} ${p.prop_type}`
   }
 
   getPropertyValueText(v: any) {
@@ -68,25 +73,24 @@ export class PropclassEditorComponent implements OnInit {
     return this.pClassItem["properties"]
   }
 
-
-  async initialize() {
+  private async init() {
     if (!this.program || !this.pClass)
       this.router.navigate(['/'])
 
     this.isLoading = true
     const json = await this.propertyitemService.fetchPropClassWithDetails(this.program, this.pClass)
-    console.log("PROP_CLASS", this.program, this.pClass)
-    console.log(json)
+
     this.pClassItem = json
 
     this.isLoading = false
   }
 
-  async ngOnInit() {
+  async initialize() {
+    await this.init()
+  }
 
-    console.log("PropClassComponent::ngOnInit", this.program, this.pClass);
+  async ngOnInit() {
     if (!this.program && !this.pClass) {
-      console.log("subscribe program and propclass from paramater...")
       this.route.params.subscribe(async (params) => {
         this.program = params['program']
         this.pClass = params['propClass']
@@ -95,8 +99,6 @@ export class PropclassEditorComponent implements OnInit {
     } else {
       await this.initialize()
     }
-
-
   }
 
   async setAllValuesFilter(propItem: any, filterValue: boolean, event: any) {

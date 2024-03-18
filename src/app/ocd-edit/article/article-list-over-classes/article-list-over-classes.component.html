@@ -1,0 +1,28 @@
+
+@for (program of getKeys(items); track program; let idx = $index) {
+    <h2 style="letter-spacing: 0.2rem;">{{idx+1}}. {{ program | uppercase }} </h2>
+
+    @for (pClass of getKeys(items[program]); track pClass; let idx = $index) {
+
+ 
+
+        <mat-card style="margin-bottom: 15px;">
+
+             <!-- THIS WAS INSIDE THE ANCHOR TAG BELOW [routerLink]="['/editor-propclass', { program: program, propClass: pClass }]" -->
+            <a 
+                (click)="selectPClass(pClass, program)"
+                style="text-decoration: none; color: inherit;">
+                <button mat-stroked-button color="accent" style="user-select: text;">
+                    {{ pClass }}
+                </button>
+            </a> 
+            <mat-card-content>
+                
+            @for (article of items[program][pClass]; track article; let idx = $index) { 
+                <app-article-list-item [article]="article" (onArtbaseSelected)="onEvent.emit($event)"></app-article-list-item> 
+            }
+    
+        </mat-card-content>
+        </mat-card>  
+    }
+}

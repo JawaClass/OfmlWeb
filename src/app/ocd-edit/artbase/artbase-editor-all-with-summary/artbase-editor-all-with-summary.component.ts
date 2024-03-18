@@ -3,7 +3,9 @@ import { ArtbaseEditorAllComponent } from '../artbase-editor-all/artbase-editor-
 import { PropSummaryComponent } from '../../property/prop-summary/prop-summary.component'
 import { MatChipsModule } from '@angular/material/chips';
 import { ArticleInputService } from '../../article-input.service';
-import { first, firstValueFrom } from 'rxjs';
+import { first, map, tap } from 'rxjs';
+
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-artbase-editor-all-with-summary',
@@ -11,7 +13,8 @@ import { first, firstValueFrom } from 'rxjs';
   imports: [
     ArtbaseEditorAllComponent,
     PropSummaryComponent,
-    MatChipsModule
+    MatChipsModule,
+    CommonModule
   ],
   templateUrl: './artbase-editor-all-with-summary.component.html',
   styleUrl: './artbase-editor-all-with-summary.component.css'
@@ -19,12 +22,14 @@ import { first, firstValueFrom } from 'rxjs';
 export class ArtbaseEditorAllWithSummaryComponent {
 
   service = inject(ArticleInputService)
-  programs: string[] = []
-  selectedProgram: any = ""
+  selectedProgram?: any = undefined
 
-  async ngOnInit() {
-    const data = await firstValueFrom(this.service.articleItems$.pipe(first())) || []
-    this.programs = Array.from(new Set(data.map((item: any) => item.sql_db_program)))
-    this.selectedProgram = this.programs[0]
-  }
+  programs$ = this.service.articleItemsSubjectBackend$.pipe(
+    first(),
+    map(
+      (items: any[]) => Array.from(new Set(items.map(item => item.sql_db_program)))
+    ),
+    tap((programs: any[]) => this.selectedProgram = programs[0])
+  )
+
 }

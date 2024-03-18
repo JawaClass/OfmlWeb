@@ -1,7 +1,7 @@
-<div style="display: flex; gap: 10px; align-items: center; justify-content: start; max-width: 50%;">  
-    <span style="width: 12rem">{{ article.article_nr }}</span>
-    <span style="width: 2rem">{{ article.series }}</span>
-    <span style="width: 45rem">{{ getShortText(article) }}</span>
+<div style="display: flex; gap: 1rem; align-items: center; justify-content: start; flex-wrap: nowrap;">  
+    <span style="width: 25%;">{{ article.article_nr }}</span>  
+    <span style="width: 5%">{{ article.series }}</span>
+    <span style="width: 60%;">{{ getShortText(article) }}</span>
     <button mat-button matTooltip="Artikel öffnen" (click)="openEditArticle(article)">
         <mat-icon color="accent">
         edit
@@ -12,7 +12,7 @@
             label_important
     </mat-icon>
     </button>
-    <button mat-fab color="primary" style="color: white; width: 30px; height: 30px;"
+    <button mat-fab color="primary" style="color: white; width: 2rem; height: 2rem;"
             matTooltip="Artikel löschen (lang drücken)" (click)="$event.stopImmediatePropagation()"
             (holdFinished)="delete()" [timeToPass]="2500" appHoldable>
             <mat-icon>delete</mat-icon>

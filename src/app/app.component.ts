@@ -1,5 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
+import { Component, OnInit, afterNextRender, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, RouterModule, Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,9 +13,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { HeaderComponent } from './header/header.component';
 import { MatDialog } from '@angular/material/dialog';
-import { CreateProgramComponent } from './create-program/create-program.component';
+import { ExportProgramComponent } from './export-program/export-program.component';
 import { SessionService } from './session/session.service';
 import { BaseService } from './util/base.service';
+import { map } from 'rxjs';
+import { TaskDisplayService } from './tasks/task-display.service';
 
 
 @Component({
@@ -33,20 +35,36 @@ import { BaseService } from './util/base.service';
 })
 export class AppComponent implements OnInit {
 
+  taskDisplayService = inject(TaskDisplayService)
   sessionService = inject(SessionService)
-  routesActivated = true
+  routesActivated$ = this.sessionService.currentSession$.pipe(
+    map((session: any) => Boolean(session))
+  )
+
   dialogOpener = inject(MatDialog)
 
-  async ngOnInit() {
-    console.log("BASE URL ::", BaseService.BASE_URL)
-    this.sessionService.currentSession$.subscribe((session: any) => {
-      this.routesActivated = Boolean(session)
+  constructor() {
+    afterNextRender(() => {
+      console.log("APP COMP AFTER NEXT RENDER...");
+      // this.sessionService.testOb$.subscribe(x => console.log("xxx", x)
+      // )
+
+      this.taskDisplayService.newTasksArrived$.subscribe(x=> console.log("newTasksArrived??", x)
+      )
+
+      
+      this.taskDisplayService.tasks$.subscribe(x=> console.log("tasks??", x)
+      )
+
     })
   }
 
+  async ngOnInit() {
+    console.log("BASE URL ::", BaseService.BASE_URL)
+  }
 
-  openCreateProgramDialog() {
-    this.dialogOpener.open(CreateProgramComponent, { height: '95%', })
+  openExportProgramDialog() {
+    this.dialogOpener.open(ExportProgramComponent, { minHeight: "50rem", width: "60ch" })
       .afterClosed()
       .subscribe((result: any) => {
       })

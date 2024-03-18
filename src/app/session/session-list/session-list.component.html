@@ -12,7 +12,7 @@
             </button>
         </mat-list-item>
         <mat-divider style="margin: 15px"></mat-divider>
-        @for (item of sessions; track item.session.id; let idx = $index) {
+        @for (item of sessions; track item.session.id;) {
         <mat-list-item (click)="selectSession(item)" style="display: flex; justify-content: space-between; height: 90px"
             [ngStyle]="{'border': item.session.id === currentSession?.id ? '1px dashed red' : 'none'}">
             <section matListItemTitle>

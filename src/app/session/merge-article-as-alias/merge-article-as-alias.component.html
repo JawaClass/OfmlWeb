@@ -1,9 +1,9 @@
 @if(isLoading) {
 <mat-spinner style="width: 40px; height: 40px;"></mat-spinner>
-} @else {
-<fieldset style="display: flex; justify-content: space-around; color: whitesmoke;">
+} 
+<fieldset [disabled]="isLoading" style="display: flex; justify-content: space-around; color: whitesmoke;">
 
-    <legend>Artikelkopie aks Alias hinzufügen</legend>
+    <legend><h2>Artikelkopie als Alias hinzufügen</h2></legend>
 
     <mat-form-field appearance="outline">
         <mat-label>Artikelnummer</mat-label>
@@ -22,12 +22,12 @@
 
     <button mat-stroked-button color="accent"
         (click)="addArticle(newArticleNr.value, newArticleProgram.value, newArticleNrAlias.value)"
-        style="height: 52px; padding: 0; display: flex; align-content: center;">
-        <mat-icon style="font-size: 50px; height: 52px; width: 100%; padding: 0; margin: 0;">add</mat-icon>
+        style="height: 44px; padding: 0; display: flex; align-content: center;">
+        <mat-icon style="font-size: 44px; height: 44px; width: 100%; padding: 0; margin: 0;">add</mat-icon>
     </button>
 
 </fieldset>
-}
+
 
 
 @if (mergeResult) {

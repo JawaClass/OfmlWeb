@@ -1,22 +1,23 @@
 :host {
-  display: flex;
+  /* display: flex;
   flex-direction: column;
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
-  right: 0;
+  right: 0; */
+
   /*border: solid 3px yellow;  */
   /* for debugging purposes */
 }
 
-
+/* 
 .content {
   padding-top: 2vh;
   padding-left: 1vw;
   padding-right: 1vw;
   padding-bottom: 2vh;
-}
+} */
 
 mat-sidenav-container {
   position: absolute;
@@ -24,4 +25,12 @@ mat-sidenav-container {
   bottom: 0;
   left: 0;
   right: 0;
+  height: 100%;
+  overflow-y: hidden;
+  overflow-x: hidden;
 }
+/* 
+
+mat-sidenav-container * {
+  position: relative;
+} */

@@ -16,11 +16,13 @@ import { MatDividerModule } from '@angular/material/divider';
 import { Router } from '@angular/router';
 import { MergeArticleComponent } from '../merge-article/merge-article.component'
 import { MergeArticleAsAliasComponent } from '../merge-article-as-alias/merge-article-as-alias.component'
- 
+
 enum EditorMode {
   Create = 'CREATE',
   Edit = 'EDIT',
 }
+
+type SelectMode = "merge_as" | "merge"
 
 @Component({
   selector: 'app-session-editor',
@@ -43,15 +45,16 @@ enum EditorMode {
   templateUrl: './session-editor.component.html',
   styleUrl: './session-editor.component.css'
 })
-export class SessionEditorComponent implements OnInit {
+export class SessionEditorComponent {
 
-  selected = ""
+  selected: SelectMode = "merge_as"
   sessionAndOwner!: SessionAndOwner
   editorMode: EditorMode
   textResource: any
 
   service = inject(SessionService)
   dialogRef = inject(MatDialogRef<SessionEditorComponent>)
+
 
   addArticleFailed = false
 
@@ -62,43 +65,32 @@ export class SessionEditorComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) sessionAndOwner: SessionAndOwner) {
     this.editorMode = sessionAndOwner.session.id ? EditorMode.Edit : EditorMode.Create
     if (this.editorMode === EditorMode.Edit) {
-      const sessionCopy = sessionAndOwner.session //Session.fromJSON(JSON.parse(JSON.stringify(sessionAndOwner.session)))
-      this.sessionAndOwner = {session: sessionCopy, owner: sessionAndOwner.owner}
+      const sessionCopy = sessionAndOwner.session
+      this.sessionAndOwner = { session: sessionCopy, owner: sessionAndOwner.owner }
     } else {
       this.sessionAndOwner = sessionAndOwner
     }
-    
+
     this.textResource = {
       "header": this.isEditMode() ? `Sitzung editieren [${sessionAndOwner.session.id}]` : "Sitzung anlegen",
       "button": this.isEditMode() ? "Änderungen bestätigten" : "Mit Sitzung erstellen fortfahren",
       "checkbox": this.sessionAndOwner.session.isPublic ? "öffentliches Projekt" : "privates Projekt"
     }
-  }
 
-  async ngOnInit() {
-    this.dialogRef.disableClose = true
-    if (this.isEditMode()) {
-      await this.service.setCurrentSession(this.sessionAndOwner.session)
-    }
   }
-
 
   isEditMode = () => this.editorMode == EditorMode.Edit
   isCreateMode = () => this.editorMode == EditorMode.Create
   geUser = () => this.sessionAndOwner.owner.email
 
   private async createNewSession() {
-    //const session = await this.service.createSession(this.sessionAndOwner.session)
-    this.dialogRef.close({
-      session: undefined
-    })
     const articleTokens = this.sessionAndOwner.session.getInputTokens()
-
-    console.log("createNewSession::articleTokens... articleTokens")
-    console.log(articleTokens)
-    this.service.setCurrentSession(this.sessionAndOwner.session)//currentSession$.next(this.sessionAndOwner.session)
+    this.service.setCurrentSession(this.sessionAndOwner.session)
     await this.service.fetchAndSetArticleDuplicates(articleTokens)
-    this.router.navigate(['/duplicates', { }])
+    this.router.navigate(['/duplicates', {}])
+    this.dialogRef.close({
+      session: this.sessionAndOwner.session
+    })
   }
 
   private async editSession() {
@@ -115,7 +107,7 @@ export class SessionEditorComponent implements OnInit {
       this.formErrorMessage = "Name bereits vergeben."
       return
     }
-    
+
     switch (this.editorMode) {
       case EditorMode.Create:
         await this.createNewSession()
@@ -131,4 +123,5 @@ export class SessionEditorComponent implements OnInit {
     const tokens = this.sessionAndOwner.session.getInputTokens()
     return namelen > 2 && namelen < 25 && tokens.length
   }
+
 }

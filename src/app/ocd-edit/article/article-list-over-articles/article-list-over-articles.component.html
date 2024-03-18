@@ -1,0 +1,14 @@
+@for (program of getKeys(items); track program; let idx = $index) {
+    <h2 style="letter-spacing: 0.2rem;">{{idx+1}}. {{ program | uppercase }} </h2>
+
+    <mat-card style="margin-bottom: 15px;">
+        <mat-card-content>
+            
+            @for (article of items[program]; track article; let idx = $index) {
+                <app-article-list-item [article]="article" (onArtbaseSelected)="onEvent.emit($event)"></app-article-list-item>
+            }
+    
+        </mat-card-content>
+    </mat-card>
+
+}

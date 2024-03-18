@@ -1,41 +1,71 @@
-<div name="navigation" style="vertical-align: middle;">
+<!-- NAVIGATION -->
+<!-- name="navigation" style="vertical-align: middle;" -->
+<div id="navigation">
     @if (router.url !== "/") {
     <button mat-button (click)="location.back()">
         <mat-icon>arrow_back</mat-icon>
     </button>
     }
-    <button mat-button routerLink="" routerLinkActive="active">Der OFML Datenmacher</button>
+    <button mat-button routerLink="" routerLinkActive="active">OFML Datenmacher</button>
 </div>
-<section name="userSection" style="
+
+<!-- name="userSection" style="
 width: 100%;
 vertical-align: middle;
 font-size: var(--mdc-typography-button-font-size, 14px);
-display: flex; justify-content: space-evenly;">
+display: flex; align-items: center; justify-content: flex-start;" -->
+
+<!-- USER -->
+<div id="user">
     @if (currentUser) {
+
     <section>
-        <a>
-            <mat-icon style="vertical-align: middle;">person_outline</mat-icon>
-        </a>
-        <span style="vertical-align: middle; font-size:  var(--mdc-typography-button-font-size, 14px);"
-        matTooltip="Deine UserID">
-            [{{ currentUser.id }}] {{ currentUser.email }}
-        </span>
+
+        <section>
+            <mat-icon>person_outline</mat-icon>
+
+            <span matTooltip="Deine UserID">
+                [{{ currentUser.id }}] {{ currentUser.email }}
+            </span>
+        </section>
+
         <button (click)="logout()" mat-stroked-button>
             Abmelden
         </button>
     </section>
+
+    <!-- style="display: flex; gap: 1rem; align-items: center; flex-grow: 1;" -->
     <section>
         <button (click)="openSessionList()" mat-stroked-button>
-            <span style="vertical-align: middle">{{ getSessionText() }}</span>
+            <!-- style="vertical-align: middle" -->
+            <span>{{ getSessionText() }}</span>
             <mat-icon>menu</mat-icon>
         </button>
+
+        <button mat-stroked-button (click)="openTaskDisplay()">
+            <mat-icon>menu</mat-icon>
+            Tasks
+        </button>
+
+        <!-- style="color: white; width: 1.5rem; height: 1.5rem;" -->
+        <button mat-fab color="primary" matTooltip="Sitzung editieren" (click)="openEditSessionDialog()"
+            style="height: fit-content; width: fit-content;">
+            <mat-icon>edit</mat-icon>
+        </button>
     </section>
+
     } @else {
     <button (click)="openLoginDialog()" mat-stroked-button>
         Anmelden
     </button>
     }
-</section>
-<section style="vertical-align: middle">
-    <mat-icon style="vertical-align: middle" [matTooltip]="'Pfad: ' + path + ', Datum: ' + timestamp">info</mat-icon>
-</section>
+</div>
+
+<!-- MISC -->
+@if (miscData$ | async; as miscData) {
+<!-- style="vertical-align: middle" -->
+<div id="misc">
+    <!-- style="vertical-align: middle"  -->
+    <mat-icon [matTooltip]="'Pfad: ' + miscData.path + ', Datum: ' + miscData.timestamp">info</mat-icon>
+</div>
+}

@@ -32,7 +32,7 @@
                    
                 <mat-form-field style="width: 150px;" appearance="outline">
                     <mat-label>{{column[1]}}</mat-label>
-                    <input matInput  [(ngModel)]="column[2]" (change)="filterPriceItems()" />
+                    <input matInput  [(ngModel)]="column[2]" (input)="filterPriceItems()" />
                 </mat-form-field>
 
              </th>

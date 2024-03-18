@@ -1,0 +1,42 @@
+<div style="display: flex; flex-direction: row; align-items: stretch; gap: 15px; height: 60px;">
+    <section style="display: flex; flex-direction: column; justify-content: space-between;">
+        <mat-checkbox (change)="toggleView()">Ansicht ändern</mat-checkbox>
+        <strong style="margin-left: 5px;">@if (alternativeView$ | async) {Artikelansicht} @else
+            {Klassenansicht}</strong>
+    </section>
+
+    <section style="display: flex; flex-direction: row; align-items: stretch; gap: 5px;">
+        <button style="height: 100%" mat-stroked-button color="accent" (click)="resetFilter()">
+            <mat-icon color="accent">filter_list</mat-icon>
+            <span>{{artilceItemsSize$ | async}}</span>
+        </button>
+
+        @if (filter$ | async; as filter) {
+        <section style="display: flex; flex-direction: column; justify-content: space-between;">
+            <strong>Filtern nach:</strong>
+            <section style="display: flex; flex-direction: row; align-items: stretch; gap: 5px; height: 35px;">
+                <input matInput placeholder="Program" #programInput oninput="this.value = this.value.toUpperCase()"
+                    (input)="onFilterSet(undefined, programInput.value)" [value]="filter.program">
+
+                <input matInput placeholder="Artikel" #articleInput oninput="this.value = this.value.toUpperCase()"
+                    (input)="onFilterSet(articleInput.value, undefined)" [value]="filter.article">
+            </section>
+        </section>
+        }
+
+
+    </section>
+    <a routerLink="/price-multiplier" style="text-decoration: none; color: inherit; ">
+        <button style="height: 100%" mat-stroked-button color="accent">
+            <mat-icon color="accent">euro_symbol</mat-icon>
+            Multiplizierer
+        </button>
+    </a>
+    <a [routerLink]="['/editor-all', { }]" style="text-decoration: none; color: inherit;">
+        <button style="height: 100%" mat-stroked-button color="accent">
+            <mat-icon color="accent">label_important</mat-icon>
+            Globale Artbase
+        </button>
+    </a>
+
+</div>

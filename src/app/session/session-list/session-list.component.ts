@@ -34,7 +34,7 @@ export class SessionListComponent implements OnInit {
   sessionService = inject(SessionService)
   userService = inject(UserService)
   sessions: SessionAndOwner[] = []
-  currentSession!: Session
+  currentSession?: Session
   currentUser!: User
   private router = inject(Router)
 
@@ -43,23 +43,26 @@ export class SessionListComponent implements OnInit {
 
   async ngOnInit() {
     this.sessions = await this.sessionService.getAllSessionsWithOwner()
-    this.currentSession = this.sessionService.getCurrentSession()!!
+    this.currentSession = this.sessionService.getCurrentSession()
     this.currentUser = this.userService.currentUser$.value!!
   }
 
-  openCreateSessionDialog = () => this.openEditSessionDialog({ session: Session.emptyOne(this.currentUser.id!!), owner: this.currentUser })
-
-  openEditSessionDialog(sessionAndOwner: SessionAndOwner) {
-    this.dialogOpener.open(SessionEditorComponent,
-      {
-        data: sessionAndOwner
-      }).afterClosed()
-      .subscribe((result: any) => {
-        this.dialogRef.close({
-          session: this.sessionService.getCurrentSession()
-        })
-      })
-  }
+  openCreateSessionDialog = () => this.sessionService.openEditSessionDialog(
+    { session: Session.emptyOne(this.currentUser.id!!), owner: this.currentUser },
+    this.closeDialog.bind(this)
+  )
+  openEditSessionDialog = (item: SessionAndOwner) => this.sessionService.openEditSessionDialog(item, this.closeDialog.bind(this))
+  // openEditSessionDialog(sessionAndOwner: SessionAndOwner) {
+  //   this.dialogOpener.open(SessionEditorComponent,
+  //     {
+  //       data: sessionAndOwner
+  //     }).afterClosed()
+  //     .subscribe((result: any) => {
+  //       this.dialogRef.close({
+  //         session: this.sessionService.getCurrentSession()
+  //       })
+  //     })
+  // }
 
   async selectSession(item: SessionAndOwner) {
     this.sessionService.setCurrentSession(item.session)
@@ -70,5 +73,11 @@ export class SessionListComponent implements OnInit {
   async deleteSession(item: SessionAndOwner) {
     this.sessions = this.sessions.filter(x => x.session.id !== item.session.id)
     await this.sessionService.deleteSession(item.session)
+  }
+
+  private closeDialog() {
+    this.dialogRef.close({
+      session: this.sessionService.getCurrentSession()
+    })
   }
 }

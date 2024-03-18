@@ -10,8 +10,7 @@ export class PriceMultiplierService extends BaseService {
   sessionService = inject(SessionService)
 
   async fetchPrices(): Promise<any> {
-    const webProgram = this.sessionService.getCurrentSession()!!.name//currentSession$.value!.name
-    //const url = this.baseUrl + `/web_ofml/ocd/web_ocd_price?where=web_program_name="${webProgram}"`
+    const webProgram = this.sessionService.getCurrentSession()!!.name
     const url = new UrlBuilder()
     .base(BaseService.BASE_URL)
     .resource("web_ofml/ocd/web_ocd_price")
@@ -25,8 +24,6 @@ export class PriceMultiplierService extends BaseService {
   }
 
   async savePrices(patchItems: any[]) {
-    //const url = this.baseUrl + `/web_ofml/ocd/batch/web_ocd_price`
-
     const url = new UrlBuilder()
     .base(BaseService.BASE_URL)
     .resource("web_ofml/ocd/batch/web_ocd_price")

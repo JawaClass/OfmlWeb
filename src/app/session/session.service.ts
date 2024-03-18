@@ -1,18 +1,36 @@
 import { Injectable, inject, Injector, OnInit } from '@angular/core';
 import { BaseService, UrlBuilder } from '../util/base.service'
 import { Session, SessionAndOwner, IArticleDuplicate, IArticleProgramTuple } from '../models/models'
-import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, interval } from 'rxjs';
 import { Router } from '@angular/router';
+import { TaskDisplayService } from '../tasks/task-display.service';
+import { MatDialog } from '@angular/material/dialog';
+import { SessionEditorComponent } from './session-editor/session-editor.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SessionService extends BaseService {
 
+  public testOb$ = interval(1000)
+
+  dialogOpener = inject(MatDialog)
+
+  openEditSessionDialog(sessionAndOwner: SessionAndOwner, onClose?: () => void) {
+    this.dialogOpener.open(SessionEditorComponent,
+      {
+        data: sessionAndOwner
+      }
+    ).afterClosed().subscribe(
+      () => onClose ? onClose() : undefined
+    )
+  }
+
   private currentSessionSubject$ = new BehaviorSubject<Session | undefined>(undefined)
   public currentSession$ = this.currentSessionSubject$.asObservable()
   public articleDuplicates4Session$ = new BehaviorSubject<IArticleDuplicate[] | null>(null)
   private router = inject(Router)
+  private taskDisplayService = inject(TaskDisplayService)
 
   constructor() {
     super()
@@ -39,11 +57,10 @@ export class SessionService extends BaseService {
       .param("program", program)
       .param("merge_with", webProgramName)
       .build()
-    const json = await this.fetchAndParseFromUrl({ url: url })
-    /* trigger reload */
-    const session = this.getCurrentSession()
-    this.setCurrentSession(session)
-    return json
+    const result = await this.fetchAndParseFromUrl<any>({ url: url })
+    this.taskDisplayService.addTask(result["result_id"], "Artikel hinzufügen", `${articleNr} (${program}) -> ${articleNr} (${webProgramName})`)
+
+    return null
   }
 
   async mergeNewArticleWithProgramAsAlias(articleNr: string, program: string, webProgramName: string, mergeAsArticleNr: string) {
@@ -55,7 +72,10 @@ export class SessionService extends BaseService {
       .param("merge_with", webProgramName)
       .param("merge_as", mergeAsArticleNr)
       .build()
-    return await this.fetchAndParseFromUrl({ url: url })
+    const result = await this.fetchAndParseFromUrl<any>({ url: url })
+    this.taskDisplayService.addTask(result["result_id"], "Artikel als Alias hinzufügen", `${articleNr} (${program}) -> ${mergeAsArticleNr} (${webProgramName})`)
+
+    return null
   }
 
   async createSession(session: Session, articleAndPrograms: IArticleProgramTuple[]): Promise<any> {
@@ -79,10 +99,16 @@ export class SessionService extends BaseService {
         requestOptions: requestOptions
       }
     )
+    if (json) {
+      this.setCurrentSession(Session.fromJSON(json))
+      this.snackBar.open("Sitzung erstellt", "Ok", { duration: 2000 })
+      return this.getCurrentSession()
+    } else {
+      // this.snackBar.open("Sitzung konnte nicht erstellt werdne", "Ok", { duration: 10_000 })
+      this.setCurrentSession(undefined)
+      return null
+    }
 
-    this.setCurrentSession(Session.fromJSON(json))
-    this.snackBar.open("Sitzung erstellt", "Ok", { duration: 2000 })
-    return this.getCurrentSession()
   }
 
   async fetchAndSetArticleDuplicates(articleTokens: string[]) {
@@ -100,7 +126,9 @@ export class SessionService extends BaseService {
   }
 
   async setCurrentSession(session?: Session) {
-    if (session) {
+    // console.log("setCurrentSession", session);
+
+    if (session && session.id) {
       localStorage.setItem("sessionId", session.id!!.toString())
     } else {
       localStorage.removeItem("sessionId")
@@ -210,5 +238,6 @@ export class SessionService extends BaseService {
     }
     return false
   }
+
 
 }

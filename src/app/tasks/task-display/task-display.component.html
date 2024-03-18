@@ -1,0 +1,41 @@
+<div style="box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; padding: 5px;">
+    <section style="display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 5px;">
+        <span style="font-size: large;"> {{ task.title }}</span>
+        @if (isSuccessful()) {<mat-icon>done</mat-icon>}
+        @else if (isWorking())  {<mat-spinner style="height: 16px; width: 16px;"></mat-spinner>}
+        @else if (isFailure())  {<mat-icon  matTooltip="Task fehlgeschlagen">error</mat-icon>}
+    </section>
+
+    <div style="display: flex; flex-direction: column; font-size: medium; margin-left: 4px; position: relative;">
+        <span>{{ task.id }}</span>
+        <span>{{task.description}}</span>
+        <span>Startzeit: {{task.startTime}}</span>
+
+        @if(elapsedSeconds$ | async; as elapsedSeconds) {
+            <span>Arbeitet seit: {{ elapsedSeconds }} Sek</span> 
+        }
+
+        @if (task.status && task.status.value) {
+            <section style="border-left: 1px solid whitesmoke; display: flex; flex-direction: column; margin-left: 3px;">
+                <section style="display: flex; flex-direction: column; margin-left: 7px;">
+                    <strong>{{ getStatusText(task.status.value.status) }}</strong>
+                    @if (task.status.successful) { 
+                        <span>Verbrauchte Zeit: {{ task.status.value.time }} Sekunden</span>
+                        <span><em>{{ task.status.value.message }}</em></span>
+                    }
+                    @else {
+                        <span><strong>Error</strong> {{task.status.value}}</span>
+                    }
+                </section>
+            </section>
+        }
+ 
+        <button mat-fab color="primary" style="width: 30px; height: 30px; position: absolute; right: 0; bottom: 0;"
+                    matTooltip="Task aus Ansicht entfernen." (click)="$event.stopImmediatePropagation()"
+                    (holdFinished)="deleteTask(task)" [timeToPass]="1000" appHoldable>
+                    <mat-icon>delete</mat-icon>
+        </button>
+    </div>
+
+</div>
+ 

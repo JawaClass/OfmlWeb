@@ -1,0 +1,30 @@
+<div class="primary-background-color" style="display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="padding-left: 10px;">Aktuelle Tasks</h2>
+
+    <section style="display: flex; gap: 15px;">
+        <button mat-button
+                    matTooltip="Alle Tasks aus Ansicht entfernen." (click)="$event.stopImmediatePropagation()"
+                    (holdFinished)="removeAllTasks()" [timeToPass]="2000" appHoldable>
+                    <mat-icon style="font-size: 30px; height: 30px; width: 100%; margin: auto;">delete</mat-icon>
+        </button>
+
+        <button (click)="minimize()" mat-button >
+            <mat-icon style="font-size: 44px; height: 44px; width: 100%; margin: auto;">minimize</mat-icon>
+        </button>
+    </section>
+</div>
+
+<div style="margin: 10px; display: flex; flex-direction: column; gap: 15px;">
+        
+    @if(tasks$ | async; as tasks) {
+        @if (tasks.length === 0) {
+            Aktuell keine Tasks
+        } @else {
+            @for (task of tasks; track task; let idx = $index) {
+                <app-task-display [task]="task"></app-task-display>
+            }
+        }
+    }
+    
+</div>
+  

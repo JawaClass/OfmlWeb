@@ -1,14 +1,20 @@
-@for (pClass of propClassNames; track pClass) {
+@if (propClassNames$ | async; as propClassNames) {
 
-<mat-expansion-panel>
-    <mat-expansion-panel-header>
-        <mat-panel-title>
-            {{ pClass }}
-        </mat-panel-title>
-    </mat-expansion-panel-header>
+    @for (pClass of propClassNames; track pClass) {
 
-    <app-propclass-viewer [program]="selectedProgram" [pClass]="pClass">
-    </app-propclass-viewer>
+        <!-- <div>Klasse {{pClass}}</div> -->
 
-</mat-expansion-panel>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    {{ pClass }}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+        
+            <app-propclass-viewer [program]="selectedProgram" [pClass]="pClass">
+            </app-propclass-viewer>
+        
+        </mat-expansion-panel>
+        }
+
 }

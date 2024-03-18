@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnInit, inject } from '@angular/core';
+import { AfterViewInit, Component, OnChanges, OnInit, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, RouterModule, Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -18,6 +18,10 @@ import { LoginComponent } from '../session/login/login.component'
 import { ArticleInputService } from '../ocd-edit/article-input.service';
 import { SessionService } from '../session/session.service';
 import { UserService } from '../session/user.service';
+import { TaskDisplayListComponent } from '../tasks/task-display-list/task-display-list.component';
+import { TaskDisplayService } from '../tasks/task-display.service';
+import { HeaderService } from './header.service';
+
 
 @Component({
   selector: 'app-header',
@@ -32,21 +36,27 @@ import { UserService } from '../session/user.service';
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
-export class HeaderComponent {
-  title = 'OfmlWeb'
-  timestamp = ""
-  path = ""
+export class HeaderComponent implements OnInit {
   
+
+  headerService = inject(HeaderService)
+  // timestamp = ""
+  // path = ""
+
   currentUser: User | null = null
   currentSession: Session | null = null
-
   userService = inject(UserService)
-  sessionService = inject(SessionService)
-    
-  service = inject(ArticleInputService)
+  sessionService = inject(SessionService)   
   location = inject(Location)
   router = inject(Router)
   dialogOpener = inject(MatDialog)
+
+  miscData$ = this.headerService.miscData$
+
+  openEditSessionDialog() {
+    const sessionOwner = {session: this.currentSession!!, owner: this.currentUser!!}
+    this.sessionService.openEditSessionDialog(sessionOwner, () => {})
+  }
 
   getSessionText() {
     return this.currentSession ? `[${this.currentSession.id}] ${this.currentSession.name}` : "Sitzungen"
@@ -67,20 +77,15 @@ export class HeaderComponent {
 
   openSessionList = () => this.dialogOpener.open(SessionListComponent)
 
-  async fetchAndSetMiscData() {
-    const misc = await this.service.fetchMiscData()
-    this.timestamp = misc["init_tables"]
-    const oldTimestamp = localStorage.getItem("timestamp_db")
-    if (oldTimestamp !== this.timestamp) {
-      this.service.snackBar.open("Neuer OFML Datenstand aktiv vom " + this.timestamp, "Ok", {duration: 10000})
-    }
-    localStorage.setItem("timestamp_db", this.timestamp)
-    this.path = misc["path"]
+  
+
+  
+  constructor() {
+    // this.headerService.infos$.subscribe(x => console.log("headerService.infos$:::", x))
   }
-
+  
   async ngOnInit() {
-   
-
+    
     this.userService.currentUser$.subscribe( (user: any) => {
       setTimeout(() => {
         this.currentUser = user
@@ -94,7 +99,7 @@ export class HeaderComponent {
     
     // to avoid SSR clash
     if (typeof window !== 'undefined') {
-      await this.fetchAndSetMiscData()
+
       const succ = await this.userService.tryAutoLogin()
       console.log("succ - tryAutoLogin", succ)
       
@@ -106,4 +111,13 @@ export class HeaderComponent {
       }
     } 
   }
+
+  openTaskDisplay() {
+    let dialogRef = this.dialogOpener.open(TaskDisplayListComponent, { 
+    maxWidth: "80ch",
+    maxHeight: "70rem",
+    position: {bottom: '10px', right: "10px"}
+  });
+  }
+
 }

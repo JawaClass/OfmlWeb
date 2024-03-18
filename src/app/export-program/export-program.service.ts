@@ -5,7 +5,7 @@ import { BaseService, UrlBuilder } from '../util/base.service';
 @Injectable({
   providedIn: 'root'
 })
-export class CreateProgramService extends BaseService {
+export class ExportProgramService extends BaseService {
 
   exportPathOptions = [
     ["TEST_ENV", "b://Testumgebung//EasternGraphics//kn"],

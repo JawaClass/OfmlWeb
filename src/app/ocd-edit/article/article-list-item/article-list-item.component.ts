@@ -9,6 +9,7 @@ import { HoldableDirective } from '../../../util/directives/holdable.directive';
 import { ArticleitemService } from '../../articleitem.service';
 import { ArtbaseService } from '../../artbase/artbase.service'; 
 import { ArticleEditorComponent } from '../article-editor/article-editor.component';
+import { ArticleManageService } from '../article-manage/article-manage.service';
 
 
 @Component({
@@ -29,10 +30,13 @@ export class ArticleListItemComponent {
 
   @Input() article!: any
   @Output() onDeleted: EventEmitter<any> = new EventEmitter()
+  @Output() onArtbaseSelected: EventEmitter<any> = new EventEmitter()
   dialogOpener = inject(MatDialog)
   router = inject(Router)
   artbaseService = inject(ArtbaseService)
   articleService = inject(ArticleitemService)
+
+  articleManageService = inject(ArticleManageService)
   
   getShortText(article: any) {
     if (article["kurztext"]) 
@@ -44,13 +48,15 @@ export class ArticleListItemComponent {
   openEditArticle(article: any) {
     this.dialogOpener.open(ArticleEditorComponent, {
       data: article,
-      width: '35vw',
+      width: '80ch',
     })
   }
 
   navigateToEditArtbase(articleItem: any) {
     this.artbaseService.currentArticleItem$.next(articleItem)
-    this.router.navigate(['/editor-artbase']);
+    this.articleManageService.setDetailView("artbase", articleItem)  
+    // this.router.navigate(['/editor-artbase']);
+    this.onArtbaseSelected.emit(articleItem)
   }
 
   async delete() {

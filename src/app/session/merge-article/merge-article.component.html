@@ -1,9 +1,9 @@
 @if(isLoading) {
 <mat-spinner style="width: 40px; height: 40px;"></mat-spinner>
-} @else {
-<fieldset style="display: flex; justify-content: space-around; color: whitesmoke;">
+} 
+<fieldset [disabled]="isLoading" style="display: flex; justify-content: space-around; color: whitesmoke;">
 
-    <legend>Artikel hinzufügen</legend>
+    <legend><h2>Artikel hinzufügen</h2></legend>
 
     <mat-form-field appearance="outline">
         <mat-label>Artikelnummer</mat-label>
@@ -17,13 +17,13 @@
 
 
     <button mat-stroked-button color="accent" (click)="addArticle(newArticleNr.value, newArticleProgram.value)"
-        [disabled]="newArticleNr.value.length && newArticleProgram.value.length"
+        [disabled]="newArticleNr.value.length === 0 || newArticleProgram.value.length === 0"
         style="height: 44px; padding: 0; display: flex; align-content: center;">
         <mat-icon style="font-size: 44px; height: 44px; width: 100%; padding: 0; margin: 0;">add</mat-icon>
     </button>
 
 </fieldset>
-}
+ 
 
 
 @if (mergeResult) {

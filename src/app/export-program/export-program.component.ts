@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CreateProgramService } from './create-program.service';
+import { ExportProgramService } from './export-program.service';
 import { RouterModule, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
@@ -15,11 +15,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialogRef } from '@angular/material/dialog';
-import { HttpErrorResponse } from '@angular/common/http';
 import { interval } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SessionService } from '../session/session.service';
-import { Session } from '../models/models';
 import {MatSelectModule} from '@angular/material/select';
 import { OnDestroy } from '@angular/core';
 
@@ -44,10 +42,10 @@ import { OnDestroy } from '@angular/core';
     MatTooltipModule,
     MatSelectModule
   ],
-  templateUrl: './create-program.component.html',
-  styleUrl: './create-program.component.css'
+  templateUrl: './export-program.component.html',
+  styleUrl: './export-program.component.css'
 })
-export class CreateProgramComponent implements OnDestroy {
+export class ExportProgramComponent implements OnDestroy {
 
   get exportPathOptions() {
     return this.createService.exportPathOptions
@@ -76,7 +74,7 @@ export class CreateProgramComponent implements OnDestroy {
   }
 
   currentSession = inject(SessionService).getCurrentSession()!!
-  createService = inject(CreateProgramService)
+  createService = inject(ExportProgramService)
 
   createProgramForm = new FormGroup({
     programName: new FormControl(this.createService.programName || this.currentSession.name.toLowerCase().replace(" ", "_"), [
@@ -102,7 +100,7 @@ export class CreateProgramComponent implements OnDestroy {
     return root + "//" + folder
   }
 
-  dialogRef = inject(MatDialogRef<CreateProgramComponent>)
+  dialogRef = inject(MatDialogRef<ExportProgramComponent>)
   httpErrorResponse: any | null = null
   isProcessing = false
   resultExportPath = ""

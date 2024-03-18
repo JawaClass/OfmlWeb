@@ -54,6 +54,13 @@ export class ArticleDuplicateEditorComponent implements OnInit {
 
   sessionService = inject(SessionService)
   router = inject(Router)
+  showAll = true
+  articles: IArticleDuplicateToggle[] = []
+  articlesGroupedByArticleNr: any = {}
+  articlesNrUnique: string[] = []
+  activePrograms: Set<string> = new Set()
+  session!: Session
+  isProcessing: boolean = false
 
   isProgramActive = (program: string) => this.activePrograms.has(program)
   toggleActive(program: string) {
@@ -65,16 +72,8 @@ export class ArticleDuplicateEditorComponent implements OnInit {
       if (a.item.sql_db_program === program)
         a.active = active
     })
-
   }
-
-  showAll = true
-  articles: IArticleDuplicateToggle[] = []
-  articlesGroupedByArticleNr: any = {}
-  articlesNrUnique: string[] = []
-  activePrograms: Set<string> = new Set()
-  session!: Session
-  isProcessing: boolean = false
+  
   programs() {
     const p = this.articles.map(a => a.item.sql_db_program)
     const unqieue = new Set(p)
@@ -106,14 +105,9 @@ export class ArticleDuplicateEditorComponent implements OnInit {
   }
 
   async ngOnInit() {
-
-    console.log("ArticleDuplicateEditorComponent ngOnInit")
     console.log(this.sessionService.articleDuplicates4Session$.value)
-    this.session = this.sessionService.getCurrentSession()!!//currentSession$.value!
-    console.log(this.session)
+    this.session = this.sessionService.getCurrentSession()!!
     this.sessionService.articleDuplicates4Session$.subscribe(articles => {
-
-      console.log("subscribe:", articles)
       if (articles) {
         this.articles = articles.map(a => ({ item: a, active: true } as IArticleDuplicateToggle))
         this.articlesGroupedByArticleNr = this.groupby()
@@ -127,8 +121,7 @@ export class ArticleDuplicateEditorComponent implements OnInit {
     const articleAndPrograms: IArticleProgramTuple[] = this.activeArticlesByArticleNr()
       .map(a => ({ article: a.item.article_nr, program: a.item.sql_db_program }) as IArticleProgramTuple)
     this.isProcessing = true
-    const createdSession = await this.sessionService.createSession(this.session, articleAndPrograms)
-    this.sessionService.setCurrentSession(createdSession)//currentSession$.next(createdSession)
+    await this.sessionService.createSession(this.session, articleAndPrograms)
     this.isProcessing = false
     this.router.navigate(['/'])
   }
