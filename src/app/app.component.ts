@@ -46,16 +46,6 @@ export class AppComponent implements OnInit {
   constructor() {
     afterNextRender(() => {
       console.log("APP COMP AFTER NEXT RENDER...");
-      // this.sessionService.testOb$.subscribe(x => console.log("xxx", x)
-      // )
-
-      this.taskDisplayService.newTasksArrived$.subscribe(x=> console.log("newTasksArrived??", x)
-      )
-
-      
-      this.taskDisplayService.tasks$.subscribe(x=> console.log("tasks??", x)
-      )
-
     })
   }
 
