@@ -1,8 +1,7 @@
 <h1 style="display: flex; justify-content: space-between;">
     <strong style="letter-spacing: 3px;">{{pClass}}</strong>
-    <strong
-        style="letter-spacing: 3px;">{{program | uppercase}}</strong>
-    </h1>
+    <strong style="letter-spacing: 3px;">{{program | uppercase}}</strong>
+</h1>
 
 @if (isLoading) {
 <mat-spinner></mat-spinner>
@@ -12,58 +11,58 @@
 
 @for (propItem of getProperties(); track propItem.property; let idx = $index) {
 
-<mat-expansion-panel  >
-    <mat-expansion-panel-header style="display: flex;">
-        <mat-panel-title style="flex: 4; gap: 10px;">
+<mat-expansion-panel>
+    <mat-expansion-panel-header style="display: flex; white-space: nowrap;">
+        <mat-panel-title style="width: 90%; justify-content: space-between;">
 
-            <section style="display: flex; flex: 3; gap: 10px;">
-                <span>{{ getPropertyHeaderTextMain(propItem) }}</span>
-                <span>{{ getPropertyHeaderTextDetail(propItem) }}</span>
+            <section style="display: flex; gap: 1rem;">
+                <span style="display: flex; flex-wrap: nowrap;">{{ getPropertyHeaderTextMain(propItem) }}</span>
+                <span>{{ getPropertyHeaderTextDetail(propItem) }}</span>  
             </section>
 
-            <button style="width: fit-content;" mat-stroked-button color="accent"
-                (click)="setAllValuesFilter(propItem, false, $event)">
-                Alle an
-            </button>
+            <section style="display: flex; justify-content: flex-end;">
+                <button style="width: fit-content;"  mat-stroked-button color="accent"
+                    (click)="setAllValuesFilter(propItem, false, $event)">
+                    Alle an
+                </button>
 
-            <button style="width: fit-content;" mat-stroked-button color="primary"
-                (click)="setAllValuesFilter(propItem, true, $event)">
-                Alle aus
-            </button>
+                <button mat-stroked-button color="primary"
+                    (click)="setAllValuesFilter(propItem, true, $event)">
+                    Alle aus
+                </button>
 
-            <mat-checkbox (click)="onTogglePropertyScope(propItem, $event)" [checked]="isPropertyVisible(propItem)">
-                <span>
+                <mat-checkbox (click)="onTogglePropertyScope(propItem, $event)" [checked]="isPropertyVisible(propItem)">
                     {{ getPropertyVisibleText(propItem.scope) }}
-                </span>
-
-            </mat-checkbox>
-
+                </mat-checkbox>
+            </section>
 
         </mat-panel-title>
-        <mat-panel-description matTooltip="aktive Merkmalswerte" style="flex: 1;">
-            {{ getActiveValuesFromProperty(propItem).length }} / {{ propItem.values.length }}
 
+        <mat-panel-description matTooltip="aktive Merkmalswerte"
+            style="background-color: thistle; width: 10%; flex: auto; flex-grow: 0; justify-content: flex-end;">
+            {{ getActiveValuesFromProperty(propItem).length }} / {{ propItem.values.length }}
         </mat-panel-description>
+
     </mat-expansion-panel-header>
 
     @for (valItem of propItem.values; track valItem; let idx = $index) {
-    <section>
-        <mat-checkbox style="display: flex; flex-direction: row;" (click)="onToggleValue(valItem, $event)"
-            [checked]="!valItem.web_filter">
+    <section style="display: flex; flex-direction: row; justify-content: space-between;">
+        <mat-checkbox (click)="onToggleValue(valItem, $event)" [checked]="!valItem.web_filter">
             <section style="display: flex; flex-direction: row; gap: 10px;">
-                <section style="width: 20px; height: 20px;">
-                    @if(valItem["isUpdating"]) {
-                    <mat-spinner style="width: 20px; height: 20px;"></mat-spinner>
-                    }
-                </section>
-                <span style="margin-right: 10px;">{{ getPropertyValueText(valItem) }}</span>
-                @if(valItem.web_filter) {
-                <span style="color: red;">wird nicht exportiert</span>
-                } @else {
-                <span style="color: green;">wird exportiert</span>
+                @if(valItem["isUpdating"]) {
+                <mat-spinner style="width: 20px; height: 20px;"></mat-spinner>
                 }
+                <span style="margin-right: 10px;">{{ getPropertyValueText(valItem) }}</span>
             </section>
         </mat-checkbox>
+
+        <section>
+            @if(valItem.web_filter) {
+            <span style="color: red;">wird nicht exportiert</span>
+            } @else {
+            <span style="color: green;">wird exportiert</span>
+            }
+        </section>
     </section>
     }
 

@@ -44,7 +44,9 @@ export class PropclassEditorComponent implements OnInit {
   pClassItem!: any
 
   getActiveValuesFromProperty(propItem: any) {
-    return propItem.values.filter((v: any) => v.web_filter === 0)
+    console.log("getActiveValuesFromProperty web_filter", propItem.values.map((x: any) => x.web_filter));
+    
+    return propItem.values.filter((v: any) => v.web_filter === 0 || v.web_filter === false)
   }
 
   getPropertyClassText(pClassItem: any) {
