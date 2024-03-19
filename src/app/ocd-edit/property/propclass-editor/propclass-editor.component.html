@@ -20,7 +20,7 @@
                 <span>{{ getPropertyHeaderTextDetail(propItem) }}</span>  
             </section>
 
-            <section style="display: flex; justify-content: flex-end;">
+            <section style="display: flex; justify-content: flex-end; gap: 1rem;">
                 <button style="width: fit-content;"  mat-stroked-button color="accent"
                     (click)="setAllValuesFilter(propItem, false, $event)">
                     Alle an
@@ -39,7 +39,7 @@
         </mat-panel-title>
 
         <mat-panel-description matTooltip="aktive Merkmalswerte"
-            style="background-color: thistle; width: 10%; flex: auto; flex-grow: 0; justify-content: flex-end;">
+            style="width: 4ch; flex: auto; flex-grow: 0; justify-content: flex-end;">
             {{ getActiveValuesFromProperty(propItem).length }} / {{ propItem.values.length }}
         </mat-panel-description>
 

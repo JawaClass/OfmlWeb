@@ -115,7 +115,7 @@ export class HeaderComponent implements OnInit {
   openTaskDisplay() {
     let dialogRef = this.dialogOpener.open(TaskDisplayListComponent, { 
     maxWidth: "80ch",
-    maxHeight: "70rem",
+    maxHeight: "90vh",
     position: {bottom: '10px', right: "10px"}
   });
   }

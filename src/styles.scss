@@ -115,3 +115,7 @@ body {
   width: 100vw;
   margin: 0;
 }
+
+*, *::after, *::before {
+  box-sizing: border-box;
+}

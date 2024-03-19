@@ -1,8 +1,4 @@
-/* 
-:host {
-    display: flex;
-    flex-direction: column;
-} */
+
 .master {
     margin-right: 2rem;
     flex-grow: 1;

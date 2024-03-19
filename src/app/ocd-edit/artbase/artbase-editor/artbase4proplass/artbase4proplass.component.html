@@ -6,28 +6,28 @@
 
 <mat-expansion-panel style="margin-bottom: 10px;">
     <mat-expansion-panel-header style="display: flex;">
-        <mat-panel-title style="flex: 4; gap: 10px;">
+        <mat-panel-title style="gap: 1rem; justify-content: space-between; width: 100%;">
 
-            <section style="display: flex; flex: 3; gap: 10px;">
+            <section style="display: flex; gap: 1rem;">
                 <strong>{{ getPropertyHeaderTextMain(propItem) }}</strong>
                 <span>{{ getPropertyHeaderTextDetail(propItem) }}</span>
             </section>
 
-            <button style="width: fit-content;" mat-stroked-button color="accent"
-                (click)="setAllArtbaseValues(propItem, true, $event)">
-                Alle an
-            </button>
+            <section style="display: flex; justify-content: flex-end;">
+                <button style="width: fit-content;" mat-stroked-button color="accent"
+                    (click)="setAllArtbaseValues(propItem, true, $event)">
+                    Alle an
+                </button>
 
-            <button style="width: fit-content;" mat-stroked-button color="primary"
-                (click)="setAllArtbaseValues(propItem, false, $event)">
-                Alle aus
-            </button>
-
+                <button style="width: fit-content;" mat-stroked-button color="primary"
+                    (click)="setAllArtbaseValues(propItem, false, $event)">
+                    Alle aus
+                </button>
+            </section>
 
         </mat-panel-title>
-        <mat-panel-description style="flex: 1; justify-content: flex-end;" matTooltip="aktive Merkmalswerte">
-            <!-- {{ propItem.getActiveValues().length }} / {{ propItem.values.length }} -->
-            {{ getArtbaseItems4Property(propItem).length }} / {{ propItem.values.length }} fest bewertet
+        <mat-panel-description style="width: 4ch; justify-content: flex-end; flex-basis: 1; flex-grow: 0;" matTooltip="aktive Merkmalswerte">
+            {{ getArtbaseItems4Property(propItem).length }} / {{ propItem.values.length }}
         </mat-panel-description>
     </mat-expansion-panel-header>
 

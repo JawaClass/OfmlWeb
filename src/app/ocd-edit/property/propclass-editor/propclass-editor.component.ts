@@ -62,7 +62,7 @@ export class PropclassEditorComponent implements OnInit {
 
 
   getPropertyHeaderTextDetail(p: any) {
-    return `${p.scope} ${p.prop_type}`
+    return `${p.prop_type}`
   }
 
   getPropertyValueText(v: any) {
